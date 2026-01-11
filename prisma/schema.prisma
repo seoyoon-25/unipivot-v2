@@ -1,0 +1,529 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================
+// NextAuth.js 모델
+// =============================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  phone         String?
+  origin        String?   // SOUTH, NORTH, OVERSEAS
+  birthYear     Int?
+  occupation    String?
+  bio           String?
+  points        Int       @default(0)
+  role          String    @default("USER") // USER, ADMIN, SUPER_ADMIN
+  status        String    @default("ACTIVE") // ACTIVE, INACTIVE, BANNED
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  registrations Registration[]
+  attendances   Attendance[]
+  bookReports   BookReport[]
+  donations     Donation[]
+  deposits      Deposit[]
+  chatLogs      ChatLog[]
+  notifications Notification[]
+  activityLogs  ActivityLog[]
+  talents       Talent[]
+  blogPosts     BlogPost[]
+  pointHistory  PointHistory[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// =============================================
+// 프로그램 관련 모델
+// =============================================
+
+model Program {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  type        String   // BOOKCLUB, SEMINAR, WORKSHOP, KMOVE, OTHER
+  description String?
+  content     String?
+  image       String?
+  capacity    Int      @default(30)
+  fee         Int      @default(0)
+  location    String?
+  isOnline    Boolean  @default(false)
+  status      String   @default("DRAFT") // DRAFT, OPEN, CLOSED, COMPLETED
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sessions      ProgramSession[]
+  registrations Registration[]
+  books         BookOnProgram[]
+}
+
+model ProgramSession {
+  id        String   @id @default(cuid())
+  programId String
+  title     String
+  date      DateTime
+  startTime String?
+  endTime   String?
+  location  String?
+  content   String?
+  createdAt DateTime @default(now())
+
+  program     Program      @relation(fields: [programId], references: [id], onDelete: Cascade)
+  attendances Attendance[]
+}
+
+model Registration {
+  id        String   @id @default(cuid())
+  userId    String
+  programId String
+  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, programId])
+}
+
+model Attendance {
+  id        String   @id @default(cuid())
+  userId    String
+  sessionId String
+  status    String   @default("PRESENT") // PRESENT, ABSENT, LATE, EXCUSED
+  note      String?
+  createdAt DateTime @default(now())
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sessionId])
+}
+
+// =============================================
+// 포인트 내역 모델
+// =============================================
+
+model PointHistory {
+  id          String   @id @default(cuid())
+  userId      String
+  amount      Int      // 양수: 적립, 음수: 사용
+  type        String   // EARN, SPEND
+  category    String   // ATTENDANCE, REPORT, DONATION, PROGRAM, EVENT, EXCHANGE, OTHER
+  description String
+  balance     Int      // 거래 후 잔액
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// =============================================
+// 도서 관련 모델
+// =============================================
+
+model Book {
+  id        String   @id @default(cuid())
+  title     String
+  author    String?
+  publisher String?
+  isbn      String?
+  image     String?
+  summary   String?
+  createdAt DateTime @default(now())
+
+  programs BookOnProgram[]
+  reports  BookReport[]
+}
+
+model BookOnProgram {
+  id        String   @id @default(cuid())
+  bookId    String
+  programId String
+  week      Int?
+  createdAt DateTime @default(now())
+
+  book    Book    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@unique([bookId, programId])
+}
+
+model BookReport {
+  id        String   @id @default(cuid())
+  userId    String
+  bookId    String
+  title     String
+  content   String
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+}
+
+// =============================================
+// 사업 관리 모델
+// =============================================
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  status      String   @default("PLANNING") // PLANNING, IN_PROGRESS, COMPLETED, ON_HOLD
+  budget      Int?
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  milestones Milestone[]
+  partners   PartnerOnProject[]
+  documents  Document[]
+  events     CalendarEvent[]
+}
+
+model Milestone {
+  id          String    @id @default(cuid())
+  projectId   String
+  title       String
+  description String?
+  dueDate     DateTime?
+  status      String    @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
+  createdAt   DateTime  @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Partner {
+  id          String   @id @default(cuid())
+  name        String
+  type        String?  // GOVERNMENT, CORPORATION, NGO, ACADEMIC, OTHER
+  contact     String?
+  email       String?
+  phone       String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  projects PartnerOnProject[]
+}
+
+model PartnerOnProject {
+  id        String   @id @default(cuid())
+  partnerId String
+  projectId String
+  role      String?
+  createdAt DateTime @default(now())
+
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([partnerId, projectId])
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  projectId String?
+  title     String
+  type      String?  // PROPOSAL, REPORT, CONTRACT, MEETING, OTHER
+  filePath  String?
+  fileSize  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+}
+
+model CalendarEvent {
+  id          String    @id @default(cuid())
+  projectId   String?
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+  allDay      Boolean   @default(false)
+  location    String?
+  type        String?   // MEETING, DEADLINE, EVENT, OTHER
+  createdAt   DateTime  @default(now())
+
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+}
+
+// =============================================
+// 재무 관련 모델
+// =============================================
+
+model Transaction {
+  id          String   @id @default(cuid())
+  type        String   // INCOME, EXPENSE
+  category    String?  // DONATION, PROGRAM_FEE, GRANT, SALARY, RENT, SUPPLIES, OTHER
+  amount      Int
+  description String?
+  date        DateTime
+  receipt     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Deposit {
+  id        String   @id @default(cuid())
+  userId    String?
+  amount    Int
+  purpose   String?  // PROGRAM_FEE, MEMBERSHIP, OTHER
+  status    String   @default("PENDING") // PENDING, CONFIRMED, REFUNDED
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model Donation {
+  id        String   @id @default(cuid())
+  userId    String?
+  amount    Int
+  type      String?  // ONE_TIME, MONTHLY
+  method    String?  // BANK_TRANSFER, CARD, OTHER
+  message   String?
+  anonymous Boolean  @default(false)
+  status    String   @default("PENDING") // PENDING, COMPLETED, CANCELLED
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+// =============================================
+// 전문가/재능 기부 모델
+// =============================================
+
+model Expert {
+  id           String   @id @default(cuid())
+  name         String
+  title        String?
+  organization String?
+  field        String?
+  bio          String?
+  image        String?
+  email        String?
+  phone        String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Talent {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  category    String?  // DESIGN, DEVELOPMENT, TRANSLATION, MARKETING, OTHER
+  description String?
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// =============================================
+// AI 챗봇 모델
+// =============================================
+
+model ChatLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  sessionId String
+  role      String   // USER, ASSISTANT
+  content   String
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model KnowledgeBase {
+  id        String   @id @default(cuid())
+  category  String   // FAQ, PROGRAM, ORGANIZATION, OTHER
+  question  String
+  answer    String
+  keywords  String?
+  priority  Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// =============================================
+// 콘텐츠 관리 모델
+// =============================================
+
+model Notice {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  isPinned  Boolean  @default(false)
+  isPublic  Boolean  @default(true)
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  authorId    String
+  title       String
+  slug        String   @unique
+  excerpt     String?
+  content     String
+  image       String?
+  category    String?
+  tags        String?
+  isPublished Boolean  @default(false)
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+// =============================================
+// CMS 모델
+// =============================================
+
+model PageContent {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  content   String?
+  metaTitle String?
+  metaDesc  String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Menu {
+  id        String   @id @default(cuid())
+  parentId  String?
+  title     String
+  url       String?
+  target    String?  @default("_self")
+  position  Int      @default(0)
+  isActive  Boolean  @default(true)
+  location  String?  // HEADER, FOOTER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String?
+  type      String?  // TEXT, NUMBER, BOOLEAN, JSON, IMAGE
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Banner {
+  id        String    @id @default(cuid())
+  title     String
+  subtitle  String?
+  image     String?
+  link      String?
+  position  String?   // HERO, SIDEBAR, POPUP
+  isActive  Boolean   @default(true)
+  startDate DateTime?
+  endDate   DateTime?
+  order     Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// =============================================
+// 시스템 모델
+// =============================================
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  target    String?
+  targetId  String?
+  details   String?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // SYSTEM, PROGRAM, PAYMENT, OTHER
+  title     String
+  content   String?
+  link      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EmailLog {
+  id        String   @id @default(cuid())
+  to        String
+  subject   String
+  content   String?
+  status    String   @default("SENT") // SENT, FAILED
+  error     String?
+  createdAt DateTime @default(now())
+}
