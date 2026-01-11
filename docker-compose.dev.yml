@@ -1,0 +1,29 @@
+version: '3.8'
+
+# Development Docker Compose
+# Usage: docker compose -f docker-compose.dev.yml up
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: unipivot-dev
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=file:./prisma/dev.db
+      - NEXTAUTH_SECRET=dev-secret-key
+      - NEXTAUTH_URL=http://localhost:3000
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - unipivot-dev-network
+
+networks:
+  unipivot-dev-network:
+    driver: bridge

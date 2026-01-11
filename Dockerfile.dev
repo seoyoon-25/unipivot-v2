@@ -1,0 +1,32 @@
+# UniPivot v2.0 Development Dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install dependencies for development
+RUN apk add --no-cache libc6-compat git
+
+# Copy package files
+COPY package.json package-lock.json* pnpm-lock.yaml* ./
+
+# Install all dependencies (including devDependencies)
+RUN \
+  if [ -f pnpm-lock.yaml ]; then \
+    corepack enable pnpm && pnpm install; \
+  elif [ -f package-lock.json ]; then \
+    npm install; \
+  else \
+    npm install; \
+  fi
+
+# Copy source files
+COPY . .
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Expose port
+EXPOSE 3000
+
+# Start development server
+CMD ["npm", "run", "dev"]

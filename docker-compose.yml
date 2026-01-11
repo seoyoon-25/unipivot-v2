@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # ===========================================
+  # Next.js Application
+  # ===========================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - DATABASE_URL=${DATABASE_URL:-file:./prisma/production.db}
+        - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+        - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+    container_name: unipivot-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL:-file:./prisma/production.db}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+    volumes:
+      - ./prisma:/app/prisma
+      - app-data:/app/data
+    networks:
+      - unipivot-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # ===========================================
+  # Nginx Reverse Proxy (Production)
+  # ===========================================
+  nginx:
+    image: nginx:alpine
+    container_name: unipivot-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/certbot/conf:/etc/letsencrypt:ro
+      - ./docker/certbot/www:/var/www/certbot:ro
+    depends_on:
+      - app
+    networks:
+      - unipivot-network
+
+  # ===========================================
+  # Certbot for SSL (Production)
+  # ===========================================
+  certbot:
+    image: certbot/certbot
+    container_name: unipivot-certbot
+    volumes:
+      - ./docker/certbot/conf:/etc/letsencrypt
+      - ./docker/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - unipivot-network
+
+networks:
+  unipivot-network:
+    driver: bridge
+
+volumes:
+  app-data:
