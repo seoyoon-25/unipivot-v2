@@ -7,7 +7,13 @@ import { useEffect, useState } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { Avatar } from '@/components/ui'
 
-const menuItems = [
+type MenuItem = {
+  label: string
+  href?: string
+  children?: { label: string; href: string; description?: string }[]
+}
+
+const menuItems: MenuItem[] = [
   {
     label: '프로그램',
     children: [
@@ -33,7 +39,13 @@ const menuItems = [
       { label: '후원하기', href: '/donate', description: '유니피벗 후원' },
     ],
   },
-  { label: '소개', href: '/about' },
+  {
+    label: '소개',
+    children: [
+      { label: '단체 소개', href: '/p/about-us', description: '미션과 핵심 가치' },
+      { label: '연혁', href: '/about', description: '유니피벗 히스토리' },
+    ],
+  },
 ]
 
 export function Navbar() {

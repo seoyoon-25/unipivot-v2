@@ -9,6 +9,7 @@ const notoSansKR = Noto_Sans_KR({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://bestcome.org'),
   title: {
     default: '유니피벗 | 남북청년 교류 커뮤니티',
     template: '%s | 유니피벗',
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
-    url: 'https://unipivot.org',
+    url: 'https://bestcome.org',
     siteName: '유니피벗',
     title: '유니피벗 | 남북청년 교류 커뮤니티',
     description: '남북청년이 함께 새로운 한반도를 만들어갑니다.',

@@ -2,20 +2,22 @@ module.exports = {
   apps: [
     {
       name: 'unipivot-v2',
-      script: 'node_modules/.bin/next',
-      args: 'start',
+      script: 'npx',
+      args: 'next start -p 3001',
       cwd: '/var/www/unihome-v2',
       instances: 1,
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
-        PORT: 3001,
-        DATABASE_URL: 'file:/var/www/unihome-v2/prisma/data/unipivot.db'
+        DATABASE_URL: 'postgresql://unipivot:unipivot2024@localhost:5432/unipivot?schema=public',
+        NEXTAUTH_URL: 'https://bestcome.org',
+        NEXTAUTH_SECRET: 'KASx4b+dafakuXKMenf3IdpT6c0vXCd0KPxtsM5/YFw='
       },
       env_production: {
         NODE_ENV: 'production',
-        PORT: 3001,
-        DATABASE_URL: 'file:/var/www/unihome-v2/prisma/data/unipivot.db'
+        DATABASE_URL: 'postgresql://unipivot:unipivot2024@localhost:5432/unipivot?schema=public',
+        NEXTAUTH_URL: 'https://bestcome.org',
+        NEXTAUTH_SECRET: 'KASx4b+dafakuXKMenf3IdpT6c0vXCd0KPxtsM5/YFw='
       },
       log_date_format: 'YYYY-MM-DD HH:mm:ss',
       error_file: '/var/log/pm2/unipivot-error.log',
