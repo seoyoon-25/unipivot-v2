@@ -15,11 +15,18 @@ type MenuItem = {
 
 const menuItems: MenuItem[] = [
   {
+    label: '소개',
+    children: [
+      { label: '단체 소개', href: '/p/about-us', description: '미션과 핵심 가치' },
+      { label: '연혁', href: '/p/history', description: '유니피벗 히스토리' },
+    ],
+  },
+  {
     label: '프로그램',
     children: [
-      { label: '독서모임', href: '/bookclub', description: '남Book북한걸음' },
-      { label: '세미나', href: '/seminar', description: '정기 교육 세미나' },
-      { label: 'K-Move', href: '/kmove', description: '한반도 이슈 탐방' },
+      { label: '프로그램 안내', href: '/p/programs', description: '유니피벗 프로그램' },
+      { label: '독서모임', href: '/p/bookclub-info', description: '남Book북한걸음' },
+      { label: '세미나', href: '/p/seminar-info', description: '정기 교육 세미나' },
     ],
   },
   {
@@ -37,15 +44,6 @@ const menuItems: MenuItem[] = [
       { label: '전문가 풀', href: '/experts', description: '분야별 전문가' },
       { label: '재능나눔', href: '/talent', description: '재능 기부' },
       { label: '후원하기', href: '/donate', description: '유니피벗 후원' },
-    ],
-  },
-  {
-    label: '소개',
-    children: [
-      { label: '단체 소개', href: '/p/about-us', description: '미션과 핵심 가치' },
-      { label: '프로그램 안내', href: '/p/programs', description: '유니피벗 프로그램' },
-      { label: '테스트', href: '/p/test', description: '테스트 페이지' },
-      { label: '연혁', href: '/about', description: '유니피벗 히스토리' },
     ],
   },
 ]
