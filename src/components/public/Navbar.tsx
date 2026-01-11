@@ -43,6 +43,7 @@ const menuItems: MenuItem[] = [
     label: '소개',
     children: [
       { label: '단체 소개', href: '/p/about-us', description: '미션과 핵심 가치' },
+      { label: '프로그램 안내', href: '/p/programs', description: '유니피벗 프로그램' },
       { label: '연혁', href: '/about', description: '유니피벗 히스토리' },
     ],
   },
