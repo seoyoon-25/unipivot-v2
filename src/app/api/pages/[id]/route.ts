@@ -48,7 +48,7 @@ export async function PUT(
     }
 
     const body = await request.json()
-    const { title, slug, content, styles, components, metaTitle, metaDesc, isPublished, isActive } = body
+    const { title, slug, content, styles, components, metaTitle, metaDesc, isPublished, isActive, parentId, order, isFolder } = body
 
     // Check if page exists
     const existing = await prisma.pageContent.findUnique({ where: { id } })
@@ -64,6 +64,11 @@ export async function PUT(
       }
     }
 
+    // Prevent setting page as its own parent
+    if (parentId === id) {
+      return NextResponse.json({ error: 'Cannot set page as its own parent' }, { status: 400 })
+    }
+
     const page = await prisma.pageContent.update({
       where: { id },
       data: {
@@ -76,6 +81,9 @@ export async function PUT(
         ...(metaDesc !== undefined && { metaDesc }),
         ...(isPublished !== undefined && { isPublished }),
         ...(isActive !== undefined && { isActive }),
+        ...(parentId !== undefined && { parentId }),
+        ...(order !== undefined && { order }),
+        ...(isFolder !== undefined && { isFolder }),
       },
     })
 

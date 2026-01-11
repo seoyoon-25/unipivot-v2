@@ -441,6 +441,7 @@ model BlogPost {
 
 model PageContent {
   id          String   @id @default(cuid())
+  parentId    String?  // 부모 페이지 ID (null = 최상위)
   slug        String   @unique
   title       String
   content     String?  // HTML content
@@ -448,10 +449,15 @@ model PageContent {
   components  String?  // GrapesJS JSON data
   metaTitle   String?
   metaDesc    String?
+  isFolder    Boolean  @default(false)  // 폴더 여부
+  order       Int      @default(0)       // 정렬 순서
   isPublished Boolean  @default(false)
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  parent      PageContent?  @relation("PageHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children    PageContent[] @relation("PageHierarchy")
 }
 
 model Menu {

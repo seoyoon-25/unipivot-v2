@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
-// GET /api/pages - List all pages
+// GET /api/pages - List all pages (hierarchical)
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -11,8 +11,36 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { searchParams } = new URL(request.url)
+    const flat = searchParams.get('flat') === 'true'
+
+    if (flat) {
+      // Return flat list (for dropdowns, etc.)
+      const pages = await prisma.pageContent.findMany({
+        orderBy: [{ order: 'asc' }, { updatedAt: 'desc' }],
+      })
+      return NextResponse.json(pages)
+    }
+
+    // Return hierarchical structure
     const pages = await prisma.pageContent.findMany({
-      orderBy: { updatedAt: 'desc' },
+      where: { parentId: null },
+      orderBy: { order: 'asc' },
+      include: {
+        children: {
+          orderBy: { order: 'asc' },
+          include: {
+            children: {
+              orderBy: { order: 'asc' },
+              include: {
+                children: {
+                  orderBy: { order: 'asc' },
+                },
+              },
+            },
+          },
+        },
+      },
     })
 
     return NextResponse.json(pages)
@@ -31,7 +59,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { title, slug } = body
+    const { title, slug, parentId, isFolder } = body
 
     if (!title || !slug) {
       return NextResponse.json({ error: 'Title and slug are required' }, { status: 400 })
@@ -43,10 +71,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Slug already exists' }, { status: 400 })
     }
 
+    // Get max order for the parent level
+    const maxOrder = await prisma.pageContent.aggregate({
+      where: { parentId: parentId || null },
+      _max: { order: true },
+    })
+    const newOrder = (maxOrder._max.order ?? -1) + 1
+
     const page = await prisma.pageContent.create({
       data: {
         title,
         slug,
+        parentId: parentId || null,
+        isFolder: isFolder || false,
+        order: newOrder,
         content: '',
         styles: '',
         components: '[]',
