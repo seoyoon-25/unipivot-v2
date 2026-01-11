@@ -1,19 +1,21 @@
 module.exports = {
   apps: [
     {
-      name: 'unipivot',
+      name: 'unipivot-v2',
       script: 'node_modules/.bin/next',
       args: 'start',
       cwd: '/var/www/unihome-v2',
-      instances: 'max',
-      exec_mode: 'cluster',
+      instances: 1,
+      exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
-        PORT: 3000
+        PORT: 3001,
+        DATABASE_URL: 'file:/var/www/unihome-v2/prisma/data/unipivot.db'
       },
       env_production: {
         NODE_ENV: 'production',
-        PORT: 3000
+        PORT: 3001,
+        DATABASE_URL: 'file:/var/www/unihome-v2/prisma/data/unipivot.db'
       },
       log_date_format: 'YYYY-MM-DD HH:mm:ss',
       error_file: '/var/log/pm2/unipivot-error.log',
