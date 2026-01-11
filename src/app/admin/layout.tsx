@@ -4,9 +4,10 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import {
   LayoutDashboard, Users, BookOpen, Briefcase, Wallet,
-  FileText, Bot, Palette, Settings, LogOut, Home,
-  ChevronDown, Menu
+  FileText, Bot, Palette, Settings, Home,
+  ChevronDown
 } from 'lucide-react'
+import AdminMobileNav from './AdminMobileNav'
 
 const sidebarItems = [
   { label: '대시보드', href: '/admin', icon: LayoutDashboard },
@@ -76,6 +77,14 @@ const sidebarItems = [
   },
 ]
 
+const mobileNavItems = [
+  { label: '대시보드', href: '/admin', icon: LayoutDashboard },
+  { label: '회원', href: '/admin/members', icon: Users },
+  { label: '프로그램', href: '/admin/programs', icon: BookOpen },
+  { label: '재무', href: '/admin/finance/donations', icon: Wallet },
+  { label: '콘텐츠', href: '/admin/contents/notices', icon: FileText },
+]
+
 export default async function AdminLayout({
   children,
 }: {
@@ -89,8 +98,8 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar */}
-      <aside className="hidden lg:flex w-64 bg-gray-900 flex-col fixed h-full">
+      {/* Sidebar - Desktop */}
+      <aside className="hidden lg:flex w-64 bg-gray-900 flex-col fixed h-full z-50">
         <div className="p-6 border-b border-gray-800">
           <Link href="/admin" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
@@ -154,13 +163,10 @@ export default async function AdminLayout({
 
       {/* Main Content */}
       <div className="flex-1 lg:ml-64">
-        {/* Top Bar */}
-        <header className="bg-white shadow-sm sticky top-0 z-40">
-          <div className="flex items-center justify-between px-6 py-4">
-            <button className="lg:hidden p-2 text-gray-600">
-              <Menu className="w-6 h-6" />
-            </button>
-            <div className="flex items-center gap-4 ml-auto">
+        {/* Top Bar - Desktop */}
+        <header className="hidden lg:block bg-white shadow-sm sticky top-0 z-40">
+          <div className="flex items-center justify-end px-6 py-4">
+            <div className="flex items-center gap-4">
               <span className="text-sm text-gray-600">{session.user?.name}</span>
               <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-bold">
                 {session.user?.name?.[0] || 'A'}
@@ -169,8 +175,31 @@ export default async function AdminLayout({
           </div>
         </header>
 
+        {/* Mobile Header */}
+        <header className="lg:hidden bg-gray-900 text-white sticky top-0 z-40">
+          <div className="flex items-center justify-between px-4 py-3">
+            <Link href="/admin" className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
+                <span className="text-white font-bold text-sm">U</span>
+              </div>
+              <span className="font-bold">Admin</span>
+            </Link>
+            <div className="flex items-center gap-3">
+              <Link href="/" className="p-2 text-gray-400 hover:text-white">
+                <Home className="w-5 h-5" />
+              </Link>
+              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-bold">
+                {session.user?.name?.[0] || 'A'}
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Mobile Bottom Navigation */}
+        <AdminMobileNav items={mobileNavItems} />
+
         {/* Page Content */}
-        <main className="p-6">
+        <main className="p-4 lg:p-6 pb-24 lg:pb-6">
           {children}
         </main>
       </div>
