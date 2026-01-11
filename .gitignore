@@ -66,3 +66,7 @@ public/workbox-*.js
 # Temporary files
 tmp/
 temp/
+
+# Database backups
+backups/
+logs/
