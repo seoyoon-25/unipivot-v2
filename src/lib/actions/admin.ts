@@ -370,20 +370,22 @@ export async function updateDonationStatus(id: string, status: string) {
 }
 
 // =============================================
-// Finance - Transactions
+// Finance - Transactions (NGO 회계 시스템)
 // =============================================
 
 export async function getTransactions(params: {
   page?: number
   limit?: number
   type?: string
+  fundId?: string
   startDate?: Date
   endDate?: Date
 }) {
-  const { page = 1, limit = 10, type, startDate, endDate } = params
+  const { page = 1, limit = 10, type, fundId, startDate, endDate } = params
 
   const where: any = {}
   if (type) where.type = type
+  if (fundId) where.fundId = fundId
   if (startDate || endDate) {
     where.date = {}
     if (startDate) where.date.gte = startDate
@@ -391,14 +393,19 @@ export async function getTransactions(params: {
   }
 
   const [transactions, total, summary] = await Promise.all([
-    prisma.transaction.findMany({
+    prisma.financeTransaction.findMany({
       where,
       skip: (page - 1) * limit,
       take: limit,
-      orderBy: { date: 'desc' }
+      orderBy: { date: 'desc' },
+      include: {
+        fund: true,
+        financeAccount: true,
+        receipt: true
+      }
     }),
-    prisma.transaction.count({ where }),
-    prisma.transaction.groupBy({
+    prisma.financeTransaction.count({ where }),
+    prisma.financeTransaction.groupBy({
       by: ['type'],
       _sum: { amount: true }
     })
@@ -415,16 +422,152 @@ export async function getTransactions(params: {
   }
 }
 
-export async function createTransaction(data: {
-  type: string
-  category?: string
-  amount: number
-  description?: string
+export async function createFinanceTransaction(data: {
   date: Date
+  type: string
+  fundId: string
+  financeAccountId: string
+  amount: number
+  description: string
+  vendor?: string
+  paymentMethod?: string
+  evidenceType?: string
+  note?: string
+  createdBy?: string
 }) {
-  const transaction = await prisma.transaction.create({ data })
+  const transaction = await prisma.$transaction(async (tx) => {
+    const newTx = await tx.financeTransaction.create({
+      data,
+      include: { fund: true, financeAccount: true }
+    })
+
+    // 기금 잔액 업데이트
+    const balanceChange = data.type === 'INCOME' ? data.amount : -data.amount
+    await tx.fund.update({
+      where: { id: data.fundId },
+      data: { balance: { increment: balanceChange } }
+    })
+
+    return newTx
+  })
+
   revalidatePath('/admin/finance/transactions')
   return transaction
+}
+
+// =============================================
+// Finance - Accounts (계정과목)
+// =============================================
+
+export async function getFinanceAccounts(params?: {
+  type?: string
+  category?: string
+  isActive?: boolean
+}) {
+  const where: any = {}
+  if (params?.type) where.type = params.type
+  if (params?.category) where.category = params.category
+  if (params?.isActive !== undefined) where.isActive = params.isActive
+
+  return prisma.financeAccount.findMany({
+    where,
+    orderBy: { sortOrder: 'asc' }
+  })
+}
+
+// =============================================
+// Finance - Funds (기금)
+// =============================================
+
+export async function getFunds(params?: {
+  type?: string
+  isActive?: boolean
+}) {
+  const where: any = {}
+  if (params?.type) where.type = params.type
+  if (params?.isActive !== undefined) where.isActive = params.isActive
+
+  return prisma.fund.findMany({
+    where,
+    include: {
+      financeProject: true,
+      _count: { select: { transactions: true } }
+    },
+    orderBy: { createdAt: 'desc' }
+  })
+}
+
+export async function createFund(data: {
+  name: string
+  type: string
+  description?: string
+  financeProjectId?: string
+}) {
+  const fund = await prisma.fund.create({
+    data: { ...data, balance: 0 }
+  })
+  revalidatePath('/admin/finance/funds')
+  return fund
+}
+
+// =============================================
+// Finance - Summary (재무 요약)
+// =============================================
+
+export async function getFinanceSummary(year?: number) {
+  const targetYear = year || new Date().getFullYear()
+  const startDate = new Date(targetYear, 0, 1)
+  const endDate = new Date(targetYear, 11, 31, 23, 59, 59)
+
+  const [incomeTotal, expenseTotal, funds, recentTx, monthlyData] = await Promise.all([
+    prisma.financeTransaction.aggregate({
+      where: { type: 'INCOME', date: { gte: startDate, lte: endDate } },
+      _sum: { amount: true }
+    }),
+    prisma.financeTransaction.aggregate({
+      where: { type: 'EXPENSE', date: { gte: startDate, lte: endDate } },
+      _sum: { amount: true }
+    }),
+    prisma.fund.findMany({
+      where: { isActive: true },
+      select: { id: true, name: true, type: true, balance: true }
+    }),
+    prisma.financeTransaction.findMany({
+      take: 5,
+      orderBy: { date: 'desc' },
+      include: { financeAccount: true, fund: true }
+    }),
+    prisma.financeTransaction.findMany({
+      where: { date: { gte: startDate, lte: endDate } },
+      select: { date: true, type: true, amount: true }
+    })
+  ])
+
+  // 월별 데이터 계산
+  const monthlyTrend: { month: number; income: number; expense: number }[] = []
+  for (let i = 1; i <= 12; i++) {
+    monthlyTrend.push({ month: i, income: 0, expense: 0 })
+  }
+  monthlyData.forEach(tx => {
+    const month = tx.date.getMonth()
+    if (tx.type === 'INCOME') {
+      monthlyTrend[month].income += tx.amount
+    } else {
+      monthlyTrend[month].expense += tx.amount
+    }
+  })
+
+  return {
+    period: { year: targetYear },
+    totals: {
+      income: incomeTotal._sum.amount || 0,
+      expense: expenseTotal._sum.amount || 0,
+      balance: (incomeTotal._sum.amount || 0) - (expenseTotal._sum.amount || 0)
+    },
+    funds,
+    recentTransactions: recentTx,
+    monthlyTrend
+  }
 }
 
 // =============================================
@@ -439,4 +582,299 @@ export async function logActivity(data: {
   details?: string
 }) {
   return prisma.activityLog.create({ data })
+}
+
+// =============================================
+// Program Participants (프로그램 참가자)
+// =============================================
+
+export async function getProgramParticipants(programId: string) {
+  const participants = await prisma.programParticipant.findMany({
+    where: { programId },
+    include: {
+      user: { select: { id: true, name: true, email: true, phone: true, image: true } },
+      attendances: { include: { session: true } },
+      reports: { where: { status: 'SUBMITTED' } }
+    },
+    orderBy: { joinedAt: 'asc' }
+  })
+
+  return participants.map(p => {
+    const totalSessions = p.attendances.length
+    const presentCount = p.attendances.filter(a => a.status === 'PRESENT' || a.status === 'LATE').length
+    const reportCount = p.reports.length
+
+    return {
+      ...p,
+      stats: {
+        totalSessions,
+        presentCount,
+        attendanceRate: totalSessions > 0 ? Math.round((presentCount / totalSessions) * 100) : 0,
+        reportCount,
+        reportRate: totalSessions > 0 ? Math.round((reportCount / totalSessions) * 100) : 0
+      }
+    }
+  })
+}
+
+export async function addParticipant(programId: string, userId: string, depositAmount?: number) {
+  const participant = await prisma.programParticipant.create({
+    data: {
+      programId,
+      userId,
+      depositAmount: depositAmount || 0,
+      depositStatus: depositAmount ? 'UNPAID' : 'NONE'
+    },
+    include: { user: { select: { id: true, name: true, email: true } } }
+  })
+  revalidatePath(`/admin/programs/${programId}`)
+  return participant
+}
+
+// =============================================
+// Program Sessions (프로그램 세션)
+// =============================================
+
+export async function getProgramSessions(programId: string) {
+  return prisma.programSession.findMany({
+    where: { programId },
+    include: {
+      _count: { select: { attendances: true, reports: true } }
+    },
+    orderBy: { sessionNo: 'asc' }
+  })
+}
+
+export async function createProgramSession(programId: string, data: {
+  sessionNo: number
+  date: Date
+  startTime?: string
+  endTime?: string
+  title?: string
+  bookTitle?: string
+  bookRange?: string
+  location?: string
+  description?: string
+  reportDeadline?: Date
+}) {
+  const crypto = await import('crypto')
+  const qrCode = crypto.randomBytes(16).toString('hex')
+
+  const session = await prisma.programSession.create({
+    data: { ...data, programId, qrCode }
+  })
+
+  // 모든 활성 참가자에게 출석 레코드 생성
+  const participants = await prisma.programParticipant.findMany({
+    where: { programId, status: 'ACTIVE' }
+  })
+
+  if (participants.length > 0) {
+    await prisma.programAttendance.createMany({
+      data: participants.map(p => ({
+        sessionId: session.id,
+        participantId: p.id,
+        status: 'ABSENT'
+      })),
+      skipDuplicates: true
+    })
+  }
+
+  revalidatePath(`/admin/programs/${programId}`)
+  return session
+}
+
+// =============================================
+// Attendance (출석)
+// =============================================
+
+export async function getSessionAttendance(sessionId: string) {
+  return prisma.programAttendance.findMany({
+    where: { sessionId },
+    include: {
+      participant: {
+        include: { user: { select: { id: true, name: true, email: true, image: true } } }
+      }
+    },
+    orderBy: { participant: { user: { name: 'asc' } } }
+  })
+}
+
+export async function updateAttendance(
+  sessionId: string,
+  participantId: string,
+  status: 'PRESENT' | 'ABSENT' | 'LATE' | 'EXCUSED'
+) {
+  const attendance = await prisma.programAttendance.upsert({
+    where: { sessionId_participantId: { sessionId, participantId } },
+    update: {
+      status,
+      checkedAt: status === 'PRESENT' || status === 'LATE' ? new Date() : null,
+      checkMethod: 'MANUAL'
+    },
+    create: {
+      sessionId,
+      participantId,
+      status,
+      checkedAt: status === 'PRESENT' || status === 'LATE' ? new Date() : null,
+      checkMethod: 'MANUAL'
+    }
+  })
+
+  const session = await prisma.programSession.findUnique({
+    where: { id: sessionId },
+    select: { programId: true }
+  })
+  if (session) revalidatePath(`/admin/programs/${session.programId}`)
+
+  return attendance
+}
+
+// =============================================
+// Deposit (보증금)
+// =============================================
+
+export async function getDepositSetting(programId: string) {
+  return prisma.depositSetting.findUnique({ where: { programId } })
+}
+
+export async function updateDepositSetting(programId: string, data: {
+  isEnabled?: boolean
+  totalSessions: number
+  depositAmount: number
+  conditionType: string
+  attendanceRate?: number
+  reportRate?: number
+}) {
+  const setting = await prisma.depositSetting.upsert({
+    where: { programId },
+    update: data,
+    create: { programId, ...data }
+  })
+  revalidatePath(`/admin/programs/${programId}`)
+  return setting
+}
+
+export async function settleDeposit(participantId: string, data: {
+  returnAmount?: number
+  forfeitAmount?: number
+  returnMethod?: string
+  note?: string
+}) {
+  const participant = await prisma.programParticipant.update({
+    where: { id: participantId },
+    data: {
+      returnAmount: data.returnAmount,
+      forfeitAmount: data.forfeitAmount,
+      returnMethod: data.returnMethod,
+      settleNote: data.note,
+      settledAt: new Date(),
+      depositStatus: data.returnAmount && data.returnAmount > 0 ? 'RETURNED' :
+                     data.forfeitAmount && data.forfeitAmount > 0 ? 'FORFEITED' : 'PAID'
+    }
+  })
+  revalidatePath(`/admin/programs/${participant.programId}`)
+  return participant
+}
+
+// =============================================
+// Reports (독후감/보고서)
+// =============================================
+
+export async function getProgramReports(programId: string, sessionId?: string) {
+  const where: any = { programId }
+  if (sessionId) where.sessionId = sessionId
+
+  return prisma.programReport.findMany({
+    where,
+    include: {
+      session: true,
+      user: { select: { id: true, name: true, image: true } },
+      _count: { select: { comments: true, likes: true } }
+    },
+    orderBy: { createdAt: 'desc' }
+  })
+}
+
+// =============================================
+// Finance Donations (기부금)
+// =============================================
+
+export async function getFinanceDonations(params: {
+  page?: number
+  limit?: number
+  type?: string
+}) {
+  const { page = 1, limit = 20, type } = params
+  const where: any = {}
+  if (type) where.type = type
+
+  const [donations, total, summary] = await Promise.all([
+    prisma.financeDonation.findMany({
+      where,
+      include: { donor: true },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { date: 'desc' }
+    }),
+    prisma.financeDonation.count({ where }),
+    prisma.financeDonation.aggregate({
+      _sum: { amount: true },
+      _count: true
+    })
+  ])
+
+  return {
+    donations,
+    total,
+    pages: Math.ceil(total / limit),
+    summary: { totalAmount: summary._sum.amount || 0, totalCount: summary._count }
+  }
+}
+
+export async function createFinanceDonation(data: {
+  donorName: string
+  donorType?: string
+  amount: number
+  date: Date
+  type?: string
+  designation?: string
+  note?: string
+}) {
+  // 기부자 생성 또는 찾기
+  let donor = await prisma.donor.findFirst({
+    where: { name: data.donorName }
+  })
+
+  if (!donor) {
+    donor = await prisma.donor.create({
+      data: { name: data.donorName, type: data.donorType || 'INDIVIDUAL' }
+    })
+  }
+
+  const donation = await prisma.financeDonation.create({
+    data: {
+      donorId: donor.id,
+      donorName: data.donorName,
+      donorType: data.donorType || 'INDIVIDUAL',
+      amount: data.amount,
+      date: data.date,
+      type: data.type || 'ONETIME',
+      designation: data.designation,
+      note: data.note
+    }
+  })
+
+  // 기부자 통계 업데이트
+  await prisma.donor.update({
+    where: { id: donor.id },
+    data: {
+      totalDonation: { increment: data.amount },
+      donationCount: { increment: 1 },
+      lastDonationAt: data.date
+    }
+  })
+
+  revalidatePath('/admin/finance/donations')
+  return donation
 }

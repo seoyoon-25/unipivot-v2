@@ -1,17 +1,31 @@
 import { notFound } from 'next/navigation'
-import { getProgram } from '@/lib/actions/admin'
-import ProgramDetail from './ProgramDetail'
+import { getProgram, getProgramParticipants, getProgramSessions, getDepositSetting } from '@/lib/actions/admin'
+import ProgramDetailTabs from './ProgramDetailTabs'
 
 interface Props {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export default async function ProgramDetailPage({ params }: Props) {
-  const program = await getProgram(params.id)
+  const { id } = await params
+
+  const [program, participants, sessions, depositSetting] = await Promise.all([
+    getProgram(id),
+    getProgramParticipants(id),
+    getProgramSessions(id),
+    getDepositSetting(id)
+  ])
 
   if (!program) {
     notFound()
   }
 
-  return <ProgramDetail program={program} />
+  return (
+    <ProgramDetailTabs
+      program={program}
+      participants={participants}
+      sessions={sessions}
+      depositSetting={depositSetting}
+    />
+  )
 }

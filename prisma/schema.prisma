@@ -30,19 +30,23 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts      Account[]
-  sessions      Session[]
-  registrations Registration[]
-  attendances   Attendance[]
-  bookReports   BookReport[]
-  donations     Donation[]
-  deposits      Deposit[]
-  chatLogs      ChatLog[]
-  notifications Notification[]
-  activityLogs  ActivityLog[]
-  talents       Talent[]
-  blogPosts     BlogPost[]
-  pointHistory  PointHistory[]
+  accounts            Account[]
+  sessions            Session[]
+  registrations       Registration[]
+  bookReports         BookReport[]
+  donations           Donation[]
+  deposits            Deposit[]
+  chatLogs            ChatLog[]
+  notifications       Notification[]
+  activityLogs        ActivityLog[]
+  talents             Talent[]
+  blogPosts           BlogPost[]
+  pointHistory        PointHistory[]
+  programApplications ProgramApplication[]
+  programParticipants ProgramParticipant[]
+  programReports      ProgramReport[]
+  reportComments      ReportComment[]
+  reportLikes         ReportLike[]
 }
 
 model Account {
@@ -102,24 +106,14 @@ model Program {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  sessions      ProgramSession[]
-  registrations Registration[]
-  books         BookOnProgram[]
-}
-
-model ProgramSession {
-  id        String   @id @default(cuid())
-  programId String
-  title     String
-  date      DateTime
-  startTime String?
-  endTime   String?
-  location  String?
-  content   String?
-  createdAt DateTime @default(now())
-
-  program     Program      @relation(fields: [programId], references: [id], onDelete: Cascade)
-  attendances Attendance[]
+  sessions       ProgramSession[]
+  registrations  Registration[]
+  books          BookOnProgram[]
+  applications   ProgramApplication[]
+  gallery        ProgramGallery[]
+  depositSetting DepositSetting?
+  participants   ProgramParticipant[]
+  programReports ProgramReport[]
 }
 
 model Registration {
@@ -135,20 +129,6 @@ model Registration {
   program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
 
   @@unique([userId, programId])
-}
-
-model Attendance {
-  id        String   @id @default(cuid())
-  userId    String
-  sessionId String
-  status    String   @default("PRESENT") // PRESENT, ABSENT, LATE, EXCUSED
-  note      String?
-  createdAt DateTime @default(now())
-
-  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  session ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, sessionId])
 }
 
 // =============================================
@@ -536,4 +516,375 @@ model EmailLog {
   status    String   @default("SENT") // SENT, FAILED
   error     String?
   createdAt DateTime @default(now())
+}
+
+// =============================================
+// NGO 회계 시스템 모델
+// =============================================
+
+model FiscalYear {
+  id        String   @id @default(cuid())
+  year      Int      @unique
+  startDate DateTime
+  endDate   DateTime
+  isCurrent Boolean  @default(false)
+  isClosed  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  budgets Budget[]
+}
+
+model FinanceAccount {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  type        String   // INCOME, EXPENSE, ASSET, LIABILITY
+  category    String
+  subcategory String?
+  description String?
+  isActive    Boolean  @default(true)
+  isSystem    Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  transactions FinanceTransaction[]
+  budgetItems  BudgetItem[]
+}
+
+model Fund {
+  id               String   @id @default(cuid())
+  name             String
+  type             String   // GENERAL, PROJECT
+  description      String?
+  financeProjectId String?
+  balance          Int      @default(0)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+
+  financeProject FinanceProject? @relation(fields: [financeProjectId], references: [id])
+  transactions   FinanceTransaction[]
+  budgets        Budget[]
+}
+
+model FinanceProject {
+  id              String    @id @default(cuid())
+  name            String
+  funder          String
+  contractNumber  String?
+  totalBudget     Int
+  startDate       DateTime
+  endDate         DateTime
+  status          String    @default("PLANNING") // PLANNING, ACTIVE, SETTLEMENT, CLOSED
+  settlementDates String?   // JSON array
+  description     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  funds       Fund[]
+  budgetItems ProjectBudgetItem[]
+  documents   ProjectDocument[]
+}
+
+model ProjectBudgetItem {
+  id               String  @id @default(cuid())
+  financeProjectId String
+  category         String
+  subcategory      String?
+  item             String
+  budget           Int
+  executed         Int     @default(0)
+  note             String?
+  sortOrder        Int     @default(0)
+
+  financeProject FinanceProject @relation(fields: [financeProjectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectDocument {
+  id               String   @id @default(cuid())
+  financeProjectId String
+  type             String   // CONTRACT, REPORT, SETTLEMENT, OTHER
+  name             String
+  fileUrl          String
+  uploadedAt       DateTime @default(now())
+  uploadedBy       String?
+
+  financeProject FinanceProject @relation(fields: [financeProjectId], references: [id], onDelete: Cascade)
+}
+
+model FinanceTransaction {
+  id                  String   @id @default(cuid())
+  date                DateTime
+  type                String   // INCOME, EXPENSE
+  fundId              String
+  financeAccountId    String
+  amount              Int
+  description         String
+  vendor              String?
+  paymentMethod       String?  // CASH, CARD, TRANSFER
+  projectBudgetItemId String?
+  receiptId           String?
+  evidenceType        String?  // TAX_INVOICE, CASH_RECEIPT, CARD_SLIP, SIMPLE, NONE
+  depositType         String?  // DEPOSIT_IN, DEPOSIT_RETURN, DEPOSIT_FORFEIT
+  participantId       String?
+  note                String?
+  createdBy           String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  fund           Fund           @relation(fields: [fundId], references: [id])
+  financeAccount FinanceAccount @relation(fields: [financeAccountId], references: [id])
+  receipt        Receipt?       @relation(fields: [receiptId], references: [id])
+}
+
+model Receipt {
+  id           String   @id @default(cuid())
+  imageUrl     String
+  thumbnailUrl String?
+  ocrData      String?  // JSON
+  ocrStatus    String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  date         DateTime?
+  amount       Int?
+  vendor       String?
+  status       String   @default("PENDING") // PENDING, MATCHED, ARCHIVED
+  uploadedBy   String?
+  uploadedAt   DateTime @default(now())
+
+  transactions FinanceTransaction[]
+}
+
+model Budget {
+  id           String    @id @default(cuid())
+  fundId       String
+  fiscalYearId String
+  status       String    @default("DRAFT") // DRAFT, APPROVED, CLOSED
+  totalAmount  Int       @default(0)
+  approvedAt   DateTime?
+  approvedBy   String?
+  createdAt    DateTime  @default(now())
+
+  fund       Fund       @relation(fields: [fundId], references: [id])
+  fiscalYear FiscalYear @relation(fields: [fiscalYearId], references: [id])
+  items      BudgetItem[]
+}
+
+model BudgetItem {
+  id               String @id @default(cuid())
+  budgetId         String
+  financeAccountId String
+  amount           Int
+  executed         Int    @default(0)
+  note             String?
+
+  budget         Budget         @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  financeAccount FinanceAccount @relation(fields: [financeAccountId], references: [id])
+}
+
+model FinanceDonation {
+  id              String    @id @default(cuid())
+  donorId         String?
+  donorName       String
+  donorType       String    @default("INDIVIDUAL") // INDIVIDUAL, CORPORATE
+  amount          Int
+  date            DateTime
+  type            String    @default("ONETIME") // REGULAR, ONETIME, DESIGNATED
+  designation     String?
+  receiptIssued   Boolean   @default(false)
+  receiptNumber   String?
+  receiptIssuedAt DateTime?
+  note            String?
+  createdAt       DateTime  @default(now())
+
+  donor Donor? @relation(fields: [donorId], references: [id])
+}
+
+model Donor {
+  id            String    @id @default(cuid())
+  name          String
+  type          String    @default("INDIVIDUAL") // INDIVIDUAL, CORPORATE
+  residentId    String?   // 암호화
+  businessId    String?
+  phone         String?
+  email         String?
+  address       String?
+  totalDonation Int       @default(0)
+  donationCount Int       @default(0)
+  lastDonationAt DateTime?
+  createdAt     DateTime  @default(now())
+
+  donations FinanceDonation[]
+}
+
+// =============================================
+// NGO 프로그램 관리 확장 모델
+// =============================================
+
+model ProgramApplication {
+  id          String    @id @default(cuid())
+  programId   String
+  userId      String
+  status      String    @default("PENDING") // PENDING, CONFIRMED, CANCELLED, REJECTED
+  appliedAt   DateTime  @default(now())
+  confirmedAt DateTime?
+  cancelledAt DateTime?
+  cancelReason String?
+  note        String?
+
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@unique([programId, userId])
+}
+
+model ProgramGallery {
+  id         String   @id @default(cuid())
+  programId  String
+  imageUrl   String
+  caption    String?
+  sortOrder  Int      @default(0)
+  uploadedAt DateTime @default(now())
+
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+}
+
+model DepositSetting {
+  id              String    @id @default(cuid())
+  programId       String    @unique
+  isEnabled       Boolean   @default(true)
+  totalSessions   Int
+  depositAmount   Int
+  conditionType   String    // ATTENDANCE_ONLY, ATTENDANCE_AND_REPORT
+  attendanceRate  Int       @default(80)
+  reportRate      Int?
+  status          String    @default("ACTIVE") // ACTIVE, SETTLING, SETTLED
+  settledAt       DateTime?
+  settledBy       String?
+  totalDeposits   Int       @default(0)
+  totalReturned   Int       @default(0)
+  totalForfeited  Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+}
+
+model ProgramParticipant {
+  id                    String    @id @default(cuid())
+  programId             String
+  userId                String
+  status                String    @default("ACTIVE") // ACTIVE, DROPPED, COMPLETED
+  joinedAt              DateTime  @default(now())
+  depositAmount         Int       @default(0)
+  depositPaidAt         DateTime?
+  depositStatus         String    @default("NONE") // NONE, UNPAID, PAID, RETURNED, FORFEITED, CARRIED
+  finalAttendanceRate   Float?
+  finalReportRate       Float?
+  returnAmount          Int?
+  forfeitAmount         Int?
+  returnMethod          String?   // TRANSFER, CARRY_OVER, CASH
+  settledAt             DateTime?
+  settleNote            String?
+  depositTransactionId  String?
+  returnTransactionId   String?
+  forfeitTransactionId  String?
+
+  program     Program               @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user        User                  @relation(fields: [userId], references: [id])
+  attendances ProgramAttendance[]
+  reports     ProgramReport[]
+
+  @@unique([programId, userId])
+}
+
+model ProgramSession {
+  id             String    @id @default(cuid())
+  programId      String
+  sessionNo      Int
+  date           DateTime
+  startTime      String?
+  endTime        String?
+  title          String?
+  bookTitle      String?
+  bookRange      String?
+  location       String?
+  description    String?
+  qrCode         String?   @unique
+  qrExpiresAt    DateTime?
+  reportDeadline DateTime?
+  status         String    @default("SCHEDULED") // SCHEDULED, ONGOING, COMPLETED, CANCELLED
+  createdAt      DateTime  @default(now())
+
+  program     Program             @relation(fields: [programId], references: [id], onDelete: Cascade)
+  attendances ProgramAttendance[]
+  reports     ProgramReport[]
+
+  @@unique([programId, sessionNo])
+}
+
+model ProgramAttendance {
+  id            String    @id @default(cuid())
+  sessionId     String
+  participantId String
+  status        String    @default("ABSENT") // PRESENT, ABSENT, LATE, EXCUSED
+  checkedAt     DateTime?
+  checkMethod   String?   // QR, MANUAL
+  note          String?
+
+  session     ProgramSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  participant ProgramParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, participantId])
+}
+
+model ProgramReport {
+  id            String    @id @default(cuid())
+  sessionId     String
+  participantId String
+  userId        String
+  programId     String
+  title         String
+  content       String
+  charCount     Int       @default(0)
+  photoUrl      String?
+  question      String?
+  status        String    @default("DRAFT") // DRAFT, SUBMITTED
+  submittedAt   DateTime?
+  visibility    String    @default("PARTICIPANTS") // PARTICIPANTS, PUBLIC
+  viewCount     Int       @default(0)
+  likeCount     Int       @default(0)
+  commentCount  Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  session     ProgramSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  participant ProgramParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  user        User               @relation(fields: [userId], references: [id])
+  program     Program            @relation(fields: [programId], references: [id], onDelete: Cascade)
+  comments    ReportComment[]
+  likes       ReportLike[]
+
+  @@unique([sessionId, participantId])
+}
+
+model ReportComment {
+  id        String   @id @default(cuid())
+  reportId  String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  report ProgramReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  user   User          @relation(fields: [userId], references: [id])
+}
+
+model ReportLike {
+  id        String   @id @default(cuid())
+  reportId  String
+  userId    String
+  createdAt DateTime @default(now())
+
+  report ProgramReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  user   User          @relation(fields: [userId], references: [id])
+
+  @@unique([reportId, userId])
 }

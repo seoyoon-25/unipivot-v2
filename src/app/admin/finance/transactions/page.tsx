@@ -1,17 +1,23 @@
-import { getTransactions } from '@/lib/actions/admin'
+import { getTransactions, getFinanceAccounts, getFunds } from '@/lib/actions/admin'
 import TransactionsTable from './TransactionsTable'
 
 interface Props {
-  searchParams: { page?: string; type?: string }
+  searchParams: Promise<{ page?: string; type?: string }>
 }
 
 export default async function TransactionsPage({ searchParams }: Props) {
-  const page = parseInt(searchParams.page || '1')
-  const { transactions, total, pages, summary } = await getTransactions({
-    page,
-    limit: 10,
-    type: searchParams.type
-  })
+  const params = await searchParams
+  const page = parseInt(params.page || '1')
+
+  const [{ transactions, total, pages, summary }, accounts, funds] = await Promise.all([
+    getTransactions({
+      page,
+      limit: 15,
+      type: params.type
+    }),
+    getFinanceAccounts({ isActive: true }),
+    getFunds({ isActive: true })
+  ])
 
   return (
     <TransactionsTable
@@ -20,7 +26,9 @@ export default async function TransactionsPage({ searchParams }: Props) {
       pages={pages}
       currentPage={page}
       summary={summary}
-      searchParams={searchParams}
+      searchParams={params}
+      accounts={accounts}
+      funds={funds}
     />
   )
 }
