@@ -39,6 +39,7 @@ const sidebarItems = [
       { label: '거래 내역', href: '/admin/finance/transactions' },
       { label: '계정과목', href: '/admin/finance/accounts' },
       { label: '기금 관리', href: '/admin/finance/funds' },
+      { label: '입금 관리', href: '/admin/finance/deposits' },
       { label: '후원 관리', href: '/admin/finance/donations' },
       { label: '보고서', href: '/admin/finance/reports' },
     ],
