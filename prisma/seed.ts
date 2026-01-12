@@ -312,6 +312,73 @@ async function main() {
     console.log('No programs or users found, skipping deposit data')
   }
 
+  // =============================================
+  // 후원금 샘플 데이터
+  // =============================================
+  console.log('\nSeeding donation data...')
+
+  // 기존 후원금 삭제
+  await prisma.financeDonation.deleteMany({})
+
+  // 샘플 후원금 데이터
+  const sampleDonations = [
+    // 2025년 11월
+    { donorName: '김○○', donorType: 'INDIVIDUAL', amount: 500000, date: '2025-11-10', type: 'ONETIME', receiptIssued: true, receiptNumber: 'D2025-001' },
+    { donorName: '(주)○○기업', donorType: 'CORPORATE', amount: 1000000, date: '2025-11-25', type: 'ONETIME', receiptIssued: true, receiptNumber: 'D2025-002' },
+
+    // 2025년 12월
+    { donorName: '이○○', donorType: 'INDIVIDUAL', amount: 300000, date: '2025-12-12', type: 'ONETIME', receiptIssued: true, receiptNumber: 'D2025-003' },
+    { donorName: '최○○', donorType: 'INDIVIDUAL', amount: 200000, date: '2025-12-12', type: 'ONETIME', receiptIssued: true, receiptNumber: 'D2025-004' },
+    { donorName: '(재)○○재단', donorType: 'CORPORATE', amount: 5000000, date: '2025-12-20', type: 'DESIGNATED', designation: '청년교류사업', receiptIssued: true, receiptNumber: 'D2025-005' },
+
+    // 2026년 1월 - 정기 후원
+    { donorName: '박○○', donorType: 'INDIVIDUAL', amount: 50000, date: '2026-01-05', type: 'REGULAR', note: '월정기후원', receiptIssued: false },
+    { donorName: '정○○', donorType: 'INDIVIDUAL', amount: 30000, date: '2026-01-05', type: 'REGULAR', note: '월정기후원', receiptIssued: false },
+    { donorName: '한○○', donorType: 'INDIVIDUAL', amount: 100000, date: '2026-01-05', type: 'REGULAR', note: '월정기후원', receiptIssued: false },
+    { donorName: '박○○', donorType: 'INDIVIDUAL', amount: 1000000, date: '2026-01-12', type: 'ONETIME', note: '신년 특별후원', receiptIssued: false },
+
+    // 기업 후원
+    { donorName: '(주)△△테크', donorType: 'CORPORATE', amount: 3000000, date: '2026-01-08', type: 'DESIGNATED', designation: '독서모임 운영', receiptIssued: true, receiptNumber: 'D2026-001' },
+    { donorName: '○○법률사무소', donorType: 'CORPORATE', amount: 500000, date: '2026-01-10', type: 'ONETIME', receiptIssued: false },
+  ]
+
+  for (const donation of sampleDonations) {
+    await prisma.financeDonation.create({
+      data: {
+        donorName: donation.donorName,
+        donorType: donation.donorType,
+        amount: donation.amount,
+        date: new Date(donation.date),
+        type: donation.type,
+        designation: donation.designation || null,
+        receiptIssued: donation.receiptIssued,
+        receiptNumber: donation.receiptNumber || null,
+        receiptIssuedAt: donation.receiptIssued ? new Date(donation.date) : null,
+        note: donation.note || null,
+      },
+    })
+  }
+
+  console.log(`Created ${sampleDonations.length} donation records`)
+
+  // 후원금 통계
+  const donationStats = await prisma.financeDonation.aggregate({
+    _count: true,
+    _sum: { amount: true }
+  })
+  const byType = await prisma.financeDonation.groupBy({
+    by: ['type'],
+    _count: true,
+    _sum: { amount: true }
+  })
+
+  console.log('\n후원금 현황:')
+  console.log(`  총 후원: ${donationStats._count}건, ${donationStats._sum.amount?.toLocaleString()}원`)
+  byType.forEach(t => {
+    const typeLabel = t.type === 'REGULAR' ? '정기후원' : t.type === 'DESIGNATED' ? '지정후원' : '일시후원'
+    console.log(`  ${typeLabel}: ${t._count}건, ${t._sum.amount?.toLocaleString()}원`)
+  })
+
   console.log('\nSeed completed!')
 }
 
