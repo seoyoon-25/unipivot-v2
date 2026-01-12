@@ -116,7 +116,7 @@ async function main() {
   console.log(`Created fiscal year ${currentYear}`)
 
   // Create general fund
-  await prisma.fund.upsert({
+  const generalFund = await prisma.fund.upsert({
     where: { id: 'general-fund' },
     update: {},
     create: {
@@ -129,6 +129,95 @@ async function main() {
     },
   })
   console.log('Created general fund')
+
+  // Get account IDs for transactions
+  const accounts = await prisma.financeAccount.findMany()
+  const getAccountId = (code: string) => accounts.find(a => a.code === code)?.id
+
+  // Sample transactions data
+  const sampleTransactions = [
+    // 2025년 11월 거래
+    { date: '2025-11-01', type: 'INCOME', accountCode: '4301', amount: 5000000, description: '통일부 남북청년교류 보조금 (1차)', vendor: '통일부', paymentMethod: 'TRANSFER', evidenceType: 'TAX_INVOICE' },
+    { date: '2025-11-05', type: 'EXPENSE', accountCode: '5201', amount: 800000, description: '11월 사무실 임차료', vendor: '○○빌딩', paymentMethod: 'TRANSFER', evidenceType: 'TAX_INVOICE' },
+    { date: '2025-11-05', type: 'EXPENSE', accountCode: '5202', amount: 150000, description: '11월 관리비', vendor: '○○빌딩', paymentMethod: 'TRANSFER', evidenceType: 'TAX_INVOICE' },
+    { date: '2025-11-10', type: 'INCOME', accountCode: '4201', amount: 500000, description: '김○○ 후원금', vendor: '김○○', paymentMethod: 'TRANSFER', evidenceType: 'NONE' },
+    { date: '2025-11-12', type: 'EXPENSE', accountCode: '5105', amount: 300000, description: '독서모임 강사료 (박○○ 작가)', vendor: '박○○', paymentMethod: 'TRANSFER', evidenceType: 'SIMPLE' },
+    { date: '2025-11-15', type: 'EXPENSE', accountCode: '5101', amount: 3500000, description: '11월 직원 급여', vendor: null, paymentMethod: 'TRANSFER', evidenceType: 'NONE' },
+    { date: '2025-11-15', type: 'EXPENSE', accountCode: '5104', amount: 350000, description: '11월 4대보험료', vendor: '국민건강보험공단', paymentMethod: 'TRANSFER', evidenceType: 'NONE' },
+    { date: '2025-11-18', type: 'INCOME', accountCode: '4401', amount: 240000, description: '독서모임 참가비 (8명 x 30,000원)', vendor: null, paymentMethod: 'TRANSFER', evidenceType: 'NONE' },
+    { date: '2025-11-20', type: 'EXPENSE', accountCode: '5307', amount: 85000, description: '독서모임 다과비', vendor: '○○베이커리', paymentMethod: 'CARD', evidenceType: 'CARD_SLIP' },
+    { date: '2025-11-22', type: 'EXPENSE', accountCode: '5303', amount: 200000, description: 'SNS 광고비 (페이스북/인스타)', vendor: 'Meta', paymentMethod: 'CARD', evidenceType: 'CARD_SLIP' },
+    { date: '2025-11-25', type: 'INCOME', accountCode: '4202', amount: 1000000, description: '(주)○○기업 후원금', vendor: '(주)○○기업', paymentMethod: 'TRANSFER', evidenceType: 'TAX_INVOICE' },
+    { date: '2025-11-28', type: 'EXPENSE', accountCode: '5401', amount: 120000, description: '사무용품 구입', vendor: '오피스디포', paymentMethod: 'CARD', evidenceType: 'CARD_SLIP' },
+
+    // 2025년 12월 거래
+    { date: '2025-12-01', type: 'INCOME', accountCode: '4301', amount: 5000000, description: '통일부 남북청년교류 보조금 (2차)', vendor: '통일부', paymentMethod: 'TRANSFER', evidenceType: 'TAX_INVOICE' },
+    { date: '2025-12-05', type: 'EXPENSE', accountCode: '5201', amount: 800000, description: '12월 사무실 임차료', vendor: '○○빌딩', paymentMethod: 'TRANSFER', evidenceType: 'TAX_INVOICE' },
+    { date: '2025-12-05', type: 'EXPENSE', accountCode: '5202', amount: 150000, description: '12월 관리비', vendor: '○○빌딩', paymentMethod: 'TRANSFER', evidenceType: 'TAX_INVOICE' },
+    { date: '2025-12-10', type: 'EXPENSE', accountCode: '5302', amount: 1500000, description: '송년행사 장소대관료', vendor: '○○컨벤션센터', paymentMethod: 'TRANSFER', evidenceType: 'TAX_INVOICE' },
+    { date: '2025-12-10', type: 'EXPENSE', accountCode: '5307', amount: 800000, description: '송년행사 케이터링', vendor: '○○케이터링', paymentMethod: 'CARD', evidenceType: 'TAX_INVOICE' },
+    { date: '2025-12-12', type: 'INCOME', accountCode: '4201', amount: 300000, description: '이○○ 후원금', vendor: '이○○', paymentMethod: 'TRANSFER', evidenceType: 'NONE' },
+    { date: '2025-12-12', type: 'INCOME', accountCode: '4201', amount: 200000, description: '최○○ 후원금', vendor: '최○○', paymentMethod: 'TRANSFER', evidenceType: 'NONE' },
+    { date: '2025-12-15', type: 'EXPENSE', accountCode: '5101', amount: 3500000, description: '12월 직원 급여', vendor: null, paymentMethod: 'TRANSFER', evidenceType: 'NONE' },
+    { date: '2025-12-15', type: 'EXPENSE', accountCode: '5104', amount: 350000, description: '12월 4대보험료', vendor: '국민건강보험공단', paymentMethod: 'TRANSFER', evidenceType: 'NONE' },
+    { date: '2025-12-18', type: 'EXPENSE', accountCode: '5105', amount: 300000, description: '독서모임 강사료 (박○○ 작가)', vendor: '박○○', paymentMethod: 'TRANSFER', evidenceType: 'SIMPLE' },
+    { date: '2025-12-20', type: 'INCOME', accountCode: '4403', amount: 500000, description: '송년행사 참가비 (50명 x 10,000원)', vendor: null, paymentMethod: 'TRANSFER', evidenceType: 'NONE' },
+    { date: '2025-12-22', type: 'EXPENSE', accountCode: '5306', amount: 180000, description: '송년행사 교통비 (버스 대절)', vendor: '○○관광', paymentMethod: 'TRANSFER', evidenceType: 'TAX_INVOICE' },
+    { date: '2025-12-28', type: 'INCOME', accountCode: '4501', amount: 15000, description: '12월 예금이자', vendor: '○○은행', paymentMethod: 'TRANSFER', evidenceType: 'NONE' },
+
+    // 2026년 1월 거래
+    { date: '2026-01-02', type: 'INCOME', accountCode: '4101', amount: 600000, description: '2026년 정회원 연회비 (20명 x 30,000원)', vendor: null, paymentMethod: 'TRANSFER', evidenceType: 'NONE' },
+    { date: '2026-01-05', type: 'EXPENSE', accountCode: '5201', amount: 800000, description: '1월 사무실 임차료', vendor: '○○빌딩', paymentMethod: 'TRANSFER', evidenceType: 'TAX_INVOICE' },
+    { date: '2026-01-05', type: 'EXPENSE', accountCode: '5202', amount: 150000, description: '1월 관리비', vendor: '○○빌딩', paymentMethod: 'TRANSFER', evidenceType: 'TAX_INVOICE' },
+    { date: '2026-01-08', type: 'INCOME', accountCode: '4601', amount: 400000, description: '독서모임 보증금 (8명 x 50,000원)', vendor: null, paymentMethod: 'TRANSFER', evidenceType: 'NONE' },
+    { date: '2026-01-10', type: 'EXPENSE', accountCode: '5304', amount: 250000, description: '2026년 활동 리플렛 인쇄', vendor: '○○인쇄', paymentMethod: 'TRANSFER', evidenceType: 'TAX_INVOICE' },
+    { date: '2026-01-12', type: 'INCOME', accountCode: '4201', amount: 1000000, description: '박○○ 신년 후원금', vendor: '박○○', paymentMethod: 'TRANSFER', evidenceType: 'NONE' },
+  ]
+
+  // Delete existing transactions and create new ones
+  await prisma.financeTransaction.deleteMany({})
+  console.log('Cleared existing transactions')
+
+  let totalIncome = 0
+  let totalExpense = 0
+
+  for (const tx of sampleTransactions) {
+    const accountId = getAccountId(tx.accountCode)
+    if (!accountId) {
+      console.warn(`Account not found for code: ${tx.accountCode}`)
+      continue
+    }
+
+    await prisma.financeTransaction.create({
+      data: {
+        date: new Date(tx.date),
+        type: tx.type,
+        fundId: generalFund.id,
+        financeAccountId: accountId,
+        amount: tx.amount,
+        description: tx.description,
+        vendor: tx.vendor,
+        paymentMethod: tx.paymentMethod,
+        evidenceType: tx.evidenceType,
+      },
+    })
+
+    if (tx.type === 'INCOME') {
+      totalIncome += tx.amount
+    } else {
+      totalExpense += tx.amount
+    }
+  }
+
+  console.log(`Created ${sampleTransactions.length} sample transactions`)
+
+  // Update fund balance
+  const finalBalance = totalIncome - totalExpense
+  await prisma.fund.update({
+    where: { id: generalFund.id },
+    data: { balance: finalBalance },
+  })
+  console.log(`Updated fund balance: ${finalBalance.toLocaleString()}원 (수입: ${totalIncome.toLocaleString()}원, 지출: ${totalExpense.toLocaleString()}원)`)
 
   console.log('Seed completed!')
 }

@@ -35,8 +35,10 @@ const sidebarItems = [
     label: '재무',
     icon: Wallet,
     children: [
+      { label: '회계 현황', href: '/admin/finance' },
       { label: '거래 내역', href: '/admin/finance/transactions' },
-      { label: '입금 관리', href: '/admin/finance/deposits' },
+      { label: '계정과목', href: '/admin/finance/accounts' },
+      { label: '기금 관리', href: '/admin/finance/funds' },
       { label: '후원 관리', href: '/admin/finance/donations' },
       { label: '보고서', href: '/admin/finance/reports' },
     ],

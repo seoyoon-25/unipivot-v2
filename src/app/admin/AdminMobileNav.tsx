@@ -8,7 +8,7 @@ const mobileNavItems = [
   { label: '대시보드', href: '/admin', icon: LayoutDashboard },
   { label: '회원', href: '/admin/members', icon: Users },
   { label: '프로그램', href: '/admin/programs', icon: BookOpen },
-  { label: '재무', href: '/admin/finance/donations', icon: Wallet },
+  { label: '재무', href: '/admin/finance', icon: Wallet },
   { label: '콘텐츠', href: '/admin/contents/notices', icon: FileText },
 ]
 
