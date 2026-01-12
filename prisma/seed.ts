@@ -219,7 +219,100 @@ async function main() {
   })
   console.log(`Updated fund balance: ${finalBalance.toLocaleString()}원 (수입: ${totalIncome.toLocaleString()}원, 지출: ${totalExpense.toLocaleString()}원)`)
 
-  console.log('Seed completed!')
+  // =============================================
+  // 보증금 샘플 데이터
+  // =============================================
+  console.log('\nSeeding deposit data...')
+
+  // 프로그램과 사용자 조회
+  const programs = await prisma.program.findMany({ take: 3 })
+  const users = await prisma.user.findMany({
+    where: { role: 'USER' },
+    take: 7
+  })
+
+  if (programs.length > 0 && users.length > 0) {
+    // 기존 참여자 삭제
+    await prisma.programParticipant.deleteMany({})
+    console.log('Cleared existing participants')
+
+    // 보증금 설정 생성
+    for (const program of programs) {
+      await prisma.depositSetting.upsert({
+        where: { programId: program.id },
+        update: {
+          isEnabled: true,
+          totalSessions: 8,
+          depositAmount: 50000,
+          conditionType: 'ATTENDANCE_ONLY',
+          attendanceRate: 80,
+        },
+        create: {
+          programId: program.id,
+          isEnabled: true,
+          totalSessions: 8,
+          depositAmount: 50000,
+          conditionType: 'ATTENDANCE_ONLY',
+          attendanceRate: 80,
+        },
+      })
+    }
+    console.log(`Created deposit settings for ${programs.length} programs`)
+
+    // 참여자 샘플 데이터
+    const depositStatuses = ['PAID', 'PAID', 'PAID', 'RETURNED', 'FORFEITED', 'PAID', 'PAID']
+    const attendanceRates = [100, 87.5, 75, 100, 50, 62.5, 87.5]
+
+    let participantCount = 0
+    for (let i = 0; i < Math.min(users.length, 7); i++) {
+      const user = users[i]
+      const program = programs[i % programs.length]
+      const status = depositStatuses[i]
+      const attendanceRate = attendanceRates[i]
+
+      const depositData: any = {
+        programId: program.id,
+        userId: user.id,
+        status: status === 'RETURNED' || status === 'FORFEITED' ? 'COMPLETED' : 'ACTIVE',
+        depositAmount: 50000,
+        depositStatus: status,
+        depositPaidAt: new Date('2025-12-01'),
+        finalAttendanceRate: attendanceRate,
+      }
+
+      // 정산 완료된 경우
+      if (status === 'RETURNED') {
+        depositData.returnAmount = 50000
+        depositData.returnMethod = 'TRANSFER'
+        depositData.settledAt = new Date('2026-01-10')
+        depositData.settleNote = '출석률 100% 달성으로 전액 반환'
+      } else if (status === 'FORFEITED') {
+        depositData.forfeitAmount = 50000
+        depositData.settledAt = new Date('2026-01-10')
+        depositData.settleNote = '출석률 미달로 전액 차감'
+      }
+
+      await prisma.programParticipant.create({ data: depositData })
+      participantCount++
+    }
+
+    console.log(`Created ${participantCount} participants with deposit data`)
+
+    // 통계 출력
+    const stats = await prisma.programParticipant.groupBy({
+      by: ['depositStatus'],
+      _count: true,
+      _sum: { depositAmount: true, returnAmount: true, forfeitAmount: true }
+    })
+    console.log('\n보증금 현황:')
+    stats.forEach(s => {
+      console.log(`  ${s.depositStatus}: ${s._count}명, 보증금 ${s._sum.depositAmount?.toLocaleString()}원`)
+    })
+  } else {
+    console.log('No programs or users found, skipping deposit data')
+  }
+
+  console.log('\nSeed completed!')
 }
 
 main()
