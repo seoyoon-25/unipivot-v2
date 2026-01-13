@@ -5,7 +5,7 @@ import Link from 'next/link'
 import {
   LayoutDashboard, Users, BookOpen, Briefcase, Wallet,
   FileText, Bot, Palette, Settings, Home,
-  ChevronDown, Bell, Handshake, FlaskConical
+  ChevronDown, Bell, Handshake, FlaskConical, ClipboardList
 } from 'lucide-react'
 import AdminMobileNav from './AdminMobileNav'
 import AdminHeader from './AdminHeader'
@@ -22,6 +22,11 @@ const sidebarItems = [
     label: '프로그램',
     href: '/admin/programs',
     icon: BookOpen,
+  },
+  {
+    label: '만족도 조사',
+    href: '/admin/surveys',
+    icon: ClipboardList,
   },
   {
     label: '협조요청',
