@@ -16,7 +16,7 @@ export async function getDashboardStats() {
     recentActivities
   ] = await Promise.all([
     prisma.user.count(),
-    prisma.program.count({ where: { status: { in: ['OPEN', 'CLOSED'] } } }),
+    prisma.program.count({ where: { status: { in: ['RECRUITING', 'ONGOING', 'OPEN', 'RECRUIT_CLOSED'] } } }),
     prisma.donation.aggregate({
       where: {
         status: 'COMPLETED',

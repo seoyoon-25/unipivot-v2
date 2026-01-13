@@ -6,18 +6,18 @@ import { LabFooter } from '@/components/lab/LabFooter'
 export const metadata: Metadata = {
   metadataBase: new URL('https://lab.bestcome.org'),
   title: {
-    default: '유니피벗 리서치랩 | 북한이탈주민 전문가 풀',
+    default: '유니피벗 리서치랩 | 이주민 연구 매칭 플랫폼',
     template: '%s | 유니피벗 리서치랩',
   },
-  description: '북한이탈주민 전문가 풀과 연구 매칭 플랫폼. 통일·북한 분야의 전문가와 강사를 직접 검색하고 섭외하세요.',
-  keywords: ['유니피벗', '리서치랩', '북한이탈주민', '전문가', '강사', '설문조사', '연구', '통일'],
+  description: '이주배경 주민 전문가 풀과 연구 매칭 플랫폼. 통일·북한·다문화 분야의 전문가와 강사를 직접 검색하고 섭외하세요.',
+  keywords: ['유니피벗', '리서치랩', '이주민', '다문화', '북한이탈주민', '결혼이민자', '전문가', '강사', '설문조사', '연구', '통일'],
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
     url: 'https://lab.bestcome.org',
     siteName: '유니피벗 리서치랩',
-    title: '유니피벗 리서치랩 | 북한이탈주민 전문가 풀',
-    description: '북한이탈주민 전문가 풀과 연구 매칭 플랫폼.',
+    title: '유니피벗 리서치랩 | 이주민 연구 매칭 플랫폼',
+    description: '이주배경 주민 전문가 풀과 연구 매칭 플랫폼.',
     images: [
       {
         url: '/og-image-lab.png',
