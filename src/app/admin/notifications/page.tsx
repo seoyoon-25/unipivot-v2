@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Bell, Send, Users, Search, Check, FileText } from 'lucide-react'
+import { Bell, Send, Users, Search, Check, FileText, History } from 'lucide-react'
 
 interface User {
   id: string
@@ -95,13 +95,22 @@ export default function AdminNotificationsPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">알림 발송</h1>
           <p className="text-gray-600">회원들에게 알림을 발송합니다</p>
         </div>
-        <Link
-          href="/admin/notifications/templates"
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-        >
-          <FileText className="w-5 h-5" />
-          템플릿 관리
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin/notifications/logs"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            <History className="w-5 h-5" />
+            발송 내역
+          </Link>
+          <Link
+            href="/admin/notifications/templates"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            <FileText className="w-5 h-5" />
+            템플릿 관리
+          </Link>
+        </div>
       </div>
 
       <div className="max-w-3xl">
