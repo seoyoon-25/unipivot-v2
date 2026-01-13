@@ -1425,3 +1425,22 @@ model ResearchTrend {
   crawledAt        DateTime  @default(now())
   createdAt        DateTime  @default(now())
 }
+
+// =============================================
+// 콘텐츠 템플릿 시스템
+// =============================================
+
+model ContentTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  category    String   // PROGRAM, BLOG, NOTICE, EMAIL, COOPERATION
+  content     String   @db.Text // HTML 콘텐츠
+  thumbnail   String?  // 미리보기 이미지
+  isDefault   Boolean  @default(false)
+  isPublic    Boolean  @default(true)
+  useCount    Int      @default(0)
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

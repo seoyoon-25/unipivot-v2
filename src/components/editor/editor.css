@@ -345,3 +345,127 @@
 .rich-text-content p {
   margin: 0.5em 0;
 }
+
+/* =================================== */
+/* 리사이즈 가능한 이미지 스타일 */
+/* =================================== */
+
+.resizable-image-wrapper {
+  display: flex;
+  margin: 1em 0;
+}
+
+.resizable-image-wrapper.left {
+  justify-content: flex-start;
+}
+
+.resizable-image-wrapper.center {
+  justify-content: center;
+}
+
+.resizable-image-wrapper.right {
+  justify-content: flex-end;
+}
+
+.resizable-image-container {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.resizable-image-container .resizable-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.5em;
+}
+
+.resizable-image-container.selected {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* 리사이즈 핸들 */
+.resize-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  cursor: col-resize;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+.resizable-image-container:hover .resize-handle,
+.resizable-image-container.selected .resize-handle {
+  opacity: 1;
+}
+
+.resize-handle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 40px;
+  background: #3b82f6;
+  border-radius: 2px;
+}
+
+.resize-handle-left {
+  left: -5px;
+}
+
+.resize-handle-left::before {
+  left: 3px;
+}
+
+.resize-handle-right {
+  right: -5px;
+}
+
+.resize-handle-right::before {
+  right: 3px;
+}
+
+.resizable-image-container.resizing {
+  user-select: none;
+}
+
+/* 크기 표시 */
+.image-size-indicator {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* 이미지 정렬 (rich-text-content) */
+.image-figure {
+  margin: 1em 0;
+}
+
+.image-figure.align-left {
+  text-align: left;
+}
+
+.image-figure.align-center {
+  text-align: center;
+}
+
+.image-figure.align-right {
+  text-align: right;
+}
+
+.image-figure img {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5em;
+}

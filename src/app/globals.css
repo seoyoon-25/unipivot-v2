@@ -2,16 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
+/* CSS Variables for Dynamic Fonts */
+:root {
+  --font-primary: 'Noto Sans KR', sans-serif;
+  --font-heading: 'Noto Sans KR', sans-serif;
+  --font-accent: inherit;
+  --font-size-base: 16px;
+  --font-heading-scale: 1.25;
+  --font-size-h1: 2.441em;
+  --font-size-h2: 1.953em;
+  --font-size-h3: 1.563em;
+  --font-size-h4: 1.25em;
+}
 
 @layer base {
   html {
     scroll-behavior: smooth;
+    font-size: var(--font-size-base);
   }
 
   body {
-    @apply font-sans text-gray-900 antialiased;
+    @apply text-gray-900 antialiased;
+    font-family: var(--font-primary);
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+
+  h1 { font-size: var(--font-size-h1); }
+  h2 { font-size: var(--font-size-h2); }
+  h3 { font-size: var(--font-size-h3); }
+  h4 { font-size: var(--font-size-h4); }
 
   ::selection {
     @apply bg-primary/20 text-primary-dark;
