@@ -13,7 +13,9 @@ export async function getDashboardStats() {
     activePrograms,
     monthlyDonations,
     recentMembers,
-    recentActivities
+    recentActivities,
+    activeSurveys,
+    pendingRefunds
   ] = await Promise.all([
     prisma.user.count(),
     prisma.program.count({ where: { status: { in: ['RECRUITING', 'ONGOING', 'OPEN', 'RECRUIT_CLOSED'] } } }),
@@ -35,17 +37,50 @@ export async function getDashboardStats() {
       take: 10,
       orderBy: { createdAt: 'desc' },
       include: { user: { select: { name: true } } }
+    }),
+    // 진행 중인 만족도 조사
+    prisma.satisfactionSurvey.findMany({
+      where: { status: 'SENT' },
+      include: {
+        program: {
+          select: { id: true, title: true, type: true }
+        }
+      },
+      orderBy: { deadline: 'asc' },
+      take: 5
+    }),
+    // 반환 대기 중인 보증금
+    prisma.programApplication.count({
+      where: { depositStatus: 'REFUND_PENDING' }
     })
   ])
+
+  // 조사별 응답률 계산
+  const surveysWithRate = activeSurveys.map(survey => ({
+    id: survey.id,
+    title: survey.title,
+    programId: survey.program.id,
+    programTitle: survey.program.title,
+    programType: survey.program.type,
+    deadline: survey.deadline,
+    targetCount: survey.targetCount,
+    responseCount: survey.responseCount,
+    responseRate: survey.targetCount > 0
+      ? Math.round((survey.responseCount / survey.targetCount) * 100)
+      : 0,
+    daysLeft: Math.ceil((new Date(survey.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+  }))
 
   return {
     stats: {
       totalMembers,
       activePrograms,
-      monthlyDonations: monthlyDonations._sum.amount || 0
+      monthlyDonations: monthlyDonations._sum.amount || 0,
+      pendingRefunds
     },
     recentMembers,
-    recentActivities
+    recentActivities,
+    activeSurveys: surveysWithRate
   }
 }
 
