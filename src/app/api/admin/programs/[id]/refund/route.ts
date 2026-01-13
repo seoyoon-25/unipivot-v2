@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { calculateRefund, type RefundPolicyCriteria } from '@/lib/utils/deposit-calculator'
+import { sendRefundCompleteNotification, getAvailableProvider } from '@/lib/services/messaging-service'
 
 // GET: 보증금 반환 대상자 목록
 export async function GET(
@@ -182,6 +183,12 @@ export async function POST(
     }
 
     if (action === 'complete_refund') {
+      // 프로그램 정보 조회
+      const program = await prisma.program.findUnique({
+        where: { id },
+        select: { title: true },
+      })
+
       // 반환 완료 처리
       await prisma.programApplication.updateMany({
         where: {
@@ -195,11 +202,19 @@ export async function POST(
         },
       })
 
-      // 각 신청자의 반환 금액 업데이트 (개별 처리 필요)
+      // 각 신청자의 반환 금액 업데이트 및 알림 대상 수집
+      const notificationRecipients: Array<{
+        userId: string
+        name: string
+        phone: string
+        refundAmount: number
+      }> = []
+
       for (const appId of applicationIds) {
         const app = await prisma.programApplication.findUnique({
           where: { id: appId },
           include: {
+            user: { select: { id: true, name: true, phone: true } },
             program: { include: { depositSetting: true } },
           },
         })
@@ -208,20 +223,61 @@ export async function POST(
           const refundCalc = app.refundCalculation
             ? JSON.parse(app.refundCalculation)
             : null
+          const refundAmount = refundCalc?.refundAmount || app.refundableAmount || 0
 
           await prisma.programApplication.update({
             where: { id: appId },
             data: {
-              refundedAmount: refundCalc?.refundAmount || app.refundableAmount || 0,
+              refundedAmount: refundAmount,
             },
           })
+
+          // 알림 대상 추가
+          if (app.user.phone) {
+            notificationRecipients.push({
+              userId: app.user.id,
+              name: app.user.name || '회원',
+              phone: app.user.phone,
+              refundAmount,
+            })
+          }
         }
       }
 
-      // TODO: 반환 완료 알림 발송
+      // 반환 완료 알림 발송
+      let notificationResult = null
+      if (notificationRecipients.length > 0 && program) {
+        // 반환 금액별로 그룹화하여 발송
+        const groupedByAmount = notificationRecipients.reduce(
+          (acc, r) => {
+            const key = r.refundAmount
+            if (!acc[key]) acc[key] = []
+            acc[key].push(r)
+            return acc
+          },
+          {} as Record<number, typeof notificationRecipients>
+        )
+
+        const results = []
+        for (const [amount, recipients] of Object.entries(groupedByAmount)) {
+          const result = await sendRefundCompleteNotification(
+            program.title,
+            Number(amount),
+            recipients
+          )
+          results.push(result)
+        }
+
+        notificationResult = {
+          sent: results.reduce((sum, r) => sum + r.sent, 0),
+          failed: results.reduce((sum, r) => sum + r.failed, 0),
+        }
+      }
 
       return NextResponse.json({
         message: `${applicationIds.length}명의 반환이 완료 처리되었습니다.`,
+        notification: notificationResult,
+        provider: getAvailableProvider(),
       })
     }
 

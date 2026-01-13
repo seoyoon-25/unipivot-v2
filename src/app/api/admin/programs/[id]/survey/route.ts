@@ -3,6 +3,11 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { getSurveyTemplateByProgramType } from '@/lib/constants/survey-templates'
+import {
+  sendSurveyNotification,
+  sendSurveyReminder,
+  getAvailableProvider,
+} from '@/lib/services/messaging-service'
 
 // GET: 프로그램의 만족도 조사 조회
 export async function GET(
@@ -104,13 +109,34 @@ export async function POST(
       },
     })
 
-    // TODO: 발송 시 알림톡/이메일 발송 로직 추가
+    // 즉시 발송인 경우 알림톡 발송
+    let notificationResult = null
+    if (sendNow) {
+      const recipients = program.applications
+        .filter((app) => app.user.phone)
+        .map((app) => ({
+          userId: app.user.id,
+          name: app.user.name || '회원',
+          phone: app.user.phone!,
+        }))
+
+      if (recipients.length > 0) {
+        notificationResult = await sendSurveyNotification(
+          survey.id,
+          program.title,
+          deadline,
+          recipients
+        )
+      }
+    }
 
     return NextResponse.json({
       survey,
       message: sendNow
         ? '만족도 조사가 발송되었습니다.'
         : '만족도 조사가 생성되었습니다.',
+      notification: notificationResult,
+      provider: getAvailableProvider(),
     })
   } catch (error) {
     console.error('Create survey error:', error)
@@ -145,6 +171,21 @@ export async function PUT(
       return NextResponse.json({ error: '만족도 조사를 찾을 수 없습니다.' }, { status: 404 })
     }
 
+    // 프로그램과 참가자 정보 조회
+    const program = await prisma.program.findUnique({
+      where: { id: programId },
+      include: {
+        applications: {
+          where: { status: 'ACCEPTED' },
+          include: { user: true },
+        },
+      },
+    })
+
+    if (!program) {
+      return NextResponse.json({ error: '프로그램을 찾을 수 없습니다.' }, { status: 404 })
+    }
+
     if (action === 'send') {
       await prisma.satisfactionSurvey.update({
         where: { id: surveyId },
@@ -154,9 +195,30 @@ export async function PUT(
         },
       })
 
-      // TODO: 알림톡/이메일 발송 로직
+      // 알림톡 발송
+      const recipients = program.applications
+        .filter((app) => app.user.phone)
+        .map((app) => ({
+          userId: app.user.id,
+          name: app.user.name || '회원',
+          phone: app.user.phone!,
+        }))
 
-      return NextResponse.json({ message: '만족도 조사가 발송되었습니다.' })
+      let notificationResult = null
+      if (recipients.length > 0) {
+        notificationResult = await sendSurveyNotification(
+          surveyId,
+          program.title,
+          survey.deadline,
+          recipients
+        )
+      }
+
+      return NextResponse.json({
+        message: '만족도 조사가 발송되었습니다.',
+        notification: notificationResult,
+        provider: getAvailableProvider(),
+      })
     }
 
     if (action === 'close') {
@@ -172,15 +234,46 @@ export async function PUT(
     }
 
     if (action === 'remind') {
-      // 미응답자에게 리마인더 발송
+      // 미응답자 조회
+      const respondedUserIds = await prisma.surveyResponse
+        .findMany({
+          where: { surveyId },
+          select: { userId: true },
+        })
+        .then((responses) => responses.map((r) => r.userId))
+
+      const nonRespondents = program.applications
+        .filter(
+          (app) =>
+            app.user.phone && !respondedUserIds.includes(app.user.id)
+        )
+        .map((app) => ({
+          userId: app.user.id,
+          name: app.user.name || '회원',
+          phone: app.user.phone!,
+        }))
+
+      let notificationResult = null
+      if (nonRespondents.length > 0) {
+        notificationResult = await sendSurveyReminder(
+          surveyId,
+          program.title,
+          survey.deadline,
+          nonRespondents
+        )
+      }
+
       await prisma.satisfactionSurvey.update({
         where: { id: surveyId },
         data: { reminderSent: true },
       })
 
-      // TODO: 미응답자 알림톡/이메일 발송 로직
-
-      return NextResponse.json({ message: '리마인더가 발송되었습니다.' })
+      return NextResponse.json({
+        message: `미응답자 ${nonRespondents.length}명에게 리마인더가 발송되었습니다.`,
+        notification: notificationResult,
+        nonRespondentCount: nonRespondents.length,
+        provider: getAvailableProvider(),
+      })
     }
 
     return NextResponse.json({ error: '알 수 없는 액션입니다.' }, { status: 400 })
