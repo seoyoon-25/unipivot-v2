@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Search, Pin, Eye, Trash2, Edit, X, Save } from 'lucide-react'
 import { createNotice, updateNotice, deleteNotice } from '@/lib/actions/admin'
+import { RichTextEditor } from '@/components/editor'
 
 interface Notice {
   id: string
@@ -269,12 +270,11 @@ export default function NoticesTable({ notices, total, pages, currentPage, searc
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">내용 *</label>
-                <textarea
-                  value={form.content}
-                  onChange={(e) => setForm({ ...form, content: e.target.value })}
-                  rows={10}
-                  placeholder="공지사항 내용"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                <RichTextEditor
+                  content={form.content}
+                  onChange={(html) => setForm({ ...form, content: html })}
+                  placeholder="공지사항 내용을 입력하세요..."
+                  minHeight="300px"
                 />
               </div>
 

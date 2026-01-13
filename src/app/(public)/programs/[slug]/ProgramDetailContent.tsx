@@ -3,8 +3,9 @@
 import { useState, useTransition } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Heart, Calendar, MapPin, Users, Clock, ArrowLeft } from 'lucide-react'
+import { Heart, Calendar, MapPin, Users, Clock, ArrowLeft, BookOpen } from 'lucide-react'
 import { ShareButton } from '@/components/common/ShareButton'
+import '@/components/editor/editor.css'
 import {
   getProgramStatus,
   getStatusLabel,
@@ -165,8 +166,28 @@ export function ProgramDetailContent({
 
             {/* Content */}
             {program.content && (
-              <div className="prose prose-gray max-w-none mb-8">
-                <div dangerouslySetInnerHTML={{ __html: program.content }} />
+              <div className="bg-white rounded-2xl p-6 shadow-sm mb-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">프로그램 소개</h2>
+                <div className="rich-text-content prose prose-gray max-w-none" dangerouslySetInnerHTML={{ __html: program.content }} />
+              </div>
+            )}
+
+            {/* Schedule Content */}
+            {program.scheduleContent && (
+              <div className="bg-white rounded-2xl p-6 shadow-sm mb-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">일정 안내</h2>
+                <div className="rich-text-content prose prose-gray max-w-none" dangerouslySetInnerHTML={{ __html: program.scheduleContent }} />
+              </div>
+            )}
+
+            {/* Current Book Content (for BOOKCLUB) */}
+            {program.type === 'BOOKCLUB' && program.currentBookContent && (
+              <div className="bg-white rounded-2xl p-6 shadow-sm mb-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-primary" />
+                  현재 진행 도서
+                </h2>
+                <div className="rich-text-content prose prose-gray max-w-none" dangerouslySetInnerHTML={{ __html: program.currentBookContent }} />
               </div>
             )}
 

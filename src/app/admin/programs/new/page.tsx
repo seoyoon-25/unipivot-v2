@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Save, Upload } from 'lucide-react'
+import { ArrowLeft, Save, Upload, Image } from 'lucide-react'
 import { createProgram } from '@/lib/actions/admin'
+import { RichTextEditor } from '@/components/editor'
 
 const feeTypes = [
   { value: 'FREE', label: '무료' },
@@ -29,6 +30,8 @@ export default function NewProgramPage() {
     type: 'BOOKCLUB',
     description: '',
     content: '',
+    scheduleContent: '',
+    currentBookContent: '',
     capacity: 30,
     feeType: 'FREE',
     feeAmount: 0,
@@ -42,6 +45,35 @@ export default function NewProgramPage() {
     startDate: '',
     endDate: '',
   })
+  const [uploading, setUploading] = useState(false)
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'image' | 'thumbnailSquare') => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const res = await fetch('/api/upload/image', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || '업로드 실패')
+      }
+
+      const data = await res.json()
+      setForm({ ...form, [field]: data.url })
+    } catch (error: any) {
+      alert(error.message || '이미지 업로드에 실패했습니다.')
+    } finally {
+      setUploading(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -286,15 +318,33 @@ export default function NewProgramPage() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  대표 이미지 URL
+                  대표 이미지
                 </label>
-                <input
-                  type="url"
-                  value={form.image}
-                  onChange={(e) => setForm({ ...form, image: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                />
+                <div className="space-y-2">
+                  {form.image && (
+                    <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-gray-100">
+                      <img src={form.image} alt="대표 이미지" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, image: '' })}
+                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                  <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
+                    <Upload className="w-5 h-5 text-gray-400" />
+                    <span className="text-sm text-gray-600">{uploading ? '업로드 중...' : '이미지 업로드'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, 'image')}
+                      className="hidden"
+                      disabled={uploading}
+                    />
+                  </label>
+                </div>
                 <p className="mt-1 text-xs text-gray-500">
                   프로그램 상세 페이지에 표시됩니다
                 </p>
@@ -302,15 +352,33 @@ export default function NewProgramPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  정사각형 썸네일 URL
+                  정사각형 썸네일
                 </label>
-                <input
-                  type="url"
-                  value={form.thumbnailSquare}
-                  onChange={(e) => setForm({ ...form, thumbnailSquare: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                />
+                <div className="space-y-2">
+                  {form.thumbnailSquare && (
+                    <div className="relative w-32 h-32 rounded-xl overflow-hidden bg-gray-100">
+                      <img src={form.thumbnailSquare} alt="썸네일" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, thumbnailSquare: '' })}
+                        className="absolute top-1 right-1 p-0.5 bg-red-500 text-white rounded-full hover:bg-red-600 text-xs"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                  <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
+                    <Image className="w-5 h-5 text-gray-400" />
+                    <span className="text-sm text-gray-600">{uploading ? '업로드 중...' : '썸네일 업로드'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, 'thumbnailSquare')}
+                      className="hidden"
+                      disabled={uploading}
+                    />
+                  </label>
+                </div>
                 <p className="mt-1 text-xs text-gray-500">
                   카드 목록에 표시됩니다 (1:1 비율 권장)
                 </p>
@@ -330,7 +398,7 @@ export default function NewProgramPage() {
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   rows={2}
-                  placeholder="프로그램에 대한 간단한 설명"
+                  placeholder="프로그램에 대한 간단한 설명 (검색 결과와 목록에 표시됩니다)"
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
                 />
               </div>
@@ -339,14 +407,39 @@ export default function NewProgramPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   상세 내용
                 </label>
-                <textarea
-                  value={form.content}
-                  onChange={(e) => setForm({ ...form, content: e.target.value })}
-                  rows={8}
-                  placeholder="프로그램 상세 내용 (HTML 지원)"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                <RichTextEditor
+                  content={form.content}
+                  onChange={(html) => setForm({ ...form, content: html })}
+                  placeholder="프로그램 상세 내용을 입력하세요..."
+                  minHeight="300px"
                 />
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  일정 안내
+                </label>
+                <RichTextEditor
+                  content={form.scheduleContent}
+                  onChange={(html) => setForm({ ...form, scheduleContent: html })}
+                  placeholder="일정 안내 내용을 입력하세요..."
+                  minHeight="200px"
+                />
+              </div>
+
+              {form.type === 'BOOKCLUB' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    현재 진행 도서 안내
+                  </label>
+                  <RichTextEditor
+                    content={form.currentBookContent}
+                    onChange={(html) => setForm({ ...form, currentBookContent: html })}
+                    placeholder="현재 진행 중인 도서에 대한 안내를 입력하세요..."
+                    minHeight="200px"
+                  />
+                </div>
+              )}
             </div>
           </div>
 

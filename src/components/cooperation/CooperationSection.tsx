@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import '@/components/editor/editor.css'
 
 interface CooperationSectionProps {
   title: string
@@ -20,6 +21,9 @@ export function CooperationSection({
   buttonLink,
   reverse = false,
 }: CooperationSectionProps) {
+  // Check if content is HTML (has tags) or plain text
+  const isHtml = /<[a-z][\s\S]*>/i.test(content)
+
   return (
     <div
       className={`flex flex-col gap-8 items-center ${
@@ -30,8 +34,8 @@ export function CooperationSection({
       <div className="flex-1 space-y-4">
         <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{title}</h2>
         <div
-          className="text-gray-600 leading-relaxed whitespace-pre-line"
-          dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br/>') }}
+          className={`leading-relaxed ${isHtml ? 'rich-text-content prose prose-gray max-w-none' : 'text-gray-600 whitespace-pre-line'}`}
+          dangerouslySetInnerHTML={{ __html: isHtml ? content : content.replace(/\n/g, '<br/>') }}
         />
         <Link
           href={buttonLink}

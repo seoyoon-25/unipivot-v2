@@ -182,6 +182,8 @@ export async function createProgram(data: {
   type: string
   description?: string
   content?: string
+  scheduleContent?: string
+  currentBookContent?: string
   capacity?: number
   fee?: number
   feeType?: string
@@ -222,6 +224,8 @@ export async function updateProgram(id: string, data: {
   type?: string
   description?: string
   content?: string
+  scheduleContent?: string
+  currentBookContent?: string
   capacity?: number
   fee?: number
   feeType?: string

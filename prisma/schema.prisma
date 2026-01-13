@@ -103,8 +103,10 @@ model Program {
   title             String
   slug              String    @unique
   type              String    // BOOKCLUB, SEMINAR, KMOVE, DEBATE, WORKSHOP, OTHER
-  description       String?
-  content           String?
+  description       String?   @db.Text
+  content           String?   @db.Text  // 상세 내용 (HTML)
+  scheduleContent   String?   @db.Text  // 일정 안내 (HTML)
+  currentBookContent String?  @db.Text  // 현재 진행 도서 내용 (HTML)
   image             String?
   thumbnailSquare   String?   // 정사각형 썸네일
   capacity          Int       @default(30)

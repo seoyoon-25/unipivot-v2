@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Save, Users, Calendar, MapPin, Check, X } from 'lucide-react'
 import { updateProgram, updateRegistrationStatus } from '@/lib/actions/admin'
+import { RichTextEditor } from '@/components/editor'
 
 interface Program {
   id: string
@@ -12,6 +13,8 @@ interface Program {
   type: string
   description: string | null
   content: string | null
+  scheduleContent: string | null
+  currentBookContent: string | null
   capacity: number
   fee: number
   location: string | null
@@ -45,6 +48,8 @@ export default function ProgramDetail({ program }: Props) {
     type: program.type,
     description: program.description || '',
     content: program.content || '',
+    scheduleContent: program.scheduleContent || '',
+    currentBookContent: program.currentBookContent || '',
     capacity: program.capacity,
     fee: program.fee,
     location: program.location || '',
@@ -294,13 +299,35 @@ export default function ProgramDetail({ program }: Props) {
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">상세 내용</label>
-                <textarea
-                  value={form.content}
-                  onChange={(e) => setForm({ ...form, content: e.target.value })}
-                  rows={6}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                <RichTextEditor
+                  content={form.content}
+                  onChange={(html) => setForm({ ...form, content: html })}
+                  placeholder="프로그램 상세 내용을 입력하세요..."
+                  minHeight="300px"
                 />
               </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">일정 안내</label>
+                <RichTextEditor
+                  content={form.scheduleContent}
+                  onChange={(html) => setForm({ ...form, scheduleContent: html })}
+                  placeholder="일정 안내 내용을 입력하세요..."
+                  minHeight="200px"
+                />
+              </div>
+
+              {(program.type === 'BOOKCLUB') && (
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">현재 진행 도서 안내</label>
+                  <RichTextEditor
+                    content={form.currentBookContent}
+                    onChange={(html) => setForm({ ...form, currentBookContent: html })}
+                    placeholder="현재 진행 중인 도서에 대한 안내를 입력하세요..."
+                    minHeight="200px"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="mt-6 flex justify-end">

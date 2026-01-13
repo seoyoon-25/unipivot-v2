@@ -1,0 +1,347 @@
+/* TipTap 에디터 커스텀 스타일 */
+
+.ProseMirror {
+  outline: none;
+  min-height: inherit;
+}
+
+/* 플레이스홀더 */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+
+/* 제목 스타일 */
+.ProseMirror h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.ProseMirror h3 {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.ProseMirror h4 {
+  font-size: 1em;
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+/* 목록 스타일 */
+.ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.ProseMirror li {
+  margin: 0.25em 0;
+}
+
+/* 체크리스트 */
+.ProseMirror ul[data-type='taskList'] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.ProseMirror ul[data-type='taskList'] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+}
+
+.ProseMirror ul[data-type='taskList'] li > label {
+  flex-shrink: 0;
+  margin-top: 0.25em;
+}
+
+.ProseMirror ul[data-type='taskList'] li > label input[type='checkbox'] {
+  width: 1em;
+  height: 1em;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+.ProseMirror ul[data-type='taskList'] li > div {
+  flex: 1;
+}
+
+/* 인용구 */
+.ProseMirror blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1em;
+  margin: 1em 0;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* 코드 블록 */
+.ProseMirror pre {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 1em;
+  border-radius: 0.5em;
+  overflow-x: auto;
+  margin: 1em 0;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.9em;
+}
+
+.ProseMirror code {
+  background: #f3f4f6;
+  color: #ef4444;
+  padding: 0.2em 0.4em;
+  border-radius: 0.25em;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.9em;
+}
+
+.ProseMirror pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* 구분선 */
+.ProseMirror hr {
+  border: none;
+  border-top: 2px solid #e5e7eb;
+  margin: 1.5em 0;
+}
+
+/* 테이블 */
+.ProseMirror table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  overflow: hidden;
+}
+
+.ProseMirror th,
+.ProseMirror td {
+  border: 1px solid #e5e7eb;
+  padding: 0.5em 0.75em;
+  vertical-align: top;
+  position: relative;
+}
+
+.ProseMirror th {
+  background: #f9fafb;
+  font-weight: 600;
+  text-align: left;
+}
+
+/* 선택된 셀 */
+.ProseMirror .selectedCell {
+  background: #dbeafe;
+}
+
+.ProseMirror .selectedCell:after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(59, 130, 246, 0.1);
+  pointer-events: none;
+}
+
+/* 테이블 리사이즈 핸들 */
+.ProseMirror .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #3b82f6;
+  cursor: col-resize;
+}
+
+.ProseMirror.resize-cursor {
+  cursor: col-resize;
+}
+
+/* 이미지 */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1em auto;
+  border-radius: 0.5em;
+}
+
+.ProseMirror img.ProseMirror-selectednode {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* 링크 */
+.ProseMirror a {
+  color: #3b82f6;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ProseMirror a:hover {
+  color: #2563eb;
+}
+
+/* 하이라이트 */
+.ProseMirror mark {
+  background-color: #fef08a;
+  border-radius: 0.15em;
+  padding: 0.1em 0.2em;
+}
+
+/* 유튜브 */
+.ProseMirror iframe {
+  max-width: 100%;
+  border-radius: 0.5em;
+  margin: 1em 0;
+}
+
+/* 단락 */
+.ProseMirror p {
+  margin: 0.5em 0;
+}
+
+/* 드래그 중 */
+.ProseMirror-focused {
+  outline: none;
+}
+
+/* 선택 영역 */
+.ProseMirror ::selection {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+/* =================================== */
+/* 읽기 전용 콘텐츠 스타일 */
+/* =================================== */
+
+.rich-text-content h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.rich-text-content h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.rich-text-content h3 {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.rich-text-content h4 {
+  font-size: 1em;
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.rich-text-content ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.rich-text-content ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.rich-text-content blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1em;
+  margin: 1em 0;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.rich-text-content pre {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 1em;
+  border-radius: 0.5em;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.rich-text-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+}
+
+.rich-text-content th,
+.rich-text-content td {
+  border: 1px solid #e5e7eb;
+  padding: 0.5em 0.75em;
+}
+
+.rich-text-content th {
+  background: #f9fafb;
+  font-weight: 600;
+}
+
+.rich-text-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5em;
+  margin: 1em 0;
+}
+
+.rich-text-content a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.rich-text-content a:hover {
+  color: #2563eb;
+}
+
+.rich-text-content mark {
+  background-color: #fef08a;
+  border-radius: 0.15em;
+  padding: 0.1em 0.2em;
+}
+
+.rich-text-content iframe {
+  max-width: 100%;
+  border-radius: 0.5em;
+  margin: 1em 0;
+}
+
+.rich-text-content p {
+  margin: 0.5em 0;
+}

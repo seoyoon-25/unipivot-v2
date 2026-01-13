@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { X, Upload, Loader2 } from 'lucide-react'
+import { RichTextEditor } from '@/components/editor'
 
 interface BlogPost {
   id: string
@@ -35,6 +36,7 @@ function generateSlug(title: string): string {
 export default function BlogFormModal({ isOpen, onClose, post, categories }: Props) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -47,6 +49,34 @@ export default function BlogFormModal({ isOpen, onClose, post, categories }: Pro
   })
   const [newCategory, setNewCategory] = useState('')
   const [showNewCategory, setShowNewCategory] = useState(false)
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploading(true)
+    try {
+      const formDataUpload = new FormData()
+      formDataUpload.append('file', file)
+
+      const res = await fetch('/api/upload/image', {
+        method: 'POST',
+        body: formDataUpload,
+      })
+
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || '업로드 실패')
+      }
+
+      const data = await res.json()
+      setFormData(prev => ({ ...prev, image: data.url }))
+    } catch (error: any) {
+      alert(error.message || '이미지 업로드에 실패했습니다.')
+    } finally {
+      setUploading(false)
+    }
+  }
 
   useEffect(() => {
     if (post) {
@@ -248,36 +278,45 @@ export default function BlogFormModal({ isOpen, onClose, post, categories }: Pro
             <label className="block text-sm font-medium text-gray-700 mb-2">
               내용 <span className="text-red-500">*</span>
             </label>
-            <textarea
-              value={formData.content}
-              onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-              className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
-              rows={12}
-              placeholder="게시물 내용"
-              required
+            <RichTextEditor
+              content={formData.content}
+              onChange={(html) => setFormData(prev => ({ ...prev, content: html }))}
+              placeholder="게시물 내용을 입력하세요..."
+              minHeight="350px"
             />
           </div>
 
           {/* Image */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              썸네일 이미지 URL
+              썸네일 이미지
             </label>
-            <div className="flex gap-4">
-              <input
-                type="url"
-                value={formData.image}
-                onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
-                className="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                placeholder="https://..."
-              />
+            <div className="space-y-3">
               {formData.image && (
-                <img
-                  src={formData.image}
-                  alt="Preview"
-                  className="w-16 h-16 rounded-lg object-cover"
-                />
+                <div className="relative w-32 aspect-video rounded-xl overflow-hidden bg-gray-100">
+                  <img src={formData.image} alt="미리보기" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, image: '' }))}
+                    className="absolute top-1 right-1 p-0.5 bg-red-500 text-white rounded-full hover:bg-red-600 text-xs"
+                  >
+                    ×
+                  </button>
+                </div>
               )}
+              <label className="inline-flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
+                <Upload className="w-5 h-5 text-gray-400" />
+                <span className="text-sm text-gray-600">
+                  {uploading ? '업로드 중...' : '이미지 업로드'}
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  disabled={uploading}
+                />
+              </label>
             </div>
           </div>
 
