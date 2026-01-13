@@ -20,7 +20,10 @@ model User {
   image         String?
   password      String?
   phone         String?
-  origin        String?   // SOUTH, NORTH, OVERSEAS
+  origin        String?   // SOUTH, NORTH, OVERSEAS (기존 호환)
+  originCategory String?  // DEFECTOR, MARRIAGE_IMMIGRANT, MIGRANT_WORKER, INTERNATIONAL_STUDENT, REFUGEE, OVERSEAS_KOREAN, MULTICULTURAL_CHILD, NATURALIZED, KOREAN
+  originCountry String?   // 출신 국가 코드
+  arrivalYear   Int?      // 입국년도
   birthYear     Int?
   occupation    String?
   bio           String?
@@ -47,6 +50,12 @@ model User {
   programReports      ProgramReport[]
   reportComments      ReportComment[]
   reportLikes         ReportLike[]
+  programLikes        ProgramLike[]
+  // 관심사 시스템 관계
+  interests           Interest[]
+  interestLikes       InterestLike[]
+  interestKeywordLikes InterestKeywordLike[]
+  interestAlerts      InterestAlert[]
 }
 
 model Account {
@@ -89,31 +98,41 @@ model VerificationToken {
 // =============================================
 
 model Program {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  type        String   // BOOKCLUB, SEMINAR, WORKSHOP, KMOVE, OTHER
-  description String?
-  content     String?
-  image       String?
-  capacity    Int      @default(30)
-  fee         Int      @default(0)
-  location    String?
-  isOnline    Boolean  @default(false)
-  status      String   @default("DRAFT") // DRAFT, OPEN, CLOSED, COMPLETED
-  startDate   DateTime?
-  endDate     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String    @id @default(cuid())
+  title             String
+  slug              String    @unique
+  type              String    // BOOKCLUB, SEMINAR, KMOVE, DEBATE, WORKSHOP, OTHER
+  description       String?
+  content           String?
+  image             String?
+  thumbnailSquare   String?   // 정사각형 썸네일
+  capacity          Int       @default(30)
+  fee               Int       @default(0)
+  feeType           String    @default("FREE") // FREE, DEPOSIT, FEE, TUITION
+  feeAmount         Int       @default(0)
+  location          String?
+  isOnline          Boolean   @default(false)
+  status            String    @default("DRAFT") // DRAFT, RECRUITING, RECRUIT_CLOSED, ONGOING, COMPLETED
+  recruitStartDate  DateTime? // 모집 시작일
+  recruitEndDate    DateTime? // 모집 마감일
+  startDate         DateTime?
+  endDate           DateTime?
+  applicationFormId String?   // 커스텀 신청서 양식
+  likeCount         Int       @default(0)
+  applicationCount  Int       @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  sessions       ProgramSession[]
-  registrations  Registration[]
-  books          BookOnProgram[]
-  applications   ProgramApplication[]
-  gallery        ProgramGallery[]
-  depositSetting DepositSetting?
-  participants   ProgramParticipant[]
-  programReports ProgramReport[]
+  sessions        ProgramSession[]
+  registrations   Registration[]
+  books           BookOnProgram[]
+  applications    ProgramApplication[]
+  gallery         ProgramGallery[]
+  depositSetting  DepositSetting?
+  participants    ProgramParticipant[]
+  programReports  ProgramReport[]
+  likes           ProgramLike[]
+  applicationForm ApplicationForm? @relation(fields: [applicationFormId], references: [id])
 }
 
 model Registration {
@@ -719,15 +738,45 @@ model Donor {
 // =============================================
 
 model ProgramApplication {
-  id          String    @id @default(cuid())
-  programId   String
-  userId      String
-  status      String    @default("PENDING") // PENDING, CONFIRMED, CANCELLED, REJECTED
-  appliedAt   DateTime  @default(now())
-  confirmedAt DateTime?
-  cancelledAt DateTime?
+  id           String    @id @default(cuid())
+  programId    String
+  userId       String
+  status       String    @default("PENDING") // PENDING, ACCEPTED, ADDITIONAL, REJECTED, NO_CONTACT
+  appliedAt    DateTime  @default(now())
+  confirmedAt  DateTime?
+  cancelledAt  DateTime?
   cancelReason String?
-  note        String?
+  note         String?
+
+  // 신청 정보
+  email            String?
+  hometown         String?         // 고향
+  residence        String?         // 거주지역
+  motivation       String? @db.Text // 신청동기
+  source           String?         // 신청경로: EXISTING_MEMBER, HANA_FOUNDATION, SNS, KAKAO_GROUP, KAKAO_CHANNEL, REFERRAL
+  referrer         String?         // 추천인 (source가 REFERRAL일 때)
+  facePrivacy      Boolean @default(false) // 얼굴 비공개 희망
+  privacyAgreed    Boolean @default(true)  // 개인정보 동의
+
+  // 보증금 정보
+  depositPaid    Boolean   @default(false)
+  depositAmount  Int?
+  depositPaidAt  DateTime?
+  depositNote    String?
+
+  // 독서모임용 책 조사
+  bookReceiveType      String?   // PAPER, EBOOK, OWN
+  ebookProvider        String?   // KYOBO, YES24, RIDI, ALADIN, OTHER
+  ebookProviderOther   String?   // 기타 직접입력
+  bookSurveyCompletedAt DateTime?
+
+  // 알림 발송 이력
+  acceptNotifiedAt  DateTime?
+  rejectNotifiedAt  DateTime?
+  depositNotifiedAt DateTime?
+
+  // 커스텀 필드
+  customFields String? @db.Text // JSON
 
   program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id])
@@ -887,4 +936,489 @@ model ReportLike {
   user   User          @relation(fields: [userId], references: [id])
 
   @@unique([reportId, userId])
+}
+
+// =============================================
+// 프로그램 신청 시스템 확장 모델
+// =============================================
+
+model ProgramLike {
+  id        String   @id @default(cuid())
+  programId String
+  userId    String
+  createdAt DateTime @default(now())
+
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([programId, userId])
+}
+
+model ApplicationForm {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  isDefault   Boolean  @default(false)
+  fields      String   @db.Text // JSON array of field definitions
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  programs Program[]
+}
+
+model NotificationTemplate {
+  id        String   @id @default(cuid())
+  type      String   // ACCEPT, ADDITIONAL, REJECT, DEPOSIT, BOOK_SURVEY, REMINDER, NEW_PROGRAM
+  name      String
+  subject   String
+  content   String   @db.Text
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model NotificationLog {
+  id             String    @id @default(cuid())
+  type           String
+  recipientId    String?
+  recipientEmail String?
+  recipientPhone String?
+  subject        String
+  content        String    @db.Text
+  channel        String    // EMAIL, SMS, KAKAO, PUSH
+  status         String    @default("PENDING") // PENDING, SENT, FAILED
+  sentAt         DateTime?
+  errorMessage   String?
+  createdAt      DateTime  @default(now())
+}
+
+model SystemSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String   @db.Text
+  description String?
+  updatedAt   DateTime @updatedAt
+}
+
+// =============================================
+// 관심사(Interest) 시스템 모델
+// =============================================
+
+// 관심 키워드 (통계 및 관리용)
+model InterestKeyword {
+  id                String    @id @default(cuid())
+  keyword           String    @unique
+  category          String?   // 카테고리 분류
+  totalCount        Int       @default(0) // 전체 언급 횟수
+  monthlyCount      Int       @default(0) // 이번달 언급 횟수
+  likeCount         Int       @default(0) // 공감 수
+  relatedProgramIds String?   // JSON array - 관련 프로그램 ID들
+  isFixed           Boolean   @default(false) // 고정 키워드 여부
+  isRecommended     Boolean   @default(false) // 추천 키워드 여부
+  isHidden          Boolean   @default(false) // 숨김 처리 여부
+  lastUsedAt        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  interests   Interest[]
+  keywordLikes InterestKeywordLike[]
+  alerts      InterestAlert[]
+}
+
+// 개별 관심사 입력
+model Interest {
+  id         String   @id @default(cuid())
+  keywordId  String
+  content    String?  // 추가 내용 (선택)
+  userId     String?  // 회원인 경우
+  sessionId  String?  // 비회원 세션 ID
+  nickname   String?  // 표시할 닉네임 (익명, 닉네임, 실명)
+  visibility String   @default("ANONYMOUS") // ANONYMOUS, NICKNAME, MEMBER
+  likeCount  Int      @default(0) // 공감 수
+  ipHash     String?  // IP 해시 (중복 방지)
+  createdAt  DateTime @default(now())
+
+  keyword InterestKeyword @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  user    User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  likes   InterestLike[]
+}
+
+// 관심사 좋아요 (개별 관심사에 대한)
+model InterestLike {
+  id         String   @id @default(cuid())
+  interestId String
+  userId     String?
+  sessionId  String?
+  createdAt  DateTime @default(now())
+
+  interest Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
+  user     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([interestId, userId])
+  @@unique([interestId, sessionId])
+}
+
+// 키워드 공감 (키워드 자체에 대한)
+model InterestKeywordLike {
+  id        String   @id @default(cuid())
+  keywordId String
+  userId    String?
+  sessionId String?
+  createdAt DateTime @default(now())
+
+  keyword InterestKeyword @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  user    User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([keywordId, userId])
+  @@unique([keywordId, sessionId])
+}
+
+// 알림 신청
+model InterestAlert {
+  id                String    @id @default(cuid())
+  keywordId         String
+  userId            String?
+  email             String
+  name              String?
+  isActive          Boolean   @default(true)
+  notifiedAt        DateTime?
+  notifiedProgramId String?
+  createdAt         DateTime  @default(now())
+
+  keyword InterestKeyword @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  user    User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([keywordId, email])
+}
+
+// 관심사 시스템 설정
+model InterestSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String   @db.Text
+  description String?
+  updatedAt   DateTime @updatedAt
+}
+
+// =============================================
+// 협조요청 시스템
+// =============================================
+
+// 협조요청 섹션 (메인 페이지 표시용)
+model CooperationSection {
+  id         String   @id @default(cuid())
+  order      Int      @default(0)
+  title      String
+  content    String   @db.Text
+  image      String?
+  imageAlt   String?
+  buttonText String   @default("요청하기")
+  buttonLink String
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// 자문요청
+model ConsultingRequest {
+  id           String   @id @default(cuid())
+  startDate    DateTime
+  endDate      DateTime
+  duration     Int      // 시간
+  method       String   // OFFLINE, ONLINE
+  fee          Int?     // 만원 단위
+  requirements String   @db.Text
+  organization String
+  contactName  String
+  email        String
+  phone        String
+  attachment   String?
+  status       String   @default("PENDING") // PENDING, REVIEWING, MATCHED, COMPLETED, REJECTED
+  adminNote    String?  @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// 강사요청
+model LecturerRequest {
+  id              String   @id @default(cuid())
+  topic           String
+  schedules       Json     // [{date, startTime, endTime}]
+  method          String   // OFFLINE, ONLINE
+  requirements    String   @db.Text
+  fee             String?
+  organization    String
+  contactName     String
+  contactTitle    String?
+  email           String
+  phone           String
+  attachment      String?
+  feeAgreement    Boolean  @default(false)
+  matchedExpertId String?
+  status          String   @default("PENDING") // PENDING, REVIEWING, MATCHED, COMPLETED, REJECTED
+  adminNote       String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// 설문·인터뷰 요청
+model SurveyRequest {
+  id             String   @id @default(cuid())
+  startDate      DateTime
+  endDate        DateTime
+  questionCount  Int
+  estimatedTime  Int      // 분 단위
+  serviceFee     Int?     // 만원 단위
+  participantFee Int?     // 만원 단위
+  requirements   String   @db.Text
+  requesterType  String   // INDIVIDUAL, ORGANIZATION
+  requesterName  String
+  email          String
+  phone          String
+  attachment     String?
+  status         String   @default("PENDING") // PENDING, REVIEWING, IN_PROGRESS, COMPLETED, REJECTED
+  adminNote      String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// =============================================
+// 리서치랩 전문가/강사 풀 시스템
+// =============================================
+
+// 전문가 프로필 (확장된 모델 - 기존 Expert 대체)
+model ExpertProfile {
+  id                String    @id @default(cuid())
+  userId            String?   @unique // 회원 연동 (선택)
+
+  // 기본 정보
+  name              String
+  nameEn            String?
+  photo             String?
+  title             String?   // 직함
+  organization      String?   // 소속
+
+  // 연락처
+  email             String
+  phone             String?
+
+  // 출신 정보
+  origin            String    @default("NORTH") // NORTH, SOUTH (기존 호환)
+  originCategory    String?   // DEFECTOR, MARRIAGE_IMMIGRANT, MIGRANT_WORKER, INTERNATIONAL_STUDENT, REFUGEE, OVERSEAS_KOREAN, MULTICULTURAL_CHILD, NATURALIZED, KOREAN
+  originCountry     String?   // 출신 국가 코드
+  arrivalYear       Int?      // 입국년도 (범용)
+  defectionYear     Int?      // 탈북년도 (북한이탈주민)
+  settlementYear    Int?      // 정착년도
+  hometown          String?   // 고향/출신지역
+
+  // 전문 대상 그룹
+  targetExpertise   String?   @db.Text // JSON array: 어떤 이주민 그룹에 전문인지
+
+  // 학력/경력
+  education         String?   @db.Text // JSON array
+  career            String?   @db.Text // JSON array
+  certifications    String?   @db.Text // JSON array
+
+  // 전문 분야
+  categories        String?   // JSON array of category IDs
+  specialties       String?   @db.Text // 세부 전문 분야
+  keywords          String?   // 검색 키워드 (쉼표 구분)
+
+  // 강연 정보
+  lectureTopics     String?   @db.Text // 강연 가능 주제
+  lectureAreas      String?   // 강연 가능 지역 (JSON array)
+  lectureFeeMin     Int?      // 최소 강연료 (만원)
+  lectureFeeMax     Int?      // 최대 강연료 (만원)
+  lectureNote       String?   @db.Text // 강연 관련 비고
+
+  // 자문/컨설팅
+  consultingAreas   String?   @db.Text // 자문 가능 분야
+  consultingFee     Int?      // 자문료 (시간당, 만원)
+
+  // 연구 참여
+  researchInterests String?   @db.Text // 관심 연구 분야
+  surveyAvailable   Boolean   @default(true)  // 설문 참여 가능
+  interviewAvailable Boolean  @default(true)  // 인터뷰 참여 가능
+
+  // 소개
+  bio               String?   @db.Text
+  portfolio         String?   // 포트폴리오 URL
+  sns               String?   // SNS JSON {linkedin, instagram, etc}
+
+  // 실적 통계
+  lectureCount      Int       @default(0)
+  consultingCount   Int       @default(0)
+  researchCount     Int       @default(0)
+  rating            Float?    // 평균 평점
+
+  // 상태
+  isVerified        Boolean   @default(false) // 인증 여부
+  isPublic          Boolean   @default(false) // 공개 여부
+  isActive          Boolean   @default(true)
+  viewCount         Int       @default(0)
+
+  // 관리
+  verifiedAt        DateTime?
+  verifiedBy        String?
+  adminNote         String?   @db.Text
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  lectureMatches    LectureMatch[]
+  researchParticipations ResearchParticipation[]
+}
+
+// 강연 매칭 (강사 요청과 전문가 연결)
+model LectureMatch {
+  id               String    @id @default(cuid())
+  requestId        String?   // LecturerRequest ID (메인 사이트 요청)
+  expertId         String
+
+  // 요청 정보 (직접 요청인 경우)
+  topic            String?
+  date             DateTime?
+  duration         Int?      // 시간
+  method           String?   // OFFLINE, ONLINE
+  location         String?
+  fee              Int?      // 만원
+
+  // 요청자 정보
+  requesterOrg     String?
+  requesterName    String?
+  requesterEmail   String?
+  requesterPhone   String?
+
+  status           String    @default("PENDING") // PENDING, ACCEPTED, REJECTED, COMPLETED, CANCELLED
+  rating           Int?      // 1-5
+  feedback         String?   @db.Text
+
+  // 정산
+  actualFee        Int?
+  isPaid           Boolean   @default(false)
+  paidAt           DateTime?
+
+  adminNote        String?   @db.Text
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  expert           ExpertProfile @relation(fields: [expertId], references: [id], onDelete: Cascade)
+}
+
+// 리서치랩 설문조사
+model LabSurvey {
+  id               String    @id @default(cuid())
+  title            String
+  description      String?   @db.Text
+  type             String    @default("SURVEY") // SURVEY, INTERVIEW
+
+  // 모집 정보
+  targetCount      Int       @default(10) // 목표 참가자 수
+  currentCount     Int       @default(0)  // 현재 참가자 수
+
+  // 참가 자격
+  targetOrigin     String?   // NORTH, SOUTH, ANY (기존 호환)
+  targetCategories String?   @db.Text // JSON array: 대상 이주민 카테고리들
+  targetCountries  String?   @db.Text // JSON array: 대상 출신 국가들
+  targetAgeMin     Int?
+  targetAgeMax     Int?
+  targetGender     String?   // MALE, FEMALE, ANY
+  targetConditions String?   @db.Text // 기타 참가 조건
+
+  // 설문 정보
+  questionCount    Int?
+  estimatedTime    Int?      // 분 단위
+  questions        String?   @db.Text // JSON - 설문 문항 (간단한 설문용)
+  externalUrl      String?   // 외부 설문 URL (구글폼 등)
+
+  // 사례비
+  rewardType       String    @default("CASH") // CASH, POINT, GIFT
+  rewardAmount     Int?      // 사례비 금액
+  rewardNote       String?
+
+  // 기간
+  startDate        DateTime
+  endDate          DateTime
+
+  // 요청자 정보 (외부 요청인 경우)
+  isExternal       Boolean   @default(false)
+  requesterName    String?
+  requesterOrg     String?
+  requesterEmail   String?
+  requesterPhone   String?
+
+  // 상태
+  status           String    @default("DRAFT") // DRAFT, RECRUITING, CLOSED, COMPLETED
+  isPublic         Boolean   @default(true)
+
+  adminNote        String?   @db.Text
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  participations   ResearchParticipation[]
+}
+
+// 연구 참여 기록
+model ResearchParticipation {
+  id               String    @id @default(cuid())
+  surveyId         String
+  expertId         String?   // 등록된 전문가인 경우
+  userId           String?   // 일반 회원인 경우
+
+  // 참가자 정보 (비회원인 경우)
+  name             String?
+  email            String?
+  phone            String?
+  origin           String?   // NORTH, SOUTH (기존 호환)
+  originCategory   String?   // 이주민 카테고리
+  originCountry    String?   // 출신 국가
+
+  status           String    @default("APPLIED") // APPLIED, APPROVED, COMPLETED, CANCELLED, REJECTED
+
+  // 응답 데이터
+  responses        String?   @db.Text // JSON - 설문 응답 (내부 설문용)
+  completedAt      DateTime?
+
+  // 사례비 지급
+  rewardStatus     String    @default("PENDING") // PENDING, PAID, CANCELLED
+  rewardAmount     Int?
+  paidAt           DateTime?
+
+  note             String?   @db.Text
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  survey           LabSurvey      @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  expert           ExpertProfile? @relation(fields: [expertId], references: [id], onDelete: SetNull)
+}
+
+// 전문가 카테고리
+model ExpertCategory {
+  id               String    @id @default(cuid())
+  name             String    @unique
+  nameEn           String?
+  description      String?
+  icon             String?
+  color            String?
+  sortOrder        Int       @default(0)
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+}
+
+// 연구 동향 (크롤링 데이터)
+model ResearchTrend {
+  id               String    @id @default(cuid())
+  title            String
+  authors          String?
+  source           String    // 출처 (RISS, DBPIA, KCI 등)
+  sourceUrl        String?
+  publishedDate    DateTime?
+  abstract         String?   @db.Text
+  keywords         String?
+  category         String?
+  views            Int       @default(0)
+  isActive         Boolean   @default(true)
+  crawledAt        DateTime  @default(now())
+  createdAt        DateTime  @default(now())
 }
