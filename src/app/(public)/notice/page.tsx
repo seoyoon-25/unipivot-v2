@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Pin, Calendar, Eye } from 'lucide-react'
+import { Pin, Calendar, Eye, Plus } from 'lucide-react'
 import { getPublicNotices } from '@/lib/actions/public'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 export const metadata: Metadata = {
   title: '공지사항',
@@ -13,16 +15,31 @@ interface Props {
 }
 
 export default async function NoticePage({ searchParams }: Props) {
+  const [session, noticeData] = await Promise.all([
+    getServerSession(authOptions),
+    getPublicNotices({ page: parseInt(searchParams.page || '1'), limit: 10 })
+  ])
   const page = parseInt(searchParams.page || '1')
-  const { notices, total, pages } = await getPublicNotices({ page, limit: 10 })
+  const { notices, total, pages } = noticeData
+  const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN'
 
   return (
     <>
       <section className="pt-32 pb-16 bg-gradient-to-b from-gray-900 to-gray-800">
-        <div className="max-w-7xl mx-auto px-4 text-center">
+        <div className="max-w-7xl mx-auto px-4 text-center relative">
           <span className="text-primary text-sm font-semibold tracking-wider uppercase">Notice</span>
           <h1 className="text-4xl md:text-5xl font-bold text-white mt-2 mb-4">공지사항</h1>
           <p className="text-xl text-white/80 max-w-2xl mx-auto">유니피벗의 소식과 공지사항</p>
+          {/* 관리자 전용 글쓰기 버튼 */}
+          {isAdmin && (
+            <Link
+              href="/notice/write"
+              className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-100 text-primary rounded-xl font-medium transition-colors shadow-lg"
+            >
+              <Plus className="w-5 h-5" />
+              <span className="hidden sm:inline">글쓰기</span>
+            </Link>
+          )}
         </div>
       </section>
 

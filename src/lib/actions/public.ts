@@ -512,3 +512,96 @@ export async function addPoints(
 
   return history
 }
+
+// =============================================
+// Blog
+// =============================================
+
+export async function getPublicBlogPosts(params: {
+  page?: number
+  limit?: number
+  category?: string
+  search?: string
+}) {
+  const { page = 1, limit = 12, category, search } = params
+
+  const where: any = {
+    isPublished: true
+  }
+
+  if (category) {
+    where.category = category
+  }
+
+  if (search) {
+    where.OR = [
+      { title: { contains: search, mode: 'insensitive' } },
+      { excerpt: { contains: search, mode: 'insensitive' } },
+    ]
+  }
+
+  const [posts, total, categories] = await Promise.all([
+    prisma.blogPost.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        author: {
+          select: { id: true, name: true, image: true }
+        }
+      }
+    }),
+    prisma.blogPost.count({ where }),
+    prisma.blogPost.findMany({
+      select: { category: true },
+      distinct: ['category'],
+      where: { isPublished: true, category: { not: null } }
+    })
+  ])
+
+  return {
+    posts,
+    total,
+    pages: Math.ceil(total / limit),
+    categories: categories.map(c => c.category).filter(Boolean) as string[]
+  }
+}
+
+export async function getBlogPostBySlug(slug: string) {
+  // 조회수 증가
+  await prisma.blogPost.update({
+    where: { slug },
+    data: { views: { increment: 1 } }
+  }).catch(() => {})
+
+  return prisma.blogPost.findUnique({
+    where: { slug, isPublished: true },
+    include: {
+      author: {
+        select: { id: true, name: true, image: true }
+      }
+    }
+  })
+}
+
+export async function getRelatedBlogPosts(slug: string, category: string | null) {
+  return prisma.blogPost.findMany({
+    where: {
+      isPublished: true,
+      slug: { not: slug },
+      ...(category ? { category } : {})
+    },
+    take: 3,
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      excerpt: true,
+      image: true,
+      category: true,
+      createdAt: true
+    }
+  })
+}

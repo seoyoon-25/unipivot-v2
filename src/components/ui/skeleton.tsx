@@ -1,31 +1,33 @@
-import { cn } from '@/lib/utils'
-import { Loader2 } from 'lucide-react'
+import { cn } from "@/lib/utils"
+import { Loader2 } from "lucide-react"
 
+// Spinner component
 interface SpinnerProps {
   size?: 'xs' | 'sm' | 'md' | 'lg'
   className?: string
 }
 
-export function Spinner({ size = 'md', className }: SpinnerProps) {
-  const sizeClasses = {
-    xs: 'w-3 h-3',
-    sm: 'w-4 h-4',
-    md: 'w-6 h-6',
-    lg: 'w-8 h-8',
-  }
+const spinnerSizeClasses = {
+  xs: 'w-3 h-3',
+  sm: 'w-4 h-4',
+  md: 'w-6 h-6',
+  lg: 'w-8 h-8',
+}
 
+function Spinner({ size = 'md', className }: SpinnerProps) {
   return (
     <Loader2
-      className={cn('animate-spin text-primary', sizeClasses[size], className)}
+      className={cn('animate-spin text-primary', spinnerSizeClasses[size], className)}
     />
   )
 }
 
+// Loading Overlay component
 interface LoadingOverlayProps {
   message?: string
 }
 
-export function LoadingOverlay({ message = '로딩 중...' }: LoadingOverlayProps) {
+function LoadingOverlay({ message = '로딩 중...' }: LoadingOverlayProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm">
       <div className="flex flex-col items-center gap-4">
@@ -36,22 +38,21 @@ export function LoadingOverlay({ message = '로딩 중...' }: LoadingOverlayProp
   )
 }
 
-interface SkeletonProps {
-  className?: string
-}
-
-export function Skeleton({ className }: SkeletonProps) {
+// Skeleton component
+function Skeleton({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn(
-        'animate-pulse bg-gray-200 rounded-lg',
-        className
-      )}
+      className={cn("animate-pulse rounded-lg bg-gray-200", className)}
+      {...props}
     />
   )
 }
 
-export function CardSkeleton() {
+// Card Skeleton component
+function CardSkeleton() {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm">
       <Skeleton className="h-48 mb-4" />
@@ -61,7 +62,8 @@ export function CardSkeleton() {
   )
 }
 
-export function TableSkeleton({ rows = 5 }: { rows?: number }) {
+// Table Skeleton component
+function TableSkeleton({ rows = 5 }: { rows?: number }) {
   return (
     <div className="space-y-3">
       {Array.from({ length: rows }).map((_, i) => (
@@ -75,3 +77,5 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
     </div>
   )
 }
+
+export { Spinner, LoadingOverlay, Skeleton, CardSkeleton, TableSkeleton }

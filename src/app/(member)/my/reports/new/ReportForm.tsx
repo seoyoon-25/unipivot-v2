@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Save, Book } from 'lucide-react'
 import { createBookReport } from '@/lib/actions/public'
+import { useAutoSave } from '@/hooks/useAutoSave'
+import { DraftRestoreAlert, AutoSaveIndicator } from '@/components/common/DraftRestoreAlert'
+
+const DRAFT_KEY = 'report-draft-new'
 
 interface Book {
   id: string
@@ -26,6 +30,19 @@ export default function ReportForm({ books }: Props) {
     content: '',
     isPublic: false
   })
+
+  const { hasDraft, lastSaved, restoreDraft, clearDraft } = useAutoSave({
+    key: DRAFT_KEY,
+    data: form,
+  })
+
+  const handleRestore = () => {
+    const restored = restoreDraft()
+    if (restored) {
+      setForm(restored)
+      alert('임시저장된 내용을 복원했습니다.')
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,6 +70,7 @@ export default function ReportForm({ books }: Props) {
         content: form.content,
         isPublic: form.isPublic
       })
+      clearDraft()
       router.push('/my/reports')
       router.refresh()
     } catch (err) {
@@ -65,15 +83,22 @@ export default function ReportForm({ books }: Props) {
   return (
     <form onSubmit={handleSubmit}>
       <div className="bg-white rounded-2xl p-6 shadow-sm">
-        <div className="flex items-center gap-4 mb-6">
-          <Link
-            href="/my/reports"
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <h2 className="text-lg font-bold text-gray-900">기록 작성</h2>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/my/reports"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+            <h2 className="text-lg font-bold text-gray-900">기록 작성</h2>
+          </div>
+          <AutoSaveIndicator lastSaved={lastSaved} />
         </div>
+
+        {hasDraft && (
+          <DraftRestoreAlert onRestore={handleRestore} onDiscard={clearDraft} />
+        )}
 
         <div className="space-y-6">
           {/* Book Selection */}

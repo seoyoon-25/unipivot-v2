@@ -12,21 +12,7 @@ export async function middleware(req: NextRequest) {
   // 리서치랩 도메인 처리 (lab.bestcome.org)
   const isLabDomain = hostname.includes('lab.') || hostname === LAB_DOMAIN
 
-  if (isLabDomain) {
-    // 리서치랩 도메인에서 /lab 경로가 아닌 요청은 /lab으로 리라이트
-    if (!pathname.startsWith('/lab') && !pathname.startsWith('/_next') && !pathname.startsWith('/api')) {
-      const url = req.nextUrl.clone()
-      url.pathname = `/lab${pathname}`
-      return NextResponse.rewrite(url)
-    }
-    return NextResponse.next()
-  }
-
-  // 메인 도메인에서 /lab 경로 접근 시 리서치랩 도메인으로 리다이렉트 (선택적)
-  // if (pathname.startsWith('/lab') && !isLabDomain) {
-  //   return NextResponse.redirect(new URL(`https://${LAB_DOMAIN}${pathname.replace('/lab', '')}`, req.url))
-  // }
-
+  // 토큰 가져오기 (모든 경로에서 필요)
   const token = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,
@@ -35,8 +21,42 @@ export async function middleware(req: NextRequest) {
   const isLoggedIn = !!token
   const isAdmin = token?.role === 'ADMIN' || token?.role === 'SUPER_ADMIN'
 
+  // 리서치랩 도메인 처리
+  if (isLabDomain) {
+    // 리서치랩 도메인에서 /lab 경로가 아닌 요청은 /lab으로 리라이트
+    if (!pathname.startsWith('/lab') && !pathname.startsWith('/_next') && !pathname.startsWith('/api') && !pathname.startsWith('/login') && !pathname.startsWith('/register')) {
+      const url = req.nextUrl.clone()
+      url.pathname = `/lab${pathname}`
+      return NextResponse.rewrite(url)
+    }
+
+    // 리서치랩 인증 필수 (로그인/회원가입 페이지 제외)
+    const labPublicPaths = ['/login', '/register', '/forgot-password']
+    const isLabPublicPath = labPublicPaths.some(p => pathname.startsWith(p))
+
+    if (!isLabPublicPath && !pathname.startsWith('/_next') && !pathname.startsWith('/api')) {
+      if (!isLoggedIn) {
+        // 메인 도메인 로그인 페이지로 리다이렉트 (callback URL 포함)
+        const callbackUrl = `https://${LAB_DOMAIN}${pathname}`
+        const loginUrl = new URL(`https://${MAIN_DOMAIN}/login`)
+        loginUrl.searchParams.set('callbackUrl', callbackUrl)
+        return NextResponse.redirect(loginUrl)
+      }
+    }
+
+    return NextResponse.next()
+  }
+
+  // 리서치랩 경로 인증 필수 (메인 도메인에서 접근 시)
+  const isLabRoute = pathname.startsWith('/lab')
+  if (isLabRoute && !isLoggedIn) {
+    const loginUrl = new URL('/login', req.nextUrl)
+    loginUrl.searchParams.set('callbackUrl', pathname)
+    return NextResponse.redirect(loginUrl)
+  }
+
   // 회원 전용 페이지
-  const memberRoutes = ['/my', '/my/profile', '/my/programs', '/my/reports', '/my/points', '/my/settings']
+  const memberRoutes = ['/my', '/my/profile', '/my/programs', '/my/reports', '/my/points', '/my/settings', '/my/applications', '/my/likes', '/my/notifications']
   const isMemberRoute = memberRoutes.some((route) => pathname.startsWith(route))
 
   // 관리자 전용 페이지

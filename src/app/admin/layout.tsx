@@ -44,7 +44,7 @@ const sidebarItems = [
     children: [
       { label: '전체 현황', href: '/admin/lab' },
       { label: '전문가/강사', href: '/admin/lab/experts' },
-      { label: '설문조사', href: '/admin/lab/surveys' },
+      { label: '설문/인터뷰', href: '/admin/lab/surveys' },
       { label: '연구동향', href: '/admin/lab/trends' },
       { label: '연구참여', href: '/admin/lab/participations' },
     ],

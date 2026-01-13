@@ -100,7 +100,7 @@ export default function SurveysTable({ surveys, total, pages, currentPage, searc
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('정말 이 설문조사를 삭제하시겠습니까?')) return
+    if (!confirm('정말 이 설문/인터뷰를 삭제하시겠습니까?')) return
 
     try {
       const res = await fetch(`/api/admin/lab/surveys/${id}`, {
@@ -136,15 +136,15 @@ export default function SurveysTable({ surveys, total, pages, currentPage, searc
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">설문조사 관리</h1>
-          <p className="text-gray-500 mt-1">총 {total}개의 설문조사</p>
+          <h1 className="text-2xl font-bold text-gray-900">설문/인터뷰 관리</h1>
+          <p className="text-gray-500 mt-1">총 {total}개의 설문/인터뷰</p>
         </div>
         <button
           onClick={handleCreate}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors"
         >
           <Plus className="w-5 h-5" />
-          새 설문조사
+          새 설문/인터뷰
         </button>
       </div>
 
@@ -199,13 +199,13 @@ export default function SurveysTable({ surveys, total, pages, currentPage, searc
           <div className="p-12 text-center text-gray-500">
             {searchParams.search || searchParams.status || searchParams.type
               ? '검색 결과가 없습니다.'
-              : '등록된 설문조사가 없습니다.'}
+              : '등록된 설문/인터뷰가 없습니다.'}
           </div>
         ) : (
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">설문조사</th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">제목</th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">유형</th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">기간</th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">참가자</th>

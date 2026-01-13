@@ -154,7 +154,7 @@ export default function SurveyFormModal({ survey, onClose }: Props) {
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900">
-            {survey ? '설문조사 수정' : '새 설문조사'}
+            {survey ? '설문/인터뷰 수정' : '새 설문/인터뷰'}
           </h2>
           <button
             onClick={onClose}
@@ -358,13 +358,17 @@ export default function SurveyFormModal({ survey, onClose }: Props) {
             </div>
           </div>
 
-          {/* Survey Info */}
+          {/* Survey/Interview Info */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-gray-900">설문 정보</h3>
+            <h3 className="font-semibold text-gray-900">
+              {formData.type === 'INTERVIEW' ? '인터뷰 정보' : '설문 정보'}
+            </h3>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">문항 수</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {formData.type === 'INTERVIEW' ? '질문 수' : '문항 수'}
+                </label>
                 <input
                   type="number"
                   name="questionCount"
@@ -388,13 +392,15 @@ export default function SurveyFormModal({ survey, onClose }: Props) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">외부 설문 URL</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {formData.type === 'INTERVIEW' ? '신청 폼 URL' : '외부 설문 URL'}
+              </label>
               <input
                 type="url"
                 name="externalUrl"
                 value={formData.externalUrl}
                 onChange={handleChange}
-                placeholder="https://forms.google.com/..."
+                placeholder={formData.type === 'INTERVIEW' ? 'https://forms.google.com/...' : 'https://forms.google.com/...'}
                 className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
               />
             </div>

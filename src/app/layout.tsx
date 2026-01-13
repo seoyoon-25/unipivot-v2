@@ -1,13 +1,7 @@
 import type { Metadata } from 'next'
-import { Noto_Sans_KR } from 'next/font/google'
 import { Providers } from '@/components/Providers'
+import { Toaster } from '@/components/ui'
 import './globals.css'
-
-const notoSansKR = Noto_Sans_KR({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-noto-sans-kr',
-})
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://bestcome.org'),
@@ -52,9 +46,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ko" className={notoSansKR.variable}>
-      <body className={notoSansKR.className}>
+    <html lang="ko">
+      <body className="font-pretendard">
         <Providers>{children}</Providers>
+        <Toaster />
       </body>
     </html>
   )

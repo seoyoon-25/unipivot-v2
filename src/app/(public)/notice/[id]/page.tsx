@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Calendar, Eye } from 'lucide-react'
+import { ArrowLeft, Calendar, Eye, Edit3 } from 'lucide-react'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { getNoticeById } from '@/lib/actions/public'
 
 interface Props {
@@ -8,6 +10,8 @@ interface Props {
 }
 
 export default async function NoticeDetailPage({ params }: Props) {
+  const session = await getServerSession(authOptions)
+  const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN'
   const notice = await getNoticeById(params.id)
 
   if (!notice) {
@@ -18,13 +22,24 @@ export default async function NoticeDetailPage({ params }: Props) {
     <>
       <section className="pt-32 pb-8 bg-gradient-to-b from-gray-900 to-gray-800">
         <div className="max-w-4xl mx-auto px-4">
-          <Link
-            href="/notice"
-            className="inline-flex items-center gap-2 text-white/60 hover:text-white transition-colors mb-6"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            목록으로
-          </Link>
+          <div className="flex items-center justify-between mb-6">
+            <Link
+              href="/notice"
+              className="inline-flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              목록으로
+            </Link>
+            {isAdmin && (
+              <Link
+                href={`/notice/${params.id}/edit`}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+              >
+                <Edit3 className="w-4 h-4" />
+                수정
+              </Link>
+            )}
+          </div>
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
             {notice.title}
           </h1>

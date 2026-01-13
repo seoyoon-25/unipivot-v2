@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Heart, Calendar, MapPin, Users, Clock, ArrowLeft, BookOpen } from 'lucide-react'
+import { Heart, Calendar, MapPin, Users, Clock, ArrowLeft, BookOpen, FileText, Edit3 } from 'lucide-react'
 import { ShareButton } from '@/components/common/ShareButton'
 import '@/components/editor/editor.css'
 import {
@@ -21,6 +21,7 @@ interface ProgramDetailContentProps {
   hasApplied: boolean
   application: any
   isLoggedIn: boolean
+  userRole?: string
 }
 
 export function ProgramDetailContent({
@@ -29,7 +30,9 @@ export function ProgramDetailContent({
   hasApplied,
   application,
   isLoggedIn,
+  userRole,
 }: ProgramDetailContentProps) {
+  const isAdmin = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN'
   const [liked, setLiked] = useState(initialLiked)
   const [likeCount, setLikeCount] = useState(program.likeCount)
   const [isPending, startTransition] = useTransition()
@@ -148,6 +151,14 @@ export function ProgramDetailContent({
                     imageUrl={program.thumbnailSquare || program.image}
                     className="p-3 rounded-full border border-gray-200 bg-white hover:border-gray-300 transition-colors text-gray-400"
                   />
+                  {isAdmin && (
+                    <Link
+                      href={`/programs/${program.slug}/edit`}
+                      className="p-3 rounded-full border border-gray-200 bg-white hover:border-primary hover:bg-primary/5 transition-colors text-gray-400 hover:text-primary"
+                    >
+                      <Edit3 className="w-5 h-5" />
+                    </Link>
+                  )}
                 </div>
               </div>
               {likeCount > 0 && (
@@ -194,34 +205,88 @@ export function ProgramDetailContent({
             {/* Sessions */}
             {program.sessions && program.sessions.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">진행 일정</h2>
-                <div className="space-y-3">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">
+                  {program.type === 'BOOKCLUB' ? '회차별 도서 안내' : '진행 일정'}
+                </h2>
+                <div className="space-y-4">
                   {program.sessions.map((session: any) => (
                     <div
                       key={session.id}
-                      className="bg-white rounded-xl p-4 border border-gray-100"
+                      className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm"
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="w-8 h-8 flex items-center justify-center bg-primary/10 text-primary font-semibold rounded-full text-sm">
-                          {session.sessionNo}
-                        </span>
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-900">
-                            {session.title || `${session.sessionNo}회차`}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {formatDate(session.date)}
-                            {session.startTime && ` ${session.startTime}`}
-                            {session.endTime && ` ~ ${session.endTime}`}
-                          </p>
+                      <div className="flex gap-4">
+                        {/* 도서 이미지 (독서모임인 경우) */}
+                        {program.type === 'BOOKCLUB' && session.bookImage && (
+                          <div className="flex-shrink-0">
+                            <div className="relative w-20 h-28 rounded-lg overflow-hidden shadow-md">
+                              <Image
+                                src={session.bookImage}
+                                alt={session.bookTitle || '도서 이미지'}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="w-8 h-8 flex items-center justify-center bg-primary/10 text-primary font-semibold rounded-full text-sm flex-shrink-0">
+                              {session.sessionNo}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-gray-900">
+                                {session.title || `${session.sessionNo}회차`}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {formatDate(session.date)}
+                                {session.startTime && ` ${session.startTime}`}
+                                {session.endTime && ` ~ ${session.endTime}`}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* 도서 정보 (독서모임인 경우) */}
+                          {program.type === 'BOOKCLUB' && session.bookTitle && (
+                            <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                              <p className="font-medium text-gray-900">
+                                📚 {session.bookTitle}
+                              </p>
+                              {session.bookAuthor && (
+                                <p className="text-sm text-gray-600 mt-1">
+                                  저자: {session.bookAuthor}
+                                </p>
+                              )}
+                              {session.bookRange && (
+                                <p className="text-sm text-gray-500 mt-1">
+                                  범위: {session.bookRange}
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                          {/* 일반 프로그램 도서 정보 */}
+                          {program.type !== 'BOOKCLUB' && session.bookTitle && (
+                            <p className="text-sm text-gray-600 mt-2 ml-11">
+                              📚 {session.bookTitle}
+                              {session.bookRange && ` (${session.bookRange})`}
+                            </p>
+                          )}
                         </div>
+
+                        {/* 독후감 작성 버튼 (독서모임인 경우) */}
+                        {program.type === 'BOOKCLUB' && isLoggedIn && (
+                          <div className="flex-shrink-0 self-center">
+                            <Link
+                              href={`/my/reports/new?programId=${program.id}&sessionId=${session.id}`}
+                              className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm font-medium"
+                            >
+                              <FileText className="w-4 h-4" />
+                              독후감
+                            </Link>
+                          </div>
+                        )}
                       </div>
-                      {session.bookTitle && (
-                        <p className="text-sm text-gray-600 mt-2 ml-11">
-                          📚 {session.bookTitle}
-                          {session.bookRange && ` (${session.bookRange})`}
-                        </p>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -292,11 +357,8 @@ export function ProgramDetailContent({
                 <div className="flex items-center gap-3">
                   <Users className="w-5 h-5 text-gray-400" />
                   <div>
-                    <p className="text-sm text-gray-500">정원</p>
-                    <p className="font-medium">
-                      {program.capacity}명
-                      {program.applicationCount > 0 && ` (${program.applicationCount}명 신청)`}
-                    </p>
+                    <p className="text-sm text-gray-500">모집인원</p>
+                    <p className="font-medium">{program.capacity}명</p>
                   </div>
                 </div>
               </div>

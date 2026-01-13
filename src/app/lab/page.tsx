@@ -12,8 +12,8 @@ const features = [
   },
   {
     icon: ClipboardList,
-    title: '설문조사',
-    description: '설문조사 참가자 모집을 대행해드립니다.',
+    title: '설문/인터뷰',
+    description: '설문조사 및 인터뷰 참가자 모집을 대행해드립니다.',
     href: '/lab/surveys',
     color: 'bg-green-500',
   },

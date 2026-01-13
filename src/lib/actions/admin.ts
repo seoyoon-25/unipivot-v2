@@ -140,6 +140,10 @@ export async function getMember(id: string) {
           }
         },
         orderBy: { joinedAt: 'desc' }
+      },
+      gradeHistory: {
+        orderBy: { createdAt: 'desc' },
+        take: 20
       }
     }
   })

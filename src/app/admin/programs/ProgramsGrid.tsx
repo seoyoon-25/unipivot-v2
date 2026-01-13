@@ -3,11 +3,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Plus, Search, Calendar, Users, MoreVertical, Trash2 } from 'lucide-react'
+import { Plus, Search, Calendar, Users, Edit3, Trash2, ExternalLink } from 'lucide-react'
 import { deleteProgram } from '@/lib/actions/admin'
 
 interface Program {
   id: string
+  slug: string
   title: string
   type: string
   status: string
@@ -183,15 +184,28 @@ export default function ProgramsGrid({ programs, total, pages, currentPage, sear
                   <p className="text-gray-500 text-sm">{getTypeLabel(program.type)}</p>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Link href={`/admin/programs/${program.id}`} className="p-2 text-gray-400 hover:text-gray-600">
-                    <MoreVertical className="w-5 h-5" />
+                  <Link
+                    href={`/programs/${program.slug}`}
+                    target="_blank"
+                    className="p-2 text-gray-400 hover:text-blue-500"
+                    title="새 탭에서 보기"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </Link>
+                  <Link
+                    href={`/programs/${program.slug}/edit`}
+                    className="p-2 text-gray-400 hover:text-primary"
+                    title="수정"
+                  >
+                    <Edit3 className="w-4 h-4" />
                   </Link>
                   <button
                     onClick={() => handleDelete(program.id, program.title)}
                     disabled={deleting === program.id}
                     className="p-2 text-gray-400 hover:text-red-500 disabled:opacity-50"
+                    title="삭제"
                   >
-                    <Trash2 className="w-5 h-5" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>

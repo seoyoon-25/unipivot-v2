@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { ProgramCard } from '@/components/public/ProgramCard'
 import { ProgramFilters } from './ProgramFilters'
+import Link from 'next/link'
+import { Plus } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: '프로그램 | 유니피벗',
@@ -97,11 +99,23 @@ export default async function ProgramsPage({ searchParams }: PageProps) {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">프로그램</h1>
-          <p className="text-gray-600">
-            유니피벗에서 진행하는 다양한 프로그램을 만나보세요.
-          </p>
+        <div className="mb-8 flex items-start justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">프로그램</h1>
+            <p className="text-gray-600">
+              유니피벗에서 진행하는 다양한 프로그램을 만나보세요.
+            </p>
+          </div>
+          {/* 관리자 전용 글쓰기 버튼 */}
+          {(session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN') && (
+            <Link
+              href="/programs/write"
+              className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl font-medium transition-colors"
+            >
+              <Plus className="w-5 h-5" />
+              <span className="hidden sm:inline">프로그램 등록</span>
+            </Link>
+          )}
         </div>
 
         {/* Filters */}

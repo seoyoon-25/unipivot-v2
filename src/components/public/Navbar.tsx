@@ -43,6 +43,7 @@ const menuItems: MenuItem[] = [
   {
     label: '소통마당',
     children: [
+      { label: '블로그', href: '/blog', description: '이야기와 인사이트' },
       { label: '제안하기', href: '/suggest', description: '새로운 아이디어' },
       { label: '공지사항', href: '/notice', description: '단체 소식' },
       { label: '한반도이슈', href: '/korea-issue', description: 'AI 피봇이와 함께' },
@@ -86,7 +87,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <Link href="/p/about-us" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg shadow-primary/20">
               <span className="text-white font-bold text-lg">U</span>
             </div>

@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { ClipboardList, Mic, Clock, Users, Gift, Calendar, ArrowRight, Globe } from 'lucide-react'
+import { ClipboardList, Mic, Clock, Users, Gift, Calendar, ArrowRight, Globe, ListFilter } from 'lucide-react'
 import { prisma } from '@/lib/db'
 import {
   MIGRANT_CATEGORY_LIST,
@@ -11,7 +11,7 @@ import {
 export const dynamic = 'force-dynamic'
 
 export const metadata = {
-  title: '설문조사',
+  title: '설문/인터뷰',
   description: '이주배경 주민 대상 설문조사 및 인터뷰 참가 모집',
 }
 
@@ -82,7 +82,7 @@ export default async function SurveysPage({ searchParams }: PageProps) {
       {/* Hero Section */}
       <section className="bg-white border-b border-gray-100 py-12">
         <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">설문조사</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">설문/인터뷰</h1>
           <p className="text-gray-600 max-w-2xl">
             이주배경 주민 대상 설문조사 및 인터뷰에 참여하고 사례비를 받으세요.
             여러분의 경험과 의견이 연구에 소중하게 활용됩니다.
@@ -93,58 +93,87 @@ export default async function SurveysPage({ searchParams }: PageProps) {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Filter Tabs */}
         <div className="bg-white rounded-2xl p-4 shadow-sm mb-8 space-y-4">
-          {/* Type/Status Filter */}
-          <div className="flex flex-wrap gap-2">
-            <Link
-              href="/lab/surveys"
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                !params.type && !params.status && !params.targetCategory
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              전체
-            </Link>
-            <Link
-              href={`/lab/surveys?status=RECRUITING${params.targetCategory ? `&targetCategory=${params.targetCategory}` : ''}`}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                params.status === 'RECRUITING'
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              진행중
-            </Link>
-            <Link
-              href={`/lab/surveys?status=COMPLETED${params.targetCategory ? `&targetCategory=${params.targetCategory}` : ''}`}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                params.status === 'COMPLETED'
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              진행완료
-            </Link>
-            <Link
-              href={`/lab/surveys?type=SURVEY${params.targetCategory ? `&targetCategory=${params.targetCategory}` : ''}`}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                params.type === 'SURVEY'
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              설문조사
-            </Link>
-            <Link
-              href={`/lab/surveys?type=INTERVIEW${params.targetCategory ? `&targetCategory=${params.targetCategory}` : ''}`}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                params.type === 'INTERVIEW'
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              인터뷰
-            </Link>
+          {/* Type Filter - 설문조사/인터뷰 */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <ClipboardList className="w-4 h-4 text-gray-400" />
+              <span className="text-sm font-medium text-gray-700">유형 선택</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <Link
+                href={`/lab/surveys${params.status ? `?status=${params.status}` : ''}${params.targetCategory ? `${params.status ? '&' : '?'}targetCategory=${params.targetCategory}` : ''}`}
+                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  !params.type
+                    ? 'bg-primary text-white shadow-md'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Users className="w-4 h-4" />
+                전체
+              </Link>
+              <Link
+                href={`/lab/surveys?type=SURVEY${params.status ? `&status=${params.status}` : ''}${params.targetCategory ? `&targetCategory=${params.targetCategory}` : ''}`}
+                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  params.type === 'SURVEY'
+                    ? 'bg-green-500 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <ClipboardList className="w-4 h-4" />
+                설문조사
+              </Link>
+              <Link
+                href={`/lab/surveys?type=INTERVIEW${params.status ? `&status=${params.status}` : ''}${params.targetCategory ? `&targetCategory=${params.targetCategory}` : ''}`}
+                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  params.type === 'INTERVIEW'
+                    ? 'bg-purple-500 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Mic className="w-4 h-4" />
+                인터뷰
+              </Link>
+            </div>
+          </div>
+
+          {/* Status Filter */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="w-4 h-4 text-gray-400" />
+              <span className="text-sm text-gray-500">진행 상태</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href={`/lab/surveys${params.type ? `?type=${params.type}` : ''}${params.targetCategory ? `${params.type ? '&' : '?'}targetCategory=${params.targetCategory}` : ''}`}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  !params.status
+                    ? 'bg-primary text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                전체
+              </Link>
+              <Link
+                href={`/lab/surveys?${params.type ? `type=${params.type}&` : ''}status=RECRUITING${params.targetCategory ? `&targetCategory=${params.targetCategory}` : ''}`}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  params.status === 'RECRUITING'
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                진행중
+              </Link>
+              <Link
+                href={`/lab/surveys?${params.type ? `type=${params.type}&` : ''}status=COMPLETED${params.targetCategory ? `&targetCategory=${params.targetCategory}` : ''}`}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  params.status === 'COMPLETED'
+                    ? 'bg-gray-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                진행완료
+              </Link>
+            </div>
           </div>
 
           {/* Target Category Filter */}
@@ -190,15 +219,21 @@ export default async function SurveysPage({ searchParams }: PageProps) {
         {/* Results Info */}
         <div className="mb-6">
           <p className="text-gray-600">
-            총 <span className="font-semibold text-primary">{pagination.total}</span>개의 설문조사
+            총 <span className="font-semibold text-primary">{pagination.total}</span>개의 {params.type === 'SURVEY' ? '설문조사' : params.type === 'INTERVIEW' ? '인터뷰' : '설문/인터뷰'}
           </p>
         </div>
 
         {/* Survey Grid */}
         {surveys.length === 0 ? (
           <div className="bg-white rounded-2xl p-12 text-center">
-            <ClipboardList className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">현재 진행 중인 설문조사가 없습니다.</p>
+            {params.type === 'INTERVIEW' ? (
+              <Mic className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            ) : (
+              <ClipboardList className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            )}
+            <p className="text-gray-500">
+              현재 진행 중인 {params.type === 'SURVEY' ? '설문조사가' : params.type === 'INTERVIEW' ? '인터뷰가' : '설문/인터뷰가'} 없습니다.
+            </p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

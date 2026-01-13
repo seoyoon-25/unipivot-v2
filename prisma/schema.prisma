@@ -29,7 +29,9 @@ model User {
   occupation    String?
   bio           String?
   points        Int       @default(0)
-  role          String    @default("USER") // USER, ADMIN, SUPER_ADMIN
+  role          String    @default("USER") // USER, MEMBER, STAFF, ADMIN, SUPER_ADMIN
+  grade         Int       @default(1) // 회원 등급 (1: 일반, 2: 정회원, 3: 운영진, 4: 관리자, 5: 최고관리자)
+  gradeUpdatedAt DateTime? // 등급 변경일
   status        String    @default("ACTIVE") // ACTIVE, INACTIVE, BANNED
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -60,6 +62,12 @@ model User {
   // 계좌 및 만족도 조사 관계
   bankAccounts        BankAccount[]
   surveyResponses     SurveyResponse[]
+  // 회원 등급 이력
+  gradeHistory        MemberGradeHistory[]
+  // 리서치랩 프로필
+  labProfile          LabProfile?
+  // 사례비 신청
+  rewardClaims        RewardClaim[]
 }
 
 model Account {
@@ -531,6 +539,24 @@ model ActivityLog {
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
+// 회원 등급 변경 이력
+model MemberGradeHistory {
+  id            String   @id @default(cuid())
+  userId        String
+  previousGrade Int      // 이전 등급
+  newGrade      Int      // 변경된 등급
+  previousRole  String   // 이전 역할
+  newRole       String   // 변경된 역할
+  reason        String?  // 변경 사유
+  changedBy     String?  // 변경한 관리자 ID
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
 model Notification {
   id        String   @id @default(cuid())
   userId    String
@@ -897,6 +923,8 @@ model ProgramSession {
   endTime        String?
   title          String?
   bookTitle      String?
+  bookAuthor     String?   // 도서 저자
+  bookImage      String?   // 도서 이미지 URL
   bookRange      String?
   location       String?
   description    String?
@@ -909,6 +937,7 @@ model ProgramSession {
   program     Program             @relation(fields: [programId], references: [id], onDelete: Cascade)
   attendances ProgramAttendance[]
   reports     ProgramReport[]
+  qrTokens    AttendanceQR[]
 
   @@unique([programId, sessionNo])
 }
@@ -922,10 +951,16 @@ model ProgramAttendance {
   checkMethod   String?   // QR, MANUAL
   note          String?
 
+  // QR 출석 정보
+  qrTokenId     String?   // 사용한 QR 토큰 ID
+  qrToken       AttendanceQR? @relation(fields: [qrTokenId], references: [id])
+  deviceInfo    String?   // 디바이스 정보 (선택)
+
   session     ProgramSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   participant ProgramParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
 
   @@unique([sessionId, participantId])
+  @@index([qrTokenId])
 }
 
 model ProgramReport {
@@ -1312,6 +1347,56 @@ model ExpertProfile {
   // Relations
   lectureMatches    LectureMatch[]
   researchParticipations ResearchParticipation[]
+  labProfile        LabProfile?
+}
+
+// 리서치랩 참가자 프로필 (회원과 연동)
+model LabProfile {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 프로필 상태
+  profileComplete   Boolean   @default(false)
+  lastActiveAt      DateTime?
+
+  // 참가자 기본 정보
+  birthYear         Int?
+  birthRegion       String?   // 출생지역
+  hometown          String?   // 고향
+  leftHometownYear  Int?      // 고향 떠난 시기
+  enteredKoreaYear  Int?      // 남한 입국 시기
+  maritalStatus     String?   // SINGLE, MARRIED, DIVORCED, WIDOWED, SEPARATED, OTHER
+  educationHometown String?   // 고향 최종학력
+  educationKorea    String?   // 남한 최종학력
+  occupations       String?   @db.Text  // JSON array - 현재 직업 (복수 선택)
+
+  // 본인인증 정보 (추후 구현)
+  phoneVerified     Boolean   @default(false)
+  phoneVerifiedAt   DateTime?
+  verificationCI    String?   @unique  // 중복 가입 방지용 CI 값
+
+  // 뱃지 정보 (JSON)
+  badges            String?   @db.Text  // { expert: {...}, instructor: {...}, participant: {...} }
+
+  // 활동 통계
+  surveyCount       Int       @default(0)   // 설문 참여 횟수
+  interviewCount    Int       @default(0)   // 인터뷰 참여 횟수
+  lectureCount      Int       @default(0)   // 강연 횟수 (전문가인 경우)
+
+  // 전문가 프로필 연결
+  expertProfileId   String?   @unique
+  expertProfile     ExpertProfile? @relation(fields: [expertProfileId], references: [id])
+
+  // 전문가 인증 상태
+  expertVerificationStatus String @default("NONE") // NONE, PENDING, VERIFIED, REJECTED
+  expertVerifiedAt  DateTime?
+  expertVerifiedBy  String?
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([userId])
 }
 
 // 강연 매칭 (강사 요청과 전문가 연결)
@@ -1401,6 +1486,7 @@ model LabSurvey {
   updatedAt        DateTime  @updatedAt
 
   participations   ResearchParticipation[]
+  rewardClaims     RewardClaim[]
 }
 
 // 연구 참여 기록
@@ -1435,6 +1521,53 @@ model ResearchParticipation {
 
   survey           LabSurvey      @relation(fields: [surveyId], references: [id], onDelete: Cascade)
   expert           ExpertProfile? @relation(fields: [expertId], references: [id], onDelete: SetNull)
+}
+
+// 사례비 신청 (부정 방지 기능 포함)
+model RewardClaim {
+  id            String   @id @default(cuid())
+
+  // 연구 연결 (연구별 1회 제한)
+  surveyId      String
+  survey        LabSurvey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+
+  // 신청자
+  userId        String
+  user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 신청 정보
+  realName      String
+  phoneNumber   String
+  bankCode      String
+  bankName      String
+  accountNumber String
+  amount        Int
+
+  // 부정 탐지
+  ipAddress     String
+  userAgent     String?   @db.Text
+  fingerprint   String?   // 브라우저 핑거프린트
+  flagged       Boolean   @default(false)
+  flagReason    String?   @db.Text
+  riskScore     Int       @default(0)  // 0-100
+
+  // 상태
+  status        String    @default("PENDING")  // PENDING, APPROVED, PAID, REJECTED
+  rejectedReason String?
+  approvedAt    DateTime?
+  approvedBy    String?
+  paidAt        DateTime?
+  paidBy        String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([surveyId, userId])
+  @@index([surveyId, ipAddress])
+  @@index([accountNumber])
+  @@index([phoneNumber])
+  @@index([status])
+  @@index([flagged])
 }
 
 // 전문가 카테고리
@@ -1614,4 +1747,34 @@ model ContentTemplate {
   createdBy   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// =============================================
+// QR 출석 시스템
+// =============================================
+
+model AttendanceQR {
+  id          String   @id @default(cuid())
+  sessionId   String
+  session     ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  // 토큰 정보
+  token       String   @unique  // 랜덤 토큰 (UUID)
+
+  // 유효 시간
+  validFrom   DateTime          // 시작 시간
+  validUntil  DateTime          // 종료 시간 (기본 30분)
+
+  // 상태
+  isActive    Boolean  @default(true)
+
+  // 생성 정보
+  createdBy   String            // 관리자 ID
+  createdAt   DateTime @default(now())
+
+  // 이 QR로 출석한 기록들
+  attendances ProgramAttendance[]
+
+  @@index([sessionId])
+  @@index([token])
 }

@@ -1,16 +1,17 @@
 'use client'
 
-import { cn } from '@/lib/utils'
-import { forwardRef, type InputHTMLAttributes } from 'react'
+import * as React from "react"
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+import { cn } from "@/lib/utils"
+
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
   error?: string
   hint?: string
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, hint, type = 'text', id, ...props }, ref) => {
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type = 'text', label, error, hint, id, ...props }, ref) => {
     const inputId = id || props.name
 
     return (
@@ -50,7 +51,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     )
   }
 )
-Input.displayName = 'Input'
+Input.displayName = "Input"
 
 interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string
@@ -58,7 +59,7 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
   hint?: string
 }
 
-const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, label, error, hint, id, ...props }, ref) => {
     const textareaId = id || props.name
 
@@ -98,7 +99,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     )
   }
 )
-Textarea.displayName = 'Textarea'
+Textarea.displayName = "Textarea"
 
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string
@@ -107,7 +108,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   options: { value: string; label: string }[]
 }
 
-const Select = forwardRef<HTMLSelectElement, SelectProps>(
+const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, label, error, hint, options, id, ...props }, ref) => {
     const selectId = id || props.name
 
@@ -154,6 +155,6 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
     )
   }
 )
-Select.displayName = 'Select'
+Select.displayName = "Select"
 
 export { Input, Textarea, Select }

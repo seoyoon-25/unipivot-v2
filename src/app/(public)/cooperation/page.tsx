@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/db'
 import { CooperationSection } from '@/components/cooperation/CooperationSection'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { Settings } from 'lucide-react'
 
 export const metadata = {
   title: '협조요청 | 유니피벗',
@@ -18,17 +21,31 @@ async function getSections() {
 }
 
 export default async function CooperationPage() {
-  const sections = await getSections()
+  const [sections, session] = await Promise.all([
+    getSections(),
+    getServerSession(authOptions)
+  ])
+  const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN'
 
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-primary to-primary-dark text-white py-20">
-        <div className="max-w-4xl mx-auto px-4 text-center">
+        <div className="max-w-4xl mx-auto px-4 text-center relative">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">협조요청</h1>
           <p className="text-xl text-white/80">
             유니피벗과 함께하는 다양한 협력 방법을 안내합니다
           </p>
+          {/* 관리자 전용 섹션 관리 버튼 */}
+          {isAdmin && (
+            <Link
+              href="/admin/cooperation/sections"
+              className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-100 text-primary rounded-xl font-medium transition-colors shadow-lg"
+            >
+              <Settings className="w-5 h-5" />
+              <span className="hidden sm:inline">섹션 관리</span>
+            </Link>
+          )}
         </div>
       </section>
 

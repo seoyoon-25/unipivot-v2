@@ -44,6 +44,7 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           image: user.image,
           role: user.role,
+          grade: user.grade,
         }
       },
     }),
@@ -77,10 +78,22 @@ export const authOptions: NextAuthOptions = {
     error: '/login',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id
         token.role = (user as { role?: string }).role ?? 'USER'
+        token.grade = (user as { grade?: number }).grade ?? 1
+      }
+      // 세션 업데이트 시 등급 정보 갱신
+      if (trigger === 'update') {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { role: true, grade: true }
+        })
+        if (dbUser) {
+          token.role = dbUser.role
+          token.grade = dbUser.grade
+        }
       }
       return token
     },
@@ -88,6 +101,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         (session.user as { id?: string }).id = token.id as string
         (session.user as { role?: string }).role = token.role as string
+        (session.user as { grade?: number }).grade = token.grade as number
       }
       return session
     },

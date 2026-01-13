@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Save, Upload, Image } from 'lucide-react'
+import { ArrowLeft, Save, Upload, Image, RotateCcw } from 'lucide-react'
 import { createProgram } from '@/lib/actions/admin'
 import { RichTextEditor } from '@/components/editor'
+
+const DRAFT_KEY = 'program-draft-new'
 
 const feeTypes = [
   { value: 'FREE', label: '무료' },
@@ -30,8 +32,6 @@ export default function NewProgramPage() {
     type: 'BOOKCLUB',
     description: '',
     content: '',
-    scheduleContent: '',
-    currentBookContent: '',
     capacity: 30,
     feeType: 'FREE',
     feeAmount: 0,
@@ -46,6 +46,79 @@ export default function NewProgramPage() {
     endDate: '',
   })
   const [uploading, setUploading] = useState(false)
+  const [hasDraft, setHasDraft] = useState(false)
+  const [lastSaved, setLastSaved] = useState<Date | null>(null)
+
+  // 페이지 로드 시 임시저장 데이터 확인
+  useEffect(() => {
+    const savedDraft = localStorage.getItem(DRAFT_KEY)
+    if (savedDraft) {
+      try {
+        const parsed = JSON.parse(savedDraft)
+        if (parsed.data && parsed.timestamp) {
+          setHasDraft(true)
+        }
+      } catch (e) {
+        localStorage.removeItem(DRAFT_KEY)
+      }
+    }
+  }, [])
+
+  // 자동 저장 (3초마다 변경사항 저장)
+  useEffect(() => {
+    const hasContent = form.title || form.description || form.content
+    if (!hasContent) return
+
+    const timer = setTimeout(() => {
+      const draftData = {
+        data: form,
+        timestamp: new Date().toISOString(),
+      }
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draftData))
+      setLastSaved(new Date())
+    }, 3000)
+
+    return () => clearTimeout(timer)
+  }, [form])
+
+  // 페이지 이탈 시 경고
+  useEffect(() => {
+    const hasContent = form.title || form.description || form.content
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasContent) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [form])
+
+  // 임시저장 데이터 복원
+  const restoreDraft = useCallback(() => {
+    const savedDraft = localStorage.getItem(DRAFT_KEY)
+    if (savedDraft) {
+      try {
+        const parsed = JSON.parse(savedDraft)
+        if (parsed.data) {
+          setForm(parsed.data)
+          setHasDraft(false)
+          alert('임시저장된 내용을 복원했습니다.')
+        }
+      } catch (e) {
+        alert('복원에 실패했습니다.')
+      }
+    }
+  }, [])
+
+  // 임시저장 삭제
+  const clearDraft = useCallback(() => {
+    localStorage.removeItem(DRAFT_KEY)
+    setHasDraft(false)
+    setLastSaved(null)
+  }, [])
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'image' | 'thumbnailSquare') => {
     const file = e.target.files?.[0]
@@ -92,6 +165,7 @@ export default function NewProgramPage() {
         startDate: form.startDate ? new Date(form.startDate) : undefined,
         endDate: form.endDate ? new Date(form.endDate) : undefined,
       })
+      clearDraft() // 저장 성공 시 임시저장 삭제
       alert('프로그램이 생성되었습니다.')
       router.push('/admin/programs')
     } catch (error) {
@@ -103,15 +177,48 @@ export default function NewProgramPage() {
 
   return (
     <div>
-      <div className="flex items-center gap-4 mb-8">
-        <Link
-          href="/admin/programs"
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-900">새 프로그램</h1>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <Link
+            href="/admin/programs"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <h1 className="text-2xl font-bold text-gray-900">새 프로그램</h1>
+        </div>
+        {lastSaved && (
+          <span className="text-sm text-gray-500">
+            자동 저장됨: {lastSaved.toLocaleTimeString('ko-KR')}
+          </span>
+        )}
       </div>
+
+      {/* 임시저장 복원 알림 */}
+      {hasDraft && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <RotateCcw className="w-5 h-5 text-blue-600" />
+            <span className="text-blue-800">이전에 작성 중이던 내용이 있습니다. 복원하시겠습니까?</span>
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={restoreDraft}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              복원하기
+            </button>
+            <button
+              type="button"
+              onClick={clearDraft}
+              className="px-4 py-2 bg-white text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              삭제하기
+            </button>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         <div className="space-y-6">
@@ -415,31 +522,6 @@ export default function NewProgramPage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  일정 안내
-                </label>
-                <RichTextEditor
-                  content={form.scheduleContent}
-                  onChange={(html) => setForm({ ...form, scheduleContent: html })}
-                  placeholder="일정 안내 내용을 입력하세요..."
-                  minHeight="200px"
-                />
-              </div>
-
-              {form.type === 'BOOKCLUB' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    현재 진행 도서 안내
-                  </label>
-                  <RichTextEditor
-                    content={form.currentBookContent}
-                    onChange={(html) => setForm({ ...form, currentBookContent: html })}
-                    placeholder="현재 진행 중인 도서에 대한 안내를 입력하세요..."
-                    minHeight="200px"
-                  />
-                </div>
-              )}
             </div>
           </div>
 

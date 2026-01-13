@@ -94,6 +94,7 @@ export default async function ProgramDetailPage({ params }: PageProps) {
       hasApplied={hasApplied}
       application={application}
       isLoggedIn={!!session}
+      userRole={session?.user?.role}
     />
   )
 }

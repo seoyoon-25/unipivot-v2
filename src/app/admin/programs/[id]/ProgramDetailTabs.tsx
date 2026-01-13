@@ -15,13 +15,16 @@ import {
   X,
   Clock,
   AlertCircle,
-  QrCode
+  QrCode,
+  Edit3,
+  ExternalLink
 } from 'lucide-react'
 import { updateAttendance, createProgramSession } from '@/lib/actions/admin'
 import { useRouter } from 'next/navigation'
 
 interface Program {
   id: string
+  slug: string
   title: string
   type: string
   status: string
@@ -186,6 +189,23 @@ export default function ProgramDetailTabs({ program, participants, sessions, dep
               {program.type} · 정원 {program.capacity}명 · 참가비 {formatCurrency(program.fee)}원
             </p>
           </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/programs/${program.slug}`}
+            target="_blank"
+            className="flex items-center gap-2 px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <ExternalLink className="w-4 h-4" />
+            보기
+          </Link>
+          <Link
+            href={`/programs/${program.slug}/edit`}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            <Edit3 className="w-4 h-4" />
+            수정
+          </Link>
         </div>
       </div>
 

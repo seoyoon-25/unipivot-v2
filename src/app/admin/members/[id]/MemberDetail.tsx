@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Save, User, Mail, Phone, Calendar, BookOpen, Check, X, Wallet, FileText } from 'lucide-react'
+import { ArrowLeft, Save, User, Mail, Phone, Calendar, BookOpen, Check, X, Wallet, FileText, Shield, History, ChevronUp, ChevronDown } from 'lucide-react'
 import { updateMember, updateRegistrationStatus } from '@/lib/actions/admin'
+import { GRADE_OPTIONS, getGradeInfo, GRADES } from '@/lib/constants/member-grades'
 
 interface Participation {
   id: string
@@ -19,6 +20,17 @@ interface Participation {
   program: { id: string; title: string; type: string; startDate: Date | null; endDate: Date | null }
 }
 
+interface GradeHistory {
+  id: string
+  previousGrade: number
+  newGrade: number
+  previousRole: string
+  newRole: string
+  reason: string | null
+  changedBy: string | null
+  createdAt: Date
+}
+
 interface Member {
   id: string
   name: string | null
@@ -30,6 +42,8 @@ interface Member {
   bio: string | null
   points: number
   role: string
+  grade: number
+  gradeUpdatedAt: Date | null
   status: string
   createdAt: Date
   registrations: Array<{
@@ -44,6 +58,7 @@ interface Member {
     createdAt: Date
   }>
   programParticipants?: Participation[]
+  gradeHistory?: GradeHistory[]
 }
 
 interface Props {
@@ -54,7 +69,7 @@ export default function MemberDetail({ member }: Props) {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
   const [updatingReg, setUpdatingReg] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<'info' | 'programs' | 'deposits'>('info')
+  const [activeTab, setActiveTab] = useState<'info' | 'grade' | 'programs' | 'deposits'>('info')
   const [form, setForm] = useState({
     name: member.name || '',
     phone: member.phone || '',
@@ -62,6 +77,14 @@ export default function MemberDetail({ member }: Props) {
     status: member.status,
     role: member.role
   })
+
+  // 등급 변경 관련 상태
+  const [gradeForm, setGradeForm] = useState({
+    newGrade: member.grade,
+    reason: ''
+  })
+  const [savingGrade, setSavingGrade] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
 
   const handleSave = async () => {
     setSaving(true)
@@ -92,6 +115,38 @@ export default function MemberDetail({ member }: Props) {
     }
   }
 
+  // 등급 변경 처리
+  const handleGradeChange = async () => {
+    if (gradeForm.newGrade === member.grade) {
+      alert('현재와 동일한 등급입니다.')
+      return
+    }
+
+    setSavingGrade(true)
+    try {
+      const res = await fetch(`/api/admin/members/${member.id}/grade`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(gradeForm),
+      })
+
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || '등급 변경 실패')
+      }
+
+      alert('등급이 변경되었습니다.')
+      setGradeForm({ ...gradeForm, reason: '' })
+      router.refresh()
+    } catch (error: any) {
+      alert(error.message || '등급 변경 중 오류가 발생했습니다.')
+    } finally {
+      setSavingGrade(false)
+    }
+  }
+
+  const currentGradeInfo = getGradeInfo(member.grade)
+
   return (
     <div>
       <div className="flex items-center gap-4 mb-8">
@@ -114,6 +169,13 @@ export default function MemberDetail({ member }: Props) {
               </div>
               <h2 className="text-xl font-bold text-gray-900">{member.name || '이름 없음'}</h2>
               <p className="text-gray-500">{member.email}</p>
+              {/* 등급 배지 */}
+              <div className="mt-3">
+                <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${currentGradeInfo.bgColor} ${currentGradeInfo.textColor}`}>
+                  <Shield className="w-4 h-4" />
+                  {currentGradeInfo.label}
+                </span>
+              </div>
             </div>
 
             <div className="space-y-4 text-sm">
@@ -147,6 +209,7 @@ export default function MemberDetail({ member }: Props) {
             <div className="flex border-b border-gray-100">
               {[
                 { key: 'info', label: '기본 정보', icon: User },
+                { key: 'grade', label: '회원 등급', icon: Shield },
                 { key: 'programs', label: '프로그램 이력', icon: BookOpen },
                 { key: 'deposits', label: '보증금 이력', icon: Wallet }
               ].map((tab) => (
@@ -308,6 +371,169 @@ export default function MemberDetail({ member }: Props) {
                 )}
               </div>
             </>
+          )}
+
+          {/* Grade Tab */}
+          {activeTab === 'grade' && (
+            <div className="space-y-6">
+              {/* 현재 등급 정보 */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm">
+                <h3 className="text-lg font-bold text-gray-900 mb-6">현재 등급</h3>
+                <div className="flex items-center gap-4">
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${currentGradeInfo.bgColor}`}>
+                    <Shield className={`w-8 h-8 ${currentGradeInfo.textColor}`} />
+                  </div>
+                  <div>
+                    <p className={`text-xl font-bold ${currentGradeInfo.textColor}`}>
+                      {currentGradeInfo.name}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {currentGradeInfo.description}
+                    </p>
+                    {member.gradeUpdatedAt && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        마지막 변경: {new Date(member.gradeUpdatedAt).toLocaleDateString('ko-KR')}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* 등급 변경 */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm">
+                <h3 className="text-lg font-bold text-gray-900 mb-6">등급 변경</h3>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">새 등급 선택</label>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                      {GRADE_OPTIONS.map((option) => {
+                        const gradeInfo = getGradeInfo(option.value)
+                        const isSelected = gradeForm.newGrade === option.value
+                        const isCurrent = member.grade === option.value
+
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => setGradeForm({ ...gradeForm, newGrade: option.value })}
+                            className={`relative p-4 rounded-xl border-2 transition-all ${
+                              isSelected
+                                ? `border-${gradeInfo.color}-500 ${gradeInfo.bgColor}`
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            {isCurrent && (
+                              <span className="absolute -top-2 -right-2 px-2 py-0.5 text-xs bg-gray-900 text-white rounded-full">
+                                현재
+                              </span>
+                            )}
+                            <Shield className={`w-6 h-6 mx-auto mb-2 ${isSelected ? gradeInfo.textColor : 'text-gray-400'}`} />
+                            <p className={`text-sm font-medium text-center ${isSelected ? gradeInfo.textColor : 'text-gray-600'}`}>
+                              {option.label}
+                            </p>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">변경 사유 (선택)</label>
+                    <textarea
+                      value={gradeForm.reason}
+                      onChange={(e) => setGradeForm({ ...gradeForm, reason: e.target.value })}
+                      placeholder="등급 변경 사유를 입력하세요..."
+                      rows={3}
+                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                    />
+                  </div>
+
+                  {gradeForm.newGrade !== member.grade && (
+                    <div className="p-4 bg-amber-50 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <div className={`px-3 py-1 rounded-full ${getGradeInfo(member.grade).bgColor} ${getGradeInfo(member.grade).textColor} text-sm font-medium`}>
+                          {getGradeInfo(member.grade).label}
+                        </div>
+                        <span className="text-gray-500">→</span>
+                        <div className={`px-3 py-1 rounded-full ${getGradeInfo(gradeForm.newGrade).bgColor} ${getGradeInfo(gradeForm.newGrade).textColor} text-sm font-medium`}>
+                          {getGradeInfo(gradeForm.newGrade).label}
+                        </div>
+                        {gradeForm.newGrade > member.grade ? (
+                          <ChevronUp className="w-5 h-5 text-green-500" />
+                        ) : (
+                          <ChevronDown className="w-5 h-5 text-red-500" />
+                        )}
+                        <span className={`text-sm font-medium ${gradeForm.newGrade > member.grade ? 'text-green-600' : 'text-red-600'}`}>
+                          {gradeForm.newGrade > member.grade ? '승급' : '강등'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end">
+                    <button
+                      onClick={handleGradeChange}
+                      disabled={savingGrade || gradeForm.newGrade === member.grade}
+                      className="flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Save className="w-4 h-4" />
+                      {savingGrade ? '변경 중...' : '등급 변경'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* 등급 변경 이력 */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-bold text-gray-900">등급 변경 이력</h3>
+                  <button
+                    onClick={() => setShowHistory(!showHistory)}
+                    className="flex items-center gap-1 text-sm text-primary hover:underline"
+                  >
+                    <History className="w-4 h-4" />
+                    {showHistory ? '숨기기' : '펼치기'}
+                  </button>
+                </div>
+
+                {(!member.gradeHistory || member.gradeHistory.length === 0) ? (
+                  <p className="text-gray-500 text-center py-4">등급 변경 이력이 없습니다.</p>
+                ) : showHistory ? (
+                  <div className="space-y-3">
+                    {member.gradeHistory.map((history) => (
+                      <div key={history.id} className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                        <div className="flex-shrink-0 w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                          {history.newGrade > history.previousGrade ? (
+                            <ChevronUp className="w-5 h-5 text-green-500" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5 text-red-500" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`px-2 py-0.5 text-xs rounded ${getGradeInfo(history.previousGrade).bgColor} ${getGradeInfo(history.previousGrade).textColor}`}>
+                              {getGradeInfo(history.previousGrade).label}
+                            </span>
+                            <span className="text-gray-400">→</span>
+                            <span className={`px-2 py-0.5 text-xs rounded ${getGradeInfo(history.newGrade).bgColor} ${getGradeInfo(history.newGrade).textColor}`}>
+                              {getGradeInfo(history.newGrade).label}
+                            </span>
+                          </div>
+                          {history.reason && (
+                            <p className="text-sm text-gray-600">{history.reason}</p>
+                          )}
+                          <p className="text-xs text-gray-400 mt-1">
+                            {new Date(history.createdAt).toLocaleString('ko-KR')}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500">총 {member.gradeHistory.length}건의 변경 이력</p>
+                )}
+              </div>
+            </div>
           )}
 
           {/* Programs Tab */}
