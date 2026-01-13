@@ -196,9 +196,10 @@ export default function ProgramDetail({ program }: Props) {
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 >
                   <option value="BOOKCLUB">독서모임</option>
-                  <option value="SEMINAR">세미나</option>
-                  <option value="WORKSHOP">워크샵</option>
+                  <option value="SEMINAR">강연 및 세미나</option>
                   <option value="KMOVE">K-Move</option>
+                  <option value="DEBATE">토론회</option>
+                  <option value="WORKSHOP">워크샵</option>
                   <option value="OTHER">기타</option>
                 </select>
               </div>
@@ -210,9 +211,10 @@ export default function ProgramDetail({ program }: Props) {
                   onChange={(e) => setForm({ ...form, status: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 >
-                  <option value="DRAFT">초안</option>
-                  <option value="OPEN">모집중</option>
-                  <option value="CLOSED">진행중</option>
+                  <option value="DRAFT">준비중</option>
+                  <option value="RECRUITING">모집중</option>
+                  <option value="RECRUIT_CLOSED">모집마감</option>
+                  <option value="ONGOING">진행중</option>
                   <option value="COMPLETED">완료</option>
                 </select>
               </div>

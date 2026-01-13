@@ -5,9 +5,11 @@ import Link from 'next/link'
 import {
   LayoutDashboard, Users, BookOpen, Briefcase, Wallet,
   FileText, Bot, Palette, Settings, Home,
-  ChevronDown
+  ChevronDown, Bell, Handshake, FlaskConical
 } from 'lucide-react'
 import AdminMobileNav from './AdminMobileNav'
+import AdminHeader from './AdminHeader'
+import AdminMobileHeader from './AdminMobileHeader'
 
 const sidebarItems = [
   { label: '대시보드', href: '/admin', icon: LayoutDashboard },
@@ -20,6 +22,27 @@ const sidebarItems = [
     label: '프로그램',
     href: '/admin/programs',
     icon: BookOpen,
+  },
+  {
+    label: '협조요청',
+    icon: Handshake,
+    children: [
+      { label: '전체 현황', href: '/admin/cooperation' },
+      { label: '자문요청', href: '/admin/cooperation/consulting' },
+      { label: '강사요청', href: '/admin/cooperation/lecturer' },
+      { label: '설문·인터뷰', href: '/admin/cooperation/survey' },
+    ],
+  },
+  {
+    label: '리서치랩',
+    icon: FlaskConical,
+    children: [
+      { label: '전체 현황', href: '/admin/lab' },
+      { label: '전문가/강사', href: '/admin/lab/experts' },
+      { label: '설문조사', href: '/admin/lab/surveys' },
+      { label: '연구동향', href: '/admin/lab/trends' },
+      { label: '연구참여', href: '/admin/lab/participations' },
+    ],
   },
   {
     label: '사업 관리',
@@ -74,7 +97,9 @@ const sidebarItems = [
     label: '설정',
     icon: Settings,
     children: [
+      { label: '알림 발송', href: '/admin/notifications' },
       { label: '관리자', href: '/admin/settings/admins' },
+      { label: '데이터 관리', href: '/admin/settings/migration' },
       { label: '백업', href: '/admin/settings/backup' },
     ],
   },
@@ -162,34 +187,12 @@ export default async function AdminLayout({
         {/* Top Bar - Desktop */}
         <header className="hidden lg:block bg-white shadow-sm sticky top-0 z-40">
           <div className="flex items-center justify-end px-6 py-4">
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">{session.user?.name}</span>
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-bold">
-                {session.user?.name?.[0] || 'A'}
-              </div>
-            </div>
+            <AdminHeader userName={session.user?.name} />
           </div>
         </header>
 
         {/* Mobile Header */}
-        <header className="lg:hidden bg-gray-900 text-white sticky top-0 z-40">
-          <div className="flex items-center justify-between px-4 py-3">
-            <Link href="/admin" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
-                <span className="text-white font-bold text-sm">U</span>
-              </div>
-              <span className="font-bold">Admin</span>
-            </Link>
-            <div className="flex items-center gap-3">
-              <Link href="/" className="p-2 text-gray-400 hover:text-white">
-                <Home className="w-5 h-5" />
-              </Link>
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-bold">
-                {session.user?.name?.[0] || 'A'}
-              </div>
-            </div>
-          </div>
-        </header>
+        <AdminMobileHeader userName={session.user?.name} />
 
         {/* Mobile Bottom Navigation */}
         <AdminMobileNav />

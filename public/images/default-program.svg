@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect fill="url(#grad)" width="400" height="400"/>
+  <g transform="translate(200, 180)" fill="white" fill-opacity="0.3">
+    <rect x="-60" y="-40" width="120" height="80" rx="8"/>
+    <circle cx="-30" cy="-10" r="12"/>
+    <polygon points="60,-40 60,40 0,-10"/>
+  </g>
+  <text x="200" y="260" font-family="system-ui, sans-serif" font-size="24" font-weight="500" fill="white" fill-opacity="0.4" text-anchor="middle">프로그램</text>
+</svg>

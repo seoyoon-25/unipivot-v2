@@ -1,0 +1,7 @@
+/* GrapesJS FontAwesome Override - Use FontAwesome 6 instead of 4.7 */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
+
+/* Hide old FontAwesome if loaded */
+.fa {
+  font-family: 'Font Awesome 6 Free', 'FontAwesome' !important;
+}

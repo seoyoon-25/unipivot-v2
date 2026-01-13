@@ -1,10 +1,37 @@
-export default function AdminDesignThemePage() {
-  return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">design/theme</h1>
-      <div className="bg-white rounded-2xl p-6 shadow-sm">
-        <p className="text-gray-600">관리자 페이지 - design/theme</p>
-      </div>
-    </div>
-  )
+import { prisma } from '@/lib/db'
+import ThemeSettings from './ThemeSettings'
+
+const DEFAULT_SETTINGS = {
+  'theme.primaryColor': '#3B82F6',
+  'theme.secondaryColor': '#10B981',
+  'theme.accentColor': '#F59E0B',
+  'theme.logo': '',
+  'theme.logoDark': '',
+  'theme.favicon': '',
+  'theme.siteName': '유니피벗',
+  'theme.siteDescription': '',
+  'theme.fontFamily': 'Pretendard',
+}
+
+async function getThemeSettings() {
+  const settings = await prisma.siteSetting.findMany({
+    where: {
+      key: { startsWith: 'theme.' },
+    },
+  })
+
+  const settingsMap: Record<string, string> = { ...DEFAULT_SETTINGS }
+  settings.forEach((s) => {
+    if (s.value) {
+      settingsMap[s.key] = s.value
+    }
+  })
+
+  return settingsMap
+}
+
+export default async function AdminDesignThemePage() {
+  const settings = await getThemeSettings()
+
+  return <ThemeSettings settings={settings} />
 }

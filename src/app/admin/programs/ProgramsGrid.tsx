@@ -27,9 +27,10 @@ interface Props {
 function getTypeLabel(type: string) {
   const types: Record<string, string> = {
     'BOOKCLUB': '독서모임',
-    'SEMINAR': '세미나',
-    'WORKSHOP': '워크샵',
+    'SEMINAR': '강연/세미나',
     'KMOVE': 'K-Move',
+    'DEBATE': '토론회',
+    'WORKSHOP': '워크샵',
     'OTHER': '기타'
   }
   return types[type] || type
@@ -37,7 +38,11 @@ function getTypeLabel(type: string) {
 
 function getStatusLabel(status: string) {
   const statuses: Record<string, string> = {
-    'DRAFT': '초안',
+    'DRAFT': '준비중',
+    'UPCOMING': '모집예정',
+    'RECRUITING': '모집중',
+    'RECRUIT_CLOSED': '모집마감',
+    'ONGOING': '진행중',
     'OPEN': '모집중',
     'CLOSED': '진행중',
     'COMPLETED': '완료'
@@ -47,9 +52,13 @@ function getStatusLabel(status: string) {
 
 function getStatusColor(status: string) {
   switch (status) {
-    case 'OPEN': return 'bg-blue-100 text-blue-600'
-    case 'CLOSED': return 'bg-green-100 text-green-600'
+    case 'RECRUITING':
+    case 'OPEN': return 'bg-green-100 text-green-600'
+    case 'RECRUIT_CLOSED': return 'bg-yellow-100 text-yellow-600'
+    case 'ONGOING':
+    case 'CLOSED': return 'bg-blue-100 text-blue-600'
     case 'COMPLETED': return 'bg-gray-100 text-gray-600'
+    case 'UPCOMING': return 'bg-purple-100 text-purple-600'
     default: return 'bg-yellow-100 text-yellow-600'
   }
 }
@@ -118,9 +127,10 @@ export default function ProgramsGrid({ programs, total, pages, currentPage, sear
           >
             <option value="">전체 유형</option>
             <option value="BOOKCLUB">독서모임</option>
-            <option value="SEMINAR">세미나</option>
-            <option value="WORKSHOP">워크샵</option>
+            <option value="SEMINAR">강연/세미나</option>
             <option value="KMOVE">K-Move</option>
+            <option value="DEBATE">토론회</option>
+            <option value="WORKSHOP">워크샵</option>
             <option value="OTHER">기타</option>
           </select>
           <select
@@ -129,9 +139,10 @@ export default function ProgramsGrid({ programs, total, pages, currentPage, sear
             className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
           >
             <option value="">전체 상태</option>
-            <option value="DRAFT">초안</option>
-            <option value="OPEN">모집중</option>
-            <option value="CLOSED">진행중</option>
+            <option value="DRAFT">준비중</option>
+            <option value="RECRUITING">모집중</option>
+            <option value="RECRUIT_CLOSED">모집마감</option>
+            <option value="ONGOING">진행중</option>
             <option value="COMPLETED">완료</option>
           </select>
           <button

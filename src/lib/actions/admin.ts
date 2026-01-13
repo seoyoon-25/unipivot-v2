@@ -97,7 +97,15 @@ export async function getMember(id: string) {
         include: { program: true }
       },
       donations: true,
-      activityLogs: { take: 10, orderBy: { createdAt: 'desc' } }
+      activityLogs: { take: 10, orderBy: { createdAt: 'desc' } },
+      programParticipants: {
+        include: {
+          program: {
+            select: { id: true, title: true, type: true, startDate: true, endDate: true }
+          }
+        },
+        orderBy: { joinedAt: 'desc' }
+      }
     }
   })
 }
@@ -176,10 +184,18 @@ export async function createProgram(data: {
   content?: string
   capacity?: number
   fee?: number
+  feeType?: string
+  feeAmount?: number
   location?: string
   isOnline?: boolean
+  status?: string
+  image?: string
+  thumbnailSquare?: string
+  recruitStartDate?: Date
+  recruitEndDate?: Date
   startDate?: Date
   endDate?: Date
+  applicationFormId?: string
 }) {
   const slug = data.title
     .toLowerCase()
@@ -188,9 +204,16 @@ export async function createProgram(data: {
     .replace(/^-|-$/g, '') + '-' + Date.now()
 
   const program = await prisma.program.create({
-    data: { ...data, slug, status: 'DRAFT' }
+    data: {
+      ...data,
+      slug,
+      status: data.status || 'DRAFT',
+      feeType: data.feeType || 'FREE',
+      feeAmount: data.feeAmount || 0
+    }
   })
   revalidatePath('/admin/programs')
+  revalidatePath('/programs')
   return program
 }
 
@@ -201,17 +224,26 @@ export async function updateProgram(id: string, data: {
   content?: string
   capacity?: number
   fee?: number
+  feeType?: string
+  feeAmount?: number
   location?: string
   isOnline?: boolean
   status?: string
-  startDate?: Date
-  endDate?: Date
+  image?: string
+  thumbnailSquare?: string
+  recruitStartDate?: Date | null
+  recruitEndDate?: Date | null
+  startDate?: Date | null
+  endDate?: Date | null
+  applicationFormId?: string | null
 }) {
   const program = await prisma.program.update({
     where: { id },
     data
   })
   revalidatePath('/admin/programs')
+  revalidatePath('/programs')
+  revalidatePath(`/programs/${program.slug}`)
   return program
 }
 

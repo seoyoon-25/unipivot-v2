@@ -12,10 +12,33 @@ export async function getHomePageData() {
   const [programs, notices, stats] = await Promise.all([
     // 최근 프로그램 (모집중, 진행중)
     prisma.program.findMany({
-      where: { status: { in: ['OPEN', 'CLOSED'] } },
-      take: 4,
+      where: {
+        status: { in: ['RECRUITING', 'RECRUIT_CLOSED', 'ONGOING', 'OPEN', 'CLOSED'] }
+      },
+      take: 8,
       orderBy: { createdAt: 'desc' },
-      include: { _count: { select: { registrations: true } } }
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        type: true,
+        description: true,
+        image: true,
+        thumbnailSquare: true,
+        isOnline: true,
+        feeType: true,
+        feeAmount: true,
+        status: true,
+        recruitStartDate: true,
+        recruitEndDate: true,
+        startDate: true,
+        endDate: true,
+        likeCount: true,
+        applicationCount: true,
+        capacity: true,
+        location: true,
+        _count: { select: { registrations: true, applications: true } }
+      }
     }),
     // 최근 공지사항
     prisma.notice.findMany({

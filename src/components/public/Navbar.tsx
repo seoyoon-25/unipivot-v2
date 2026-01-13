@@ -1,17 +1,27 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { Menu, X, ChevronDown, User, LogOut, Settings } from 'lucide-react'
+import { Menu, X, ChevronDown, User, LogOut, Settings, Bell } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { Avatar } from '@/components/ui'
+import NotificationDropdown from '@/components/NotificationDropdown'
+
+type SubMenuItem = {
+  label: string
+  href: string
+  description?: string
+  external?: boolean
+}
 
 type MenuItem = {
   label: string
   href?: string
-  children?: { label: string; href: string; description?: string }[]
+  children?: SubMenuItem[]
 }
+
+const LAB_DOMAIN = process.env.NEXT_PUBLIC_LAB_DOMAIN || 'lab.bestcome.org'
 
 const menuItems: MenuItem[] = [
   {
@@ -24,9 +34,10 @@ const menuItems: MenuItem[] = [
   {
     label: '프로그램',
     children: [
-      { label: '프로그램 안내', href: '/p/programs', description: '유니피벗 프로그램' },
-      { label: '독서모임', href: '/p/bookclub-info', description: '남Book북한걸음' },
-      { label: '세미나', href: '/p/seminar-info', description: '정기 교육 세미나' },
+      { label: '독서모임', href: '/programs?type=BOOKCLUB', description: '남Book북한걸음' },
+      { label: '강연 및 세미나', href: '/programs?type=SEMINAR', description: '정기 교육 세미나' },
+      { label: 'K-move', href: '/programs?type=KMOVE', description: 'K-move 프로그램' },
+      { label: '토론회', href: '/programs?type=DEBATE', description: '주제별 토론회' },
     ],
   },
   {
@@ -40,8 +51,8 @@ const menuItems: MenuItem[] = [
   {
     label: '연대하기',
     children: [
-      { label: '강연요청', href: '/request', description: '강연/협력 요청' },
-      { label: '전문가 풀', href: '/experts', description: '분야별 전문가' },
+      { label: '협조요청', href: '/cooperation', description: '자문/강사/설문 요청' },
+      { label: '리서치랩', href: `https://${LAB_DOMAIN}`, description: '연구 매칭 플랫폼', external: true },
       { label: '재능나눔', href: '/talent', description: '재능 기부' },
       { label: '후원하기', href: '/donate', description: '유니피벗 후원' },
     ],
@@ -75,7 +86,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/p/about-us" className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg shadow-primary/20">
               <span className="text-white font-bold text-lg">U</span>
             </div>
@@ -123,9 +134,18 @@ export function Navbar() {
                         <Link
                           key={child.href}
                           href={child.href}
+                          target={child.external ? '_blank' : undefined}
+                          rel={child.external ? 'noopener noreferrer' : undefined}
                           className="block px-4 py-2.5 text-gray-700 hover:bg-primary-light hover:text-primary transition-colors"
                         >
-                          <span className="font-medium">{child.label}</span>
+                          <span className="font-medium flex items-center gap-1">
+                            {child.label}
+                            {child.external && (
+                              <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                            )}
+                          </span>
                           {child.description && (
                             <span className="block text-xs text-gray-400 mt-0.5">
                               {child.description}
@@ -156,18 +176,28 @@ export function Navbar() {
           {/* Auth Buttons */}
           <div className="hidden lg:flex items-center gap-3">
             {session ? (
-              <div
-                className="dropdown relative"
-                onMouseEnter={() => setOpenDropdown('user')}
-                onMouseLeave={() => setOpenDropdown(null)}
-              >
-                <button className="flex items-center gap-2">
-                  <Avatar
-                    src={session.user?.image}
-                    name={session.user?.name || '사용자'}
-                    size="sm"
-                  />
-                </button>
+              <>
+                {/* Notification Dropdown */}
+                <div className={cn(
+                  'rounded-full',
+                  isScrolled ? '' : 'bg-white/10'
+                )}>
+                  <NotificationDropdown />
+                </div>
+
+                {/* User Dropdown */}
+                <div
+                  className="dropdown relative"
+                  onMouseEnter={() => setOpenDropdown('user')}
+                  onMouseLeave={() => setOpenDropdown(null)}
+                >
+                  <button className="flex items-center gap-2">
+                    <Avatar
+                      src={session.user?.image}
+                      name={session.user?.name || '사용자'}
+                      size="sm"
+                    />
+                  </button>
                 <div
                   className={cn(
                     'absolute top-full right-0 pt-2 w-48 transition-all duration-200',
@@ -205,6 +235,7 @@ export function Navbar() {
                   </div>
                 </div>
               </div>
+              </>
             ) : (
               <Link
                 href="/login"
@@ -241,10 +272,17 @@ export function Navbar() {
                     <Link
                       key={child.href}
                       href={child.href}
-                      className="block py-2 text-gray-700 hover:text-primary"
+                      target={child.external ? '_blank' : undefined}
+                      rel={child.external ? 'noopener noreferrer' : undefined}
+                      className="flex items-center gap-1 py-2 text-gray-700 hover:text-primary"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {child.label}
+                      {child.external && (
+                        <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      )}
                     </Link>
                   ))}
                 </div>

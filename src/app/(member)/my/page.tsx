@@ -2,8 +2,9 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { BookOpen, FileText, Coins, Calendar, ArrowRight } from 'lucide-react'
+import { BookOpen, FileText, Coins, Heart, ArrowRight } from 'lucide-react'
 import { getUserProfile } from '@/lib/actions/public'
+import { prisma } from '@/lib/db'
 
 export default async function MyDashboardPage() {
   const session = await getServerSession(authOptions)
@@ -12,7 +13,10 @@ export default async function MyDashboardPage() {
     redirect('/login')
   }
 
-  const user = await getUserProfile(session.user.id)
+  const [user, likesCount] = await Promise.all([
+    getUserProfile(session.user.id),
+    prisma.programLike.count({ where: { userId: session.user.id } }),
+  ])
 
   if (!user) {
     redirect('/login')
@@ -20,13 +24,12 @@ export default async function MyDashboardPage() {
 
   const programCount = user.registrations.filter(r => r.status === 'APPROVED').length
   const reportCount = user.bookReports.length
-  const totalDonations = user.donations.reduce((sum, d) => sum + d.amount, 0)
 
   const stats = [
     { label: '참여 프로그램', value: programCount.toString(), icon: BookOpen, href: '/my/programs' },
     { label: '독서 기록', value: reportCount.toString(), icon: FileText, href: '/my/reports' },
     { label: '보유 포인트', value: user.points.toLocaleString(), icon: Coins, href: '/my/points' },
-    { label: '총 후원금', value: `₩${totalDonations.toLocaleString()}`, icon: Calendar, href: '/my/points' },
+    { label: '관심 프로그램', value: likesCount.toString(), icon: Heart, href: '/my/likes' },
   ]
 
   return (
