@@ -137,6 +137,15 @@ model Program {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
+  // ═══════════════════════════════════════════════════════════
+  // 레거시 콘텐츠용 필드 (기존 아임웹 콘텐츠 이전용)
+  // ═══════════════════════════════════════════════════════════
+  isLegacy          Boolean   @default(false)   // 레거시 여부
+  legacyHtml        String?   @db.Text          // 기존 HTML 전체 (본문)
+  legacyImages      String[]  @default([])      // 이미지 URL 배열
+  originalUrl       String?                     // 원본 페이지 URL
+  migratedAt        DateTime?                   // 이전 일시
+
   sessions        ProgramSession[]
   registrations   Registration[]
   books           BookOnProgram[]

@@ -192,3 +192,124 @@ input:focus, textarea:focus, select:focus {
     @apply bg-background text-foreground;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   레거시 콘텐츠 스타일 (아임웹 복제본용)
+   ═══════════════════════════════════════════════════════════ */
+
+.legacy-content {
+  /* 기본 스타일 */
+  line-height: 1.8;
+  color: #333;
+}
+
+.legacy-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.legacy-content h1,
+.legacy-content h2,
+.legacy-content h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+}
+
+.legacy-content h1 { font-size: 1.75rem; }
+.legacy-content h2 { font-size: 1.5rem; }
+.legacy-content h3 { font-size: 1.25rem; }
+
+.legacy-content p {
+  margin-bottom: 1rem;
+}
+
+.legacy-content ul,
+.legacy-content ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.legacy-content ul { list-style-type: disc; }
+.legacy-content ol { list-style-type: decimal; }
+
+.legacy-content li {
+  margin-bottom: 0.5rem;
+}
+
+.legacy-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.legacy-content table td,
+.legacy-content table th {
+  border: 1px solid #ddd;
+  padding: 0.75rem;
+}
+
+.legacy-content table th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+.legacy-content a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.legacy-content a:hover {
+  color: #1d4ed8;
+}
+
+.legacy-content blockquote {
+  border-left: 4px solid #1E3A5F;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: #4b5563;
+  font-style: italic;
+}
+
+.legacy-content hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 2rem 0;
+}
+
+/* 아임웹 특정 클래스 호환 */
+.legacy-content .text-center { text-align: center; }
+.legacy-content .text-left { text-align: left; }
+.legacy-content .text-right { text-align: right; }
+.legacy-content .font-bold { font-weight: 700; }
+.legacy-content .font-normal { font-weight: 400; }
+
+/* 이미지 정렬 */
+.legacy-content .img-center {
+  display: block;
+  margin: 1rem auto;
+}
+
+/* 반응형 iframe (유튜브 등) */
+.legacy-content iframe {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.legacy-content .video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.legacy-content .video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}

@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Heart, Calendar, MapPin, Users, Clock, ArrowLeft, BookOpen, FileText, Edit3 } from 'lucide-react'
 import { ShareButton } from '@/components/common/ShareButton'
+import { LegacyProgramContent } from '@/components/programs/LegacyProgramContent'
 import '@/components/editor/editor.css'
 import {
   getProgramStatus,
@@ -84,6 +85,56 @@ export function ProgramDetailContent({
       month: 'long',
       day: 'numeric',
     })
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // 레거시 프로그램인 경우 별도 렌더링
+  // ═══════════════════════════════════════════════════════════
+  if (program.isLegacy && program.legacyHtml) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white border-b">
+          <div className="max-w-5xl mx-auto px-4 py-4">
+            <Link
+              href="/programs"
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              프로그램 목록
+            </Link>
+          </div>
+        </div>
+
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          {/* 제목 영역 */}
+          <div className="bg-white rounded-2xl p-6 mb-6 border">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-2 py-1 text-xs font-medium bg-primary/10 text-primary rounded">
+                {typeLabel}
+              </span>
+              <span className={`px-2 py-1 text-xs font-medium rounded ${statusBadgeClass}`}>
+                {statusLabel}
+              </span>
+            </div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">{program.title}</h1>
+            {program.description && (
+              <p className="text-gray-600 mt-2">{program.description}</p>
+            )}
+          </div>
+
+          {/* 레거시 콘텐츠 */}
+          <div className="bg-white rounded-2xl p-6 border">
+            <LegacyProgramContent
+              html={program.legacyHtml}
+              title={program.title}
+              originalUrl={program.originalUrl}
+              migratedAt={program.migratedAt}
+            />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

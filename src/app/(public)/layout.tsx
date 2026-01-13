@@ -12,7 +12,7 @@ export default function PublicLayout({
     <Providers>
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 pt-16 lg:pt-20">{children}</main>
         <Footer />
         <ChatbotButton />
       </div>
