@@ -57,6 +57,9 @@ model User {
   interestLikes       InterestLike[]
   interestKeywordLikes InterestKeywordLike[]
   interestAlerts      InterestAlert[]
+  // 계좌 및 만족도 조사 관계
+  bankAccounts        BankAccount[]
+  surveyResponses     SurveyResponse[]
 }
 
 model Account {
@@ -136,6 +139,7 @@ model Program {
   programReports  ProgramReport[]
   likes           ProgramLike[]
   applicationForm ApplicationForm? @relation(fields: [applicationFormId], references: [id])
+  surveys         SatisfactionSurvey[]
 }
 
 model Registration {
@@ -336,12 +340,22 @@ model Donation {
   id        String   @id @default(cuid())
   userId    String?
   amount    Int
-  type      String?  // ONE_TIME, MONTHLY
+  type      String?  // ONE_TIME, MONTHLY, DEPOSIT_CONVERT
   method    String?  // BANK_TRANSFER, CARD, OTHER
   message   String?
   anonymous Boolean  @default(false)
   status    String   @default("PENDING") // PENDING, COMPLETED, CANCELLED
   createdAt DateTime @default(now())
+
+  // 보증금 전환 관련
+  sourceType       String?  // PROGRAM_DEPOSIT (보증금 전환 시)
+  sourceId         String?  // 관련 신청 ID
+  donorName        String?  // 후원자명 (익명 시 "익명")
+
+  // 영수증 관련
+  receiptRequested Boolean  @default(false)
+  receiptIssued    Boolean  @default(false)
+  receiptIssuedAt  DateTime?
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
@@ -781,8 +795,21 @@ model ProgramApplication {
   // 커스텀 필드
   customFields String? @db.Text // JSON
 
+  // 보증금 반환 관련 필드
+  depositStatus       String   @default("NONE")  // NONE, PENDING, PAID, REFUND_PENDING, REFUNDED, DONATED, FORFEITED
+  refundCalculation   String?  @db.Text          // JSON: { attendanceRate, reportRate, refundRate, refundAmount }
+  refundableAmount    Int?                       // 반환 예정 금액
+  refundedAmount      Int?                       // 실제 반환된 금액
+  refundedAt          DateTime?
+  refundNote          String?
+  donatedAmount       Int?                       // 후원 전환 금액
+  donatedAt           DateTime?
+  surveySubmitted     Boolean  @default(false)
+  surveySubmittedAt   DateTime?
+
   program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id])
+  surveyResponse SurveyResponse?
 
   @@unique([programId, userId])
 }
@@ -804,15 +831,28 @@ model DepositSetting {
   isEnabled       Boolean   @default(true)
   totalSessions   Int
   depositAmount   Int
-  conditionType   String    // ATTENDANCE_ONLY, ATTENDANCE_AND_REPORT
+  conditionType   String    // ONE_TIME, ATTENDANCE_ONLY, ATTENDANCE_AND_REPORT
   attendanceRate  Int       @default(80)
   reportRate      Int?
+
+  // 반환 정책 상세
+  refundPolicy    String?   @db.Text  // JSON: RefundPolicyCriteria[]
+
+  // 회차별 보증금 (독서모임용)
+  depositPerSession Boolean @default(false)
+  perSessionAmount  Int?
+
+  // 만족도 조사 설정
+  surveyRequired    Boolean  @default(true)
+  surveyDeadlineDays Int     @default(7)
+
   status          String    @default("ACTIVE") // ACTIVE, SETTLING, SETTLED
   settledAt       DateTime?
   settledBy       String?
   totalDeposits   Int       @default(0)
   totalReturned   Int       @default(0)
   totalForfeited  Int       @default(0)
+  totalDonated    Int       @default(0)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -1424,6 +1464,110 @@ model ResearchTrend {
   isActive         Boolean   @default(true)
   crawledAt        DateTime  @default(now())
   createdAt        DateTime  @default(now())
+}
+
+// =============================================
+// 회원 계좌 관리 시스템
+// =============================================
+
+model BankAccount {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 계좌 정보
+  bankCode        String   // 은행 코드 (004: KB, 088: 신한, 090: 카카오 등)
+  bankName        String   // 은행명
+  accountNumber   String   // 계좌번호
+  accountHolder   String   // 예금주
+
+  // 설정
+  isDefault       Boolean  @default(false)  // 기본 계좌 여부
+  isVerified      Boolean  @default(false)  // 검증 여부
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // 관계
+  surveyResponses SurveyResponse[]
+
+  @@index([userId])
+  @@unique([userId, bankCode, accountNumber])  // 중복 방지
+}
+
+// =============================================
+// 만족도 조사 시스템
+// =============================================
+
+model SatisfactionSurvey {
+  id              String   @id @default(cuid())
+  programId       String
+  program         Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  // 조사 정보
+  title           String
+  description     String?  @db.Text
+
+  // 질문 목록
+  questions       String   @db.Text  // JSON: [{id, type, question, options?, required}]
+
+  // 설정
+  deadline        DateTime                     // 응답 기한
+  reminderSent    Boolean  @default(false)     // 리마인더 발송 여부
+
+  // 상태
+  status          String   @default("DRAFT")   // DRAFT, SENT, CLOSED
+  sentAt          DateTime?
+  closedAt        DateTime?
+
+  // 통계
+  targetCount     Int      @default(0)         // 대상자 수
+  responseCount   Int      @default(0)         // 응답자 수
+
+  // 관계
+  responses       SurveyResponse[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([programId])
+}
+
+model SurveyResponse {
+  id              String   @id @default(cuid())
+  surveyId        String
+  survey          SatisfactionSurvey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  applicationId   String   @unique
+  application     ProgramApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+
+  // 응답 내용
+  answers         String   @db.Text  // JSON: [{questionId, answer}]
+
+  // 보증금 반환 선택
+  refundChoice    String   @default("REFUND")  // REFUND, DONATE
+
+  // 반환 선택 시 계좌 정보
+  bankAccountId   String?                      // 기존 계좌 선택
+  bankAccount     BankAccount? @relation(fields: [bankAccountId], references: [id])
+  // 또는 새 계좌 입력
+  newBankCode     String?
+  newBankName     String?
+  newAccountNumber String?
+  newAccountHolder String?
+  saveNewAccount  Boolean  @default(false)     // 새 계좌 프로필에 저장
+
+  // 후원 선택 시
+  donationMessage String?                      // 후원 메시지
+  isAnonymous     Boolean  @default(false)     // 익명 후원
+  receiptRequested Boolean @default(false)     // 기부금 영수증 요청
+
+  // 상태
+  submittedAt     DateTime @default(now())
+
+  @@index([surveyId])
+  @@index([userId])
 }
 
 // =============================================
