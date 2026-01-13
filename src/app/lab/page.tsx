@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Users, ClipboardList, FileSearch, TrendingUp, ArrowRight } from 'lucide-react'
+import { TargetCategoryBanner } from '@/components/lab/TargetCategoryBanner'
 
 const features = [
   {
@@ -98,6 +99,9 @@ export default function LabHomePage() {
           </div>
         </div>
       </section>
+
+      {/* Target Category Banner */}
+      <TargetCategoryBanner />
 
       {/* Features Section */}
       <section className="py-20">

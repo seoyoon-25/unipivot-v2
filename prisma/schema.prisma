@@ -23,6 +23,7 @@ model User {
   origin        String?   // SOUTH, NORTH, OVERSEAS (기존 호환)
   originCategory String?  // DEFECTOR, MARRIAGE_IMMIGRANT, MIGRANT_WORKER, INTERNATIONAL_STUDENT, REFUGEE, OVERSEAS_KOREAN, MULTICULTURAL_CHILD, NATURALIZED, KOREAN
   originCountry String?   // 출신 국가 코드
+  originDetails String?   @db.Text // JSON: 카테고리별 상세 정보
   arrivalYear   Int?      // 입국년도
   birthYear     Int?
   occupation    String?
