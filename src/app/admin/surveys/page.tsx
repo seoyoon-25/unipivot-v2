@@ -302,7 +302,7 @@ export default function SurveysPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-6 ml-4">
+                    <div className="flex items-center gap-4 ml-4">
                       <div className="text-center">
                         <p className="text-xs text-gray-500">대상</p>
                         <p className="font-bold">{survey.targetCount}</p>
@@ -325,6 +325,16 @@ export default function SurveysPage() {
                           {responseRate}%
                         </p>
                       </div>
+                      {survey.responseCount > 0 && (
+                        <Link
+                          href={`/admin/surveys/${survey.id}/results`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors"
+                        >
+                          <BarChart3 className="w-4 h-4" />
+                          결과
+                        </Link>
+                      )}
                       <ChevronRight className="w-5 h-5 text-gray-400" />
                     </div>
                   </div>
