@@ -16,6 +16,8 @@ import {
   BarChart3,
   Calendar,
   AlertCircle,
+  Bell,
+  BellOff,
 } from 'lucide-react'
 
 interface Survey {
@@ -28,6 +30,10 @@ interface Survey {
   responseCount: number
   sentAt: string | null
   createdAt: string
+  reminderEnabled: boolean
+  reminderDaysParsed: number[]
+  reminderCount: number
+  lastReminderAt: string | null
   program: {
     id: string
     title: string
@@ -284,6 +290,19 @@ export default function SurveysPage() {
                             <AlertCircle className="w-3 h-3" />
                             기한 초과
                           </span>
+                        )}
+                        {survey.status === 'SENT' && (
+                          survey.reminderEnabled ? (
+                            <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs font-medium" title={`자동 리마인더: D-${survey.reminderDaysParsed.join(', D-')}`}>
+                              <Bell className="w-3 h-3" />
+                              자동 {survey.reminderCount > 0 && `(${survey.reminderCount}회)`}
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-gray-100 text-gray-500 text-xs font-medium">
+                              <BellOff className="w-3 h-3" />
+                              수동
+                            </span>
+                          )
                         )}
                       </div>
                       <h3 className="font-medium text-gray-900 truncate">{survey.title}</h3>

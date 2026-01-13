@@ -21,6 +21,11 @@ export async function GET(request: NextRequest) {
             type: true,
           },
         },
+        _count: {
+          select: {
+            reminders: true,
+          },
+        },
       },
       orderBy: [
         { status: 'asc' }, // DRAFT, SENT, CLOSED 순
@@ -28,7 +33,14 @@ export async function GET(request: NextRequest) {
       ],
     })
 
-    return NextResponse.json({ surveys })
+    // 리마인더 설정 정보를 파싱해서 반환
+    const surveysWithReminderInfo = surveys.map((survey) => ({
+      ...survey,
+      reminderDaysParsed: survey.reminderDays ? JSON.parse(survey.reminderDays) : [3, 1],
+      reminderCount: survey._count.reminders,
+    }))
+
+    return NextResponse.json({ surveys: surveysWithReminderInfo })
   } catch (error) {
     console.error('Get surveys error:', error)
     return NextResponse.json(

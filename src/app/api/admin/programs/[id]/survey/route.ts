@@ -75,7 +75,7 @@ export async function POST(
     }
 
     const body = await request.json()
-    const { title, description, questions, deadlineDays, sendNow } = body
+    const { title, description, questions, deadlineDays, sendNow, reminderEnabled, reminderDays } = body
 
     const program = await prisma.program.findUnique({
       where: { id },
@@ -106,6 +106,8 @@ export async function POST(
         targetCount: program.applications.length,
         status: sendNow ? 'SENT' : 'DRAFT',
         sentAt: sendNow ? new Date() : null,
+        reminderEnabled: reminderEnabled !== false, // 기본값 true
+        reminderDays: reminderDays ? JSON.stringify(reminderDays) : '[3, 1]',
       },
     })
 
@@ -281,6 +283,66 @@ export async function PUT(
     console.error('Update survey error:', error)
     return NextResponse.json(
       { error: '만족도 조사 업데이트에 실패했습니다.' },
+      { status: 500 }
+    )
+  }
+}
+
+// PATCH: 만족도 조사 설정 업데이트 (리마인더 등)
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions)
+    const { id: programId } = await params
+
+    if (!session?.user || session.user.role !== 'ADMIN') {
+      return NextResponse.json({ error: '권한이 없습니다.' }, { status: 403 })
+    }
+
+    const body = await request.json()
+    const { surveyId, reminderEnabled, reminderDays, deadline } = body
+
+    const survey = await prisma.satisfactionSurvey.findUnique({
+      where: { id: surveyId },
+    })
+
+    if (!survey || survey.programId !== programId) {
+      return NextResponse.json({ error: '만족도 조사를 찾을 수 없습니다.' }, { status: 404 })
+    }
+
+    const updateData: {
+      reminderEnabled?: boolean
+      reminderDays?: string
+      deadline?: Date
+    } = {}
+
+    if (reminderEnabled !== undefined) {
+      updateData.reminderEnabled = reminderEnabled
+    }
+
+    if (reminderDays !== undefined) {
+      updateData.reminderDays = JSON.stringify(reminderDays)
+    }
+
+    if (deadline) {
+      updateData.deadline = new Date(deadline)
+    }
+
+    const updatedSurvey = await prisma.satisfactionSurvey.update({
+      where: { id: surveyId },
+      data: updateData,
+    })
+
+    return NextResponse.json({
+      survey: updatedSurvey,
+      message: '만족도 조사 설정이 업데이트되었습니다.',
+    })
+  } catch (error) {
+    console.error('Patch survey error:', error)
+    return NextResponse.json(
+      { error: '만족도 조사 설정 업데이트에 실패했습니다.' },
       { status: 500 }
     )
   }

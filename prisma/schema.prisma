@@ -810,6 +810,7 @@ model ProgramApplication {
   program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id])
   surveyResponse SurveyResponse?
+  surveyReminders SurveyReminder[]
 
   @@unique([programId, userId])
 }
@@ -1513,7 +1514,12 @@ model SatisfactionSurvey {
 
   // 설정
   deadline        DateTime                     // 응답 기한
-  reminderSent    Boolean  @default(false)     // 리마인더 발송 여부
+  reminderSent    Boolean  @default(false)     // 리마인더 발송 여부 (레거시)
+
+  // 자동 리마인더 설정
+  reminderEnabled Boolean  @default(true)      // 자동 리마인더 활성화
+  reminderDays    String?  @default("[3, 1]")  // JSON: 마감 N일 전에 발송 (예: [7, 3, 1])
+  lastReminderAt  DateTime?                    // 마지막 리마인더 발송 시각
 
   // 상태
   status          String   @default("DRAFT")   // DRAFT, SENT, CLOSED
@@ -1526,6 +1532,7 @@ model SatisfactionSurvey {
 
   // 관계
   responses       SurveyResponse[]
+  reminders       SurveyReminder[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -1568,6 +1575,26 @@ model SurveyResponse {
 
   @@index([surveyId])
   @@index([userId])
+}
+
+// 리마인더 발송 기록
+model SurveyReminder {
+  id              String   @id @default(cuid())
+  surveyId        String
+  survey          SatisfactionSurvey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  applicationId   String
+  application     ProgramApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  userId          String
+
+  // 발송 정보
+  daysBeforeDeadline Int              // 마감 N일 전 발송
+  sentAt          DateTime @default(now())
+  channel         String   @default("KAKAO")  // KAKAO, SMS, LMS
+  status          String   @default("SENT")   // SENT, FAILED
+
+  @@unique([surveyId, applicationId, daysBeforeDeadline])
+  @@index([surveyId])
+  @@index([sentAt])
 }
 
 // =============================================
