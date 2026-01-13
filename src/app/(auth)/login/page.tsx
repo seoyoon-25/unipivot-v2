@@ -1,15 +1,14 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import { signIn } from 'next-auth/react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { signIn, getSession } from 'next-auth/react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react'
 
 function LoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/'
+  const callbackUrl = searchParams.get('callbackUrl') || undefined
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -31,13 +30,20 @@ function LoginForm() {
 
       if (result?.error) {
         setError(result.error)
+        setIsLoading(false)
       } else {
-        router.push(callbackUrl)
-        router.refresh()
+        // 세션을 가져와서 role 확인
+        const session = await getSession()
+        const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN'
+
+        // callbackUrl이 있으면 해당 URL로, 없으면 admin은 /admin, 일반은 /로 이동
+        const redirectUrl = callbackUrl || (isAdmin ? '/admin' : '/')
+
+        // 완전한 페이지 새로고침으로 세션 확실히 적용
+        window.location.href = redirectUrl
       }
     } catch {
       setError('로그인 중 오류가 발생했습니다.')
-    } finally {
       setIsLoading(false)
     }
   }
