@@ -2,14 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, BookOpen, Wallet, FileText } from 'lucide-react'
+import { LayoutDashboard, Users, BookOpen, Wallet, Palette } from 'lucide-react'
 
 const mobileNavItems = [
   { label: '대시보드', href: '/admin', icon: LayoutDashboard },
   { label: '회원', href: '/admin/members', icon: Users },
   { label: '프로그램', href: '/admin/programs', icon: BookOpen },
   { label: '재무', href: '/admin/finance', icon: Wallet },
-  { label: '콘텐츠', href: '/admin/contents/notices', icon: FileText },
+  { label: '디자인', href: '/admin/design', icon: Palette },
 ]
 
 export default function AdminMobileNav() {

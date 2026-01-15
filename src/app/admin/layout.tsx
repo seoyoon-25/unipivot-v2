@@ -91,13 +91,8 @@ const sidebarItems = [
   },
   {
     label: '디자인',
+    href: '/admin/design',
     icon: Palette,
-    children: [
-      { label: '페이지 관리', href: '/admin/design/pages' },
-      { label: '메뉴 관리', href: '/admin/design/menus' },
-      { label: '테마', href: '/admin/design/theme' },
-      { label: '배너', href: '/admin/design/banners' },
-    ],
   },
   {
     label: '설정',

@@ -57,6 +57,9 @@ function hexToHSL(hex: string): string {
   return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`
 }
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET() {
   try {
     const settings = await prisma.siteSetting.findMany({
