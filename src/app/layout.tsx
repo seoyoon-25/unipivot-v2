@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Providers } from '@/components/Providers'
 import { Toaster } from '@/components/ui'
+import { GlobalProtection } from '@/components/GlobalProtection'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -48,6 +49,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="font-pretendard">
+        <GlobalProtection />
         <Providers>{children}</Providers>
         <Toaster />
       </body>

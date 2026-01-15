@@ -147,6 +147,7 @@ SelectSeparator.displayName = SelectPrimitive.Separator.displayName
 
 export {
   SelectRoot,
+  SelectRoot as Select,
   SelectGroup,
   SelectValue,
   SelectTrigger,

@@ -12,7 +12,32 @@ import { InterestSection } from '@/components/interests'
 import { getHomePageData } from '@/lib/actions/public'
 
 export default async function HomePage() {
-  const { programs, notices, stats } = await getHomePageData()
+  let homeData: {
+    programs: any[]
+    notices: any[]
+    stats: {
+      members: number
+      completedPrograms: number
+      totalParticipations: number
+    }
+  } = {
+    programs: [],
+    notices: [],
+    stats: {
+      members: 0,
+      completedPrograms: 0,
+      totalParticipations: 0
+    }
+  }
+
+  try {
+    homeData = await getHomePageData()
+  } catch (error) {
+    console.error('Failed to load home page data:', error)
+    // 기본값으로 계속 진행
+  }
+
+  const { programs, notices, stats } = homeData
 
   return (
     <>

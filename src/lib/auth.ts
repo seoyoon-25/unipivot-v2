@@ -6,9 +6,9 @@ import GoogleProvider from 'next-auth/providers/google'
 import KakaoProvider from 'next-auth/providers/kakao'
 import { prisma } from './db'
 
-export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
-  providers: [
+// OAuth providers - 환경변수가 설정된 경우에만 활성화
+const getProviders = () => {
+  const providers: any[] = [
     CredentialsProvider({
       name: 'credentials',
       credentials: {
@@ -48,15 +48,34 @@ export const authOptions: NextAuthOptions = {
         }
       },
     }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID ?? '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
-    }),
-    KakaoProvider({
-      clientId: process.env.KAKAO_CLIENT_ID ?? '',
-      clientSecret: process.env.KAKAO_CLIENT_SECRET ?? '',
-    }),
-  ],
+  ]
+
+  // Google OAuth - 환경변수가 모두 설정된 경우에만 활성화
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    providers.push(
+      GoogleProvider({
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      })
+    )
+  }
+
+  // Kakao OAuth - 환경변수가 모두 설정된 경우에만 활성화
+  if (process.env.KAKAO_CLIENT_ID && process.env.KAKAO_CLIENT_SECRET) {
+    providers.push(
+      KakaoProvider({
+        clientId: process.env.KAKAO_CLIENT_ID,
+        clientSecret: process.env.KAKAO_CLIENT_SECRET,
+      })
+    )
+  }
+
+  return providers
+}
+
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
+  providers: getProviders(),
   session: {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30일

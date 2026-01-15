@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { Avatar } from '@/components/ui'
+import { Button } from '@/components/ui/button'
 import NotificationDropdown from '@/components/NotificationDropdown'
 
 type SubMenuItem = {
@@ -80,29 +81,39 @@ export function Navbar() {
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         isScrolled
-          ? 'bg-white/95 backdrop-blur-md shadow-sm'
-          : 'bg-transparent'
+          ? 'bg-gradient-to-r from-orange-600 to-orange-500 shadow-lg'
+          : 'bg-gradient-to-r from-orange-600 to-orange-500'
       )}
     >
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="flex items-center gap-2"
+            onClick={(e) => {
+              // 추가 안전장치: 혹시나 하는 에러 방지
+              try {
+                // Link 컴포넌트가 정상적으로 처리하도록 함
+                return true
+              } catch (error) {
+                console.error('Logo click error:', error)
+                // 에러 발생시 수동으로 홈페이지로 이동
+                e.preventDefault()
+                window.location.href = '/'
+              }
+            }}
+          >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg shadow-primary/20">
               <span className="text-white font-bold text-lg">U</span>
             </div>
-            <span
-              className={cn(
-                'font-bold text-xl transition-colors',
-                isScrolled ? 'text-gray-900' : 'text-white'
-              )}
-            >
+            <span className="font-bold text-xl text-white">
               유니피벗
             </span>
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-2">
             {menuItems.map((item) =>
               item.children ? (
                 <div
@@ -111,17 +122,14 @@ export function Navbar() {
                   onMouseEnter={() => setOpenDropdown(item.label)}
                   onMouseLeave={() => setOpenDropdown(null)}
                 >
-                  <button
-                    className={cn(
-                      'nav-link px-4 py-2 text-sm font-medium rounded-lg flex items-center gap-1 transition-colors',
-                      isScrolled
-                        ? 'text-gray-700 hover:bg-gray-100'
-                        : 'text-white/90 hover:bg-white/10'
-                    )}
+                  <Button
+                    variant="white"
+                    size="default"
+                    className="gap-1"
                   >
                     {item.label}
                     <ChevronDown className="w-4 h-4" />
-                  </button>
+                  </Button>
                   <div
                     className={cn(
                       'absolute top-full left-0 pt-2 w-48 transition-all duration-200',
@@ -137,7 +145,7 @@ export function Navbar() {
                           href={child.href}
                           target={child.external ? '_blank' : undefined}
                           rel={child.external ? 'noopener noreferrer' : undefined}
-                          className="block px-4 py-2.5 text-gray-700 hover:bg-primary-light hover:text-primary transition-colors"
+                          className="block px-4 py-2.5 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
                         >
                           <span className="font-medium flex items-center gap-1">
                             {child.label}
@@ -161,12 +169,7 @@ export function Navbar() {
                 <Link
                   key={item.label}
                   href={item.href!}
-                  className={cn(
-                    'nav-link px-4 py-2 text-sm font-medium rounded-lg transition-colors',
-                    isScrolled
-                      ? 'text-gray-700 hover:bg-gray-100'
-                      : 'text-white/90 hover:bg-white/10'
-                  )}
+                  className="inline-flex items-center justify-center h-10 px-6 py-3 text-sm font-semibold text-white bg-white/10 border border-white/20 rounded-xl transition-all duration-200 hover:bg-white/20"
                 >
                   {item.label}
                 </Link>
@@ -214,14 +217,14 @@ export function Navbar() {
                     </div>
                     <Link
                       href="/my"
-                      className="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:bg-primary-light hover:text-primary"
+                      className="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
                     >
                       <User className="w-4 h-4" />
                       마이페이지
                     </Link>
                     <Link
                       href="/my/settings"
-                      className="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:bg-primary-light hover:text-primary"
+                      className="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
                     >
                       <Settings className="w-4 h-4" />
                       설정
@@ -240,7 +243,7 @@ export function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="px-5 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors shadow-lg shadow-primary/20"
+                className="inline-flex items-center justify-center h-10 px-6 py-3 text-sm font-semibold bg-white hover:bg-orange-50 text-orange-600 rounded-xl shadow-lg transition-all duration-200"
               >
                 로그인
               </Link>
@@ -248,16 +251,18 @@ export function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden p-2"
+          <Button
+            variant="white"
+            size="icon"
+            className="lg:hidden"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? (
-              <X className={cn('w-6 h-6', isScrolled ? 'text-gray-900' : 'text-white')} />
+              <X className="w-5 h-5" />
             ) : (
-              <Menu className={cn('w-6 h-6', isScrolled ? 'text-gray-900' : 'text-white')} />
+              <Menu className="w-5 h-5" />
             )}
-          </button>
+          </Button>
         </div>
 
         {/* Mobile Menu */}
@@ -275,7 +280,7 @@ export function Navbar() {
                       href={child.href}
                       target={child.external ? '_blank' : undefined}
                       rel={child.external ? 'noopener noreferrer' : undefined}
-                      className="flex items-center gap-1 py-2 text-gray-700 hover:text-primary"
+                      className="flex items-center gap-1 py-2 text-gray-700 hover:text-orange-600"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {child.label}
@@ -291,7 +296,7 @@ export function Navbar() {
                 <Link
                   key={item.label}
                   href={item.href!}
-                  className="block py-2 text-gray-700 hover:text-primary font-medium"
+                  className="block py-2 text-gray-700 hover:text-orange-600 font-medium"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.label}
@@ -303,7 +308,7 @@ export function Navbar() {
                 <div className="space-y-2">
                   <Link
                     href="/my"
-                    className="block py-2 text-gray-700 hover:text-primary"
+                    className="block py-2 text-gray-700 hover:text-orange-600"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     마이페이지
@@ -318,8 +323,8 @@ export function Navbar() {
               ) : (
                 <Link
                   href="/login"
-                  className="block w-full py-3 bg-primary text-white text-center rounded-lg font-semibold"
                   onClick={() => setIsMobileMenuOpen(false)}
+                  className="block w-full py-3 bg-orange-500 hover:bg-orange-600 text-white text-center rounded-xl font-semibold transition-colors"
                 >
                   로그인
                 </Link>

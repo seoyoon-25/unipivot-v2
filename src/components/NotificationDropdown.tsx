@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Bell, Check, Trash2, ExternalLink } from 'lucide-react'
+import { safeDocument, isBrowser } from '@/lib/utils/safe-dom'
 
 interface Notification {
   id: string
@@ -30,13 +31,19 @@ export default function NotificationDropdown() {
   }, [])
 
   useEffect(() => {
+    if (!isBrowser()) return
+
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+
+    const doc = safeDocument()
+    if (doc) {
+      doc.addEventListener('mousedown', handleClickOutside)
+      return () => doc.removeEventListener('mousedown', handleClickOutside)
+    }
   }, [])
 
   async function fetchNotifications() {

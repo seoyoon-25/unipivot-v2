@@ -8,66 +8,56 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// =============================================
-// NextAuth.js 모델
-// =============================================
-
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  phone         String?
-  origin        String?   // SOUTH, NORTH, OVERSEAS (기존 호환)
-  originCategory String?  // DEFECTOR, MARRIAGE_IMMIGRANT, MIGRANT_WORKER, INTERNATIONAL_STUDENT, REFUGEE, OVERSEAS_KOREAN, MULTICULTURAL_CHILD, NATURALIZED, KOREAN
-  originCountry String?   // 출신 국가 코드
-  originDetails String?   @db.Text // JSON: 카테고리별 상세 정보
-  arrivalYear   Int?      // 입국년도
-  birthYear     Int?
-  occupation    String?
-  bio           String?
-  points        Int       @default(0)
-  role          String    @default("USER") // USER, MEMBER, STAFF, ADMIN, SUPER_ADMIN
-  grade         Int       @default(1) // 회원 등급 (1: 일반, 2: 정회원, 3: 운영진, 4: 관리자, 5: 최고관리자)
-  gradeUpdatedAt DateTime? // 등급 변경일
-  status        String    @default("ACTIVE") // ACTIVE, INACTIVE, BANNED
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  accounts            Account[]
-  sessions            Session[]
-  registrations       Registration[]
-  bookReports         BookReport[]
-  donations           Donation[]
-  deposits            Deposit[]
-  chatLogs            ChatLog[]
-  notifications       Notification[]
-  activityLogs        ActivityLog[]
-  talents             Talent[]
-  blogPosts           BlogPost[]
-  pointHistory        PointHistory[]
-  programApplications ProgramApplication[]
-  programParticipants ProgramParticipant[]
-  programReports      ProgramReport[]
-  reportComments      ReportComment[]
-  reportLikes         ReportLike[]
-  programLikes        ProgramLike[]
-  // 관심사 시스템 관계
-  interests           Interest[]
-  interestLikes       InterestLike[]
+  id                   String                @id @default(cuid())
+  name                 String?
+  email                String                @unique
+  emailVerified        DateTime?
+  image                String?
+  password             String?
+  phone                String?
+  origin               String?
+  birthYear            Int?
+  occupation           String?
+  bio                  String?
+  points               Int                   @default(0)
+  role                 String                @default("USER")
+  status               String                @default("ACTIVE")
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  arrivalYear          Int?
+  originCategory       String?
+  originCountry        String?
+  originDetails        String?
+  grade                Int                   @default(1)
+  gradeUpdatedAt       DateTime?
+  accounts             Account[]
+  activityLogs         ActivityLog[]
+  bankAccounts         BankAccount[]
+  blogPosts            BlogPost[]
+  bookReports          BookReport[]
+  chatLogs             ChatLog[]
+  deposits             Deposit[]
+  donations            Donation[]
+  interests            Interest[]
+  interestAlerts       InterestAlert[]
   interestKeywordLikes InterestKeywordLike[]
-  interestAlerts      InterestAlert[]
-  // 계좌 및 만족도 조사 관계
-  bankAccounts        BankAccount[]
-  surveyResponses     SurveyResponse[]
-  // 회원 등급 이력
-  gradeHistory        MemberGradeHistory[]
-  // 리서치랩 프로필
-  labProfile          LabProfile?
-  // 사례비 신청
-  rewardClaims        RewardClaim[]
+  interestLikes        InterestLike[]
+  labProfile           LabProfile?
+  gradeHistory         MemberGradeHistory[]
+  notifications        Notification[]
+  pointHistory         PointHistory[]
+  programApplications  ProgramApplication[]
+  programLikes         ProgramLike[]
+  programParticipants  ProgramParticipant[]
+  programReports       ProgramReport[]
+  registrations        Registration[]
+  reportComments       ReportComment[]
+  reportLikes          ReportLike[]
+  rewardClaims         RewardClaim[]
+  sessions             Session[]
+  surveyResponses      SurveyResponse[]
+  talents              Talent[]
 }
 
 model Account {
@@ -83,8 +73,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -105,108 +94,88 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// =============================================
-// 프로그램 관련 모델
-// =============================================
-
 model Program {
-  id                String    @id @default(cuid())
-  title             String
-  slug              String    @unique
-  type              String    // BOOKCLUB, SEMINAR, KMOVE, DEBATE, WORKSHOP, OTHER
-  description       String?   @db.Text
-  content           String?   @db.Text  // 상세 내용 (HTML)
-  scheduleContent   String?   @db.Text  // 일정 안내 (HTML)
-  currentBookContent String?  @db.Text  // 현재 진행 도서 내용 (HTML)
-  image             String?
-  thumbnailSquare   String?   // 정사각형 썸네일
-  capacity          Int       @default(30)
-  fee               Int       @default(0)
-  feeType           String    @default("FREE") // FREE, DEPOSIT, FEE, TUITION
-  feeAmount         Int       @default(0)
-  location          String?
-  isOnline          Boolean   @default(false)
-  status            String    @default("DRAFT") // DRAFT, RECRUITING, RECRUIT_CLOSED, ONGOING, COMPLETED
-  recruitStartDate  DateTime? // 모집 시작일
-  recruitEndDate    DateTime? // 모집 마감일
-  startDate         DateTime?
-  endDate           DateTime?
-  applicationFormId String?   // 커스텀 신청서 양식
-  likeCount         Int       @default(0)
-  applicationCount  Int       @default(0)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  // ═══════════════════════════════════════════════════════════
-  // 레거시 콘텐츠용 필드 (기존 아임웹 콘텐츠 이전용)
-  // ═══════════════════════════════════════════════════════════
-  isLegacy          Boolean   @default(false)   // 레거시 여부
-  legacyHtml        String?   @db.Text          // 기존 HTML 전체 (본문)
-  legacyImages      String[]  @default([])      // 이미지 URL 배열
-  originalUrl       String?                     // 원본 페이지 URL
-  migratedAt        DateTime?                   // 이전 일시
-
-  sessions        ProgramSession[]
-  registrations   Registration[]
-  books           BookOnProgram[]
-  applications    ProgramApplication[]
-  gallery         ProgramGallery[]
-  depositSetting  DepositSetting?
-  participants    ProgramParticipant[]
-  programReports  ProgramReport[]
-  likes           ProgramLike[]
-  applicationForm ApplicationForm? @relation(fields: [applicationFormId], references: [id])
-  surveys         SatisfactionSurvey[]
+  id                 String               @id @default(cuid())
+  title              String
+  slug               String               @unique
+  type               String
+  description        String?
+  content            String?
+  image              String?
+  capacity           Int                  @default(30)
+  fee                Int                  @default(0)
+  location           String?
+  isOnline           Boolean              @default(false)
+  status             String               @default("DRAFT")
+  startDate          DateTime?
+  endDate            DateTime?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  applicationCount   Int                  @default(0)
+  applicationFormId  String?
+  feeAmount          Int                  @default(0)
+  feeType            String               @default("FREE")
+  likeCount          Int                  @default(0)
+  recruitEndDate     DateTime?
+  recruitStartDate   DateTime?
+  thumbnailSquare    String?
+  currentBookContent String?
+  scheduleContent    String?
+  isLegacy           Boolean              @default(false)
+  legacyHtml         String?
+  legacyImages       String[]             @default([])
+  migratedAt         DateTime?
+  originalUrl        String?
+  books              BookOnProgram[]
+  depositSetting     DepositSetting?
+  applicationForm    ApplicationForm?     @relation(fields: [applicationFormId], references: [id])
+  applications       ProgramApplication[]
+  gallery            ProgramGallery[]
+  likes              ProgramLike[]
+  participants       ProgramParticipant[]
+  programReports     ProgramReport[]
+  sessions           ProgramSession[]
+  registrations      Registration[]
+  surveys            SatisfactionSurvey[]
 }
 
 model Registration {
   id        String   @id @default(cuid())
   userId    String
   programId String
-  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
+  status    String   @default("PENDING")
   note      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  program   Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, programId])
 }
 
-// =============================================
-// 포인트 내역 모델
-// =============================================
-
 model PointHistory {
   id          String   @id @default(cuid())
   userId      String
-  amount      Int      // 양수: 적립, 음수: 사용
-  type        String   // EARN, SPEND
-  category    String   // ATTENDANCE, REPORT, DONATION, PROGRAM, EVENT, EXCHANGE, OTHER
+  amount      Int
+  type        String
+  category    String
   description String
-  balance     Int      // 거래 후 잔액
+  balance     Int
   createdAt   DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// =============================================
-// 도서 관련 모델
-// =============================================
-
 model Book {
-  id        String   @id @default(cuid())
+  id        String          @id @default(cuid())
   title     String
   author    String?
   publisher String?
   isbn      String?
   image     String?
   summary   String?
-  createdAt DateTime @default(now())
-
-  programs BookOnProgram[]
-  reports  BookReport[]
+  createdAt DateTime        @default(now())
+  programs  BookOnProgram[]
+  reports   BookReport[]
 }
 
 model BookOnProgram {
@@ -215,9 +184,8 @@ model BookOnProgram {
   programId String
   week      Int?
   createdAt DateTime @default(now())
-
-  book    Book    @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  program   Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
 
   @@unique([bookId, programId])
 }
@@ -231,30 +199,24 @@ model BookReport {
   isPublic  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// =============================================
-// 사업 관리 모델
-// =============================================
-
 model Project {
-  id          String   @id @default(cuid())
+  id          String             @id @default(cuid())
   title       String
   description String?
-  status      String   @default("PLANNING") // PLANNING, IN_PROGRESS, COMPLETED, ON_HOLD
+  status      String             @default("PLANNING")
   budget      Int?
   startDate   DateTime?
   endDate     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  milestones Milestone[]
-  partners   PartnerOnProject[]
-  documents  Document[]
-  events     CalendarEvent[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  events      CalendarEvent[]
+  documents   Document[]
+  milestones  Milestone[]
+  partners    PartnerOnProject[]
 }
 
 model Milestone {
@@ -263,24 +225,22 @@ model Milestone {
   title       String
   description String?
   dueDate     DateTime?
-  status      String    @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
+  status      String    @default("PENDING")
   createdAt   DateTime  @default(now())
-
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model Partner {
-  id          String   @id @default(cuid())
+  id          String             @id @default(cuid())
   name        String
-  type        String?  // GOVERNMENT, CORPORATION, NGO, ACADEMIC, OTHER
+  type        String?
   contact     String?
   email       String?
   phone       String?
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  projects PartnerOnProject[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  projects    PartnerOnProject[]
 }
 
 model PartnerOnProject {
@@ -289,9 +249,8 @@ model PartnerOnProject {
   projectId String
   role      String?
   createdAt DateTime @default(now())
-
-  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  partner   Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([partnerId, projectId])
 }
@@ -300,13 +259,12 @@ model Document {
   id        String   @id @default(cuid())
   projectId String?
   title     String
-  type      String?  // PROPOSAL, REPORT, CONTRACT, MEETING, OTHER
+  type      String?
   filePath  String?
   fileSize  Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  project   Project? @relation(fields: [projectId], references: [id])
 }
 
 model CalendarEvent {
@@ -318,20 +276,15 @@ model CalendarEvent {
   endDate     DateTime?
   allDay      Boolean   @default(false)
   location    String?
-  type        String?   // MEETING, DEADLINE, EVENT, OTHER
+  type        String?
   createdAt   DateTime  @default(now())
-
-  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  project     Project?  @relation(fields: [projectId], references: [id])
 }
-
-// =============================================
-// 재무 관련 모델
-// =============================================
 
 model Transaction {
   id          String   @id @default(cuid())
-  type        String   // INCOME, EXPENSE
-  category    String?  // DONATION, PROGRAM_FEE, GRANT, SALARY, RENT, SUPPLIES, OTHER
+  type        String
+  category    String?
   amount      Int
   description String?
   date        DateTime
@@ -344,42 +297,32 @@ model Deposit {
   id        String   @id @default(cuid())
   userId    String?
   amount    Int
-  purpose   String?  // PROGRAM_FEE, MEMBERSHIP, OTHER
-  status    String   @default("PENDING") // PENDING, CONFIRMED, REFUNDED
+  purpose   String?
+  status    String   @default("PENDING")
   note      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user      User?    @relation(fields: [userId], references: [id])
 }
 
 model Donation {
-  id        String   @id @default(cuid())
-  userId    String?
-  amount    Int
-  type      String?  // ONE_TIME, MONTHLY, DEPOSIT_CONVERT
-  method    String?  // BANK_TRANSFER, CARD, OTHER
-  message   String?
-  anonymous Boolean  @default(false)
-  status    String   @default("PENDING") // PENDING, COMPLETED, CANCELLED
-  createdAt DateTime @default(now())
-
-  // 보증금 전환 관련
-  sourceType       String?  // PROGRAM_DEPOSIT (보증금 전환 시)
-  sourceId         String?  // 관련 신청 ID
-  donorName        String?  // 후원자명 (익명 시 "익명")
-
-  // 영수증 관련
-  receiptRequested Boolean  @default(false)
-  receiptIssued    Boolean  @default(false)
+  id               String    @id @default(cuid())
+  userId           String?
+  amount           Int
+  type             String?
+  method           String?
+  message          String?
+  anonymous        Boolean   @default(false)
+  status           String    @default("PENDING")
+  createdAt        DateTime  @default(now())
+  donorName        String?
+  receiptIssued    Boolean   @default(false)
   receiptIssuedAt  DateTime?
-
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  receiptRequested Boolean   @default(false)
+  sourceId         String?
+  sourceType       String?
+  user             User?     @relation(fields: [userId], references: [id])
 }
-
-// =============================================
-// 전문가/재능 기부 모델
-// =============================================
 
 model Expert {
   id           String   @id @default(cuid())
@@ -400,32 +343,26 @@ model Talent {
   id          String   @id @default(cuid())
   userId      String
   title       String
-  category    String?  // DESIGN, DEVELOPMENT, TRANSLATION, MARKETING, OTHER
+  category    String?
   description String?
-  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  status      String   @default("PENDING")
   createdAt   DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
-
-// =============================================
-// AI 챗봇 모델
-// =============================================
 
 model ChatLog {
   id        String   @id @default(cuid())
   userId    String?
   sessionId String
-  role      String   // USER, ASSISTANT
+  role      String
   content   String
   createdAt DateTime @default(now())
-
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user      User?    @relation(fields: [userId], references: [id])
 }
 
 model KnowledgeBase {
   id        String   @id @default(cuid())
-  category  String   // FAQ, PROGRAM, ORGANIZATION, OTHER
+  category  String
   question  String
   answer    String
   keywords  String?
@@ -434,10 +371,6 @@ model KnowledgeBase {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
-// =============================================
-// 콘텐츠 관리 모델
-// =============================================
 
 model Notice {
   id        String   @id @default(cuid())
@@ -464,32 +397,26 @@ model BlogPost {
   views       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
-// =============================================
-// CMS 모델
-// =============================================
-
 model PageContent {
-  id          String   @id @default(cuid())
-  parentId    String?  // 부모 페이지 ID (null = 최상위)
-  slug        String   @unique
+  id          String        @id @default(cuid())
+  slug        String        @unique
   title       String
-  content     String?  // HTML content
-  styles      String?  // CSS styles
-  components  String?  // GrapesJS JSON data
+  content     String?
   metaTitle   String?
   metaDesc    String?
-  isFolder    Boolean  @default(false)  // 폴더 여부
-  order       Int      @default(0)       // 정렬 순서
-  isPublished Boolean  @default(false)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  parent      PageContent?  @relation("PageHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  components  String?
+  isPublished Boolean       @default(false)
+  styles      String?
+  isFolder    Boolean       @default(false)
+  order       Int           @default(0)
+  parentId    String?
+  parent      PageContent?  @relation("PageHierarchy", fields: [parentId], references: [id])
   children    PageContent[] @relation("PageHierarchy")
 }
 
@@ -501,7 +428,7 @@ model Menu {
   target    String?  @default("_self")
   position  Int      @default(0)
   isActive  Boolean  @default(true)
-  location  String?  // HEADER, FOOTER
+  location  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -510,7 +437,7 @@ model SiteSetting {
   id        String   @id @default(cuid())
   key       String   @unique
   value     String?
-  type      String?  // TEXT, NUMBER, BOOLEAN, JSON, IMAGE
+  type      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -521,7 +448,7 @@ model Banner {
   subtitle  String?
   image     String?
   link      String?
-  position  String?   // HERO, SIDEBAR, POPUP
+  position  String?
   isActive  Boolean   @default(true)
   startDate DateTime?
   endDate   DateTime?
@@ -529,10 +456,6 @@ model Banner {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
-
-// =============================================
-// 시스템 모델
-// =============================================
 
 model ActivityLog {
   id        String   @id @default(cuid())
@@ -544,23 +467,20 @@ model ActivityLog {
   ip        String?
   userAgent String?
   createdAt DateTime @default(now())
-
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user      User?    @relation(fields: [userId], references: [id])
 }
 
-// 회원 등급 변경 이력
 model MemberGradeHistory {
   id            String   @id @default(cuid())
   userId        String
-  previousGrade Int      // 이전 등급
-  newGrade      Int      // 변경된 등급
-  previousRole  String   // 이전 역할
-  newRole       String   // 변경된 역할
-  reason        String?  // 변경 사유
-  changedBy     String?  // 변경한 관리자 ID
+  previousGrade Int
+  newGrade      Int
+  previousRole  String
+  newRole       String
+  reason        String?
+  changedBy     String?
   createdAt     DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([createdAt])
@@ -569,14 +489,13 @@ model MemberGradeHistory {
 model Notification {
   id        String   @id @default(cuid())
   userId    String
-  type      String   // SYSTEM, PROGRAM, PAYMENT, OTHER
+  type      String
   title     String
   content   String?
   link      String?
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model EmailLog {
@@ -584,14 +503,10 @@ model EmailLog {
   to        String
   subject   String
   content   String?
-  status    String   @default("SENT") // SENT, FAILED
+  status    String   @default("SENT")
   error     String?
   createdAt DateTime @default(now())
 }
-
-// =============================================
-// NGO 회계 시스템 모델
-// =============================================
 
 model FiscalYear {
   id        String   @id @default(cuid())
@@ -601,251 +516,222 @@ model FiscalYear {
   isCurrent Boolean  @default(false)
   isClosed  Boolean  @default(false)
   createdAt DateTime @default(now())
-
-  budgets Budget[]
+  budgets   Budget[]
 }
 
 model FinanceAccount {
-  id          String   @id @default(cuid())
-  code        String   @unique
-  name        String
-  type        String   // INCOME, EXPENSE, ASSET, LIABILITY
-  category    String
-  subcategory String?
-  description String?
-  isActive    Boolean  @default(true)
-  isSystem    Boolean  @default(false)
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-
-  transactions FinanceTransaction[]
+  id           String               @id @default(cuid())
+  code         String               @unique
+  name         String
+  type         String
+  category     String
+  subcategory  String?
+  description  String?
+  isActive     Boolean              @default(true)
+  isSystem     Boolean              @default(false)
+  sortOrder    Int                  @default(0)
+  createdAt    DateTime             @default(now())
   budgetItems  BudgetItem[]
+  transactions FinanceTransaction[]
 }
 
 model Fund {
-  id               String   @id @default(cuid())
+  id               String               @id @default(cuid())
   name             String
-  type             String   // GENERAL, PROJECT
+  type             String
   description      String?
   financeProjectId String?
-  balance          Int      @default(0)
-  isActive         Boolean  @default(true)
-  createdAt        DateTime @default(now())
-
-  financeProject FinanceProject? @relation(fields: [financeProjectId], references: [id])
-  transactions   FinanceTransaction[]
-  budgets        Budget[]
+  balance          Int                  @default(0)
+  isActive         Boolean              @default(true)
+  createdAt        DateTime             @default(now())
+  budgets          Budget[]
+  transactions     FinanceTransaction[]
+  financeProject   FinanceProject?      @relation(fields: [financeProjectId], references: [id])
 }
 
 model FinanceProject {
-  id              String    @id @default(cuid())
+  id              String              @id @default(cuid())
   name            String
   funder          String
   contractNumber  String?
   totalBudget     Int
   startDate       DateTime
   endDate         DateTime
-  status          String    @default("PLANNING") // PLANNING, ACTIVE, SETTLEMENT, CLOSED
-  settlementDates String?   // JSON array
+  status          String              @default("PLANNING")
+  settlementDates String?
   description     String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  funds       Fund[]
-  budgetItems ProjectBudgetItem[]
-  documents   ProjectDocument[]
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  funds           Fund[]
+  budgetItems     ProjectBudgetItem[]
+  documents       ProjectDocument[]
 }
 
 model ProjectBudgetItem {
-  id               String  @id @default(cuid())
+  id               String         @id @default(cuid())
   financeProjectId String
   category         String
   subcategory      String?
   item             String
   budget           Int
-  executed         Int     @default(0)
+  executed         Int            @default(0)
   note             String?
-  sortOrder        Int     @default(0)
-
-  financeProject FinanceProject @relation(fields: [financeProjectId], references: [id], onDelete: Cascade)
+  sortOrder        Int            @default(0)
+  financeProject   FinanceProject @relation(fields: [financeProjectId], references: [id], onDelete: Cascade)
 }
 
 model ProjectDocument {
-  id               String   @id @default(cuid())
+  id               String         @id @default(cuid())
   financeProjectId String
-  type             String   // CONTRACT, REPORT, SETTLEMENT, OTHER
+  type             String
   name             String
   fileUrl          String
-  uploadedAt       DateTime @default(now())
+  uploadedAt       DateTime       @default(now())
   uploadedBy       String?
-
-  financeProject FinanceProject @relation(fields: [financeProjectId], references: [id], onDelete: Cascade)
+  financeProject   FinanceProject @relation(fields: [financeProjectId], references: [id], onDelete: Cascade)
 }
 
 model FinanceTransaction {
-  id                  String   @id @default(cuid())
+  id                  String         @id @default(cuid())
   date                DateTime
-  type                String   // INCOME, EXPENSE
+  type                String
   fundId              String
   financeAccountId    String
   amount              Int
   description         String
   vendor              String?
-  paymentMethod       String?  // CASH, CARD, TRANSFER
+  paymentMethod       String?
   projectBudgetItemId String?
   receiptId           String?
-  evidenceType        String?  // TAX_INVOICE, CASH_RECEIPT, CARD_SLIP, SIMPLE, NONE
-  depositType         String?  // DEPOSIT_IN, DEPOSIT_RETURN, DEPOSIT_FORFEIT
+  evidenceType        String?
+  depositType         String?
   participantId       String?
   note                String?
   createdBy           String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
-  fund           Fund           @relation(fields: [fundId], references: [id])
-  financeAccount FinanceAccount @relation(fields: [financeAccountId], references: [id])
-  receipt        Receipt?       @relation(fields: [receiptId], references: [id])
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  financeAccount      FinanceAccount @relation(fields: [financeAccountId], references: [id])
+  fund                Fund           @relation(fields: [fundId], references: [id])
+  receipt             Receipt?       @relation(fields: [receiptId], references: [id])
 }
 
 model Receipt {
-  id           String   @id @default(cuid())
+  id           String               @id @default(cuid())
   imageUrl     String
   thumbnailUrl String?
-  ocrData      String?  // JSON
-  ocrStatus    String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  ocrData      String?
+  ocrStatus    String               @default("PENDING")
   date         DateTime?
   amount       Int?
   vendor       String?
-  status       String   @default("PENDING") // PENDING, MATCHED, ARCHIVED
+  status       String               @default("PENDING")
   uploadedBy   String?
-  uploadedAt   DateTime @default(now())
-
+  uploadedAt   DateTime             @default(now())
   transactions FinanceTransaction[]
 }
 
 model Budget {
-  id           String    @id @default(cuid())
+  id           String       @id @default(cuid())
   fundId       String
   fiscalYearId String
-  status       String    @default("DRAFT") // DRAFT, APPROVED, CLOSED
-  totalAmount  Int       @default(0)
+  status       String       @default("DRAFT")
+  totalAmount  Int          @default(0)
   approvedAt   DateTime?
   approvedBy   String?
-  createdAt    DateTime  @default(now())
-
-  fund       Fund       @relation(fields: [fundId], references: [id])
-  fiscalYear FiscalYear @relation(fields: [fiscalYearId], references: [id])
-  items      BudgetItem[]
+  createdAt    DateTime     @default(now())
+  fiscalYear   FiscalYear   @relation(fields: [fiscalYearId], references: [id])
+  fund         Fund         @relation(fields: [fundId], references: [id])
+  items        BudgetItem[]
 }
 
 model BudgetItem {
-  id               String @id @default(cuid())
+  id               String         @id @default(cuid())
   budgetId         String
   financeAccountId String
   amount           Int
-  executed         Int    @default(0)
+  executed         Int            @default(0)
   note             String?
-
-  budget         Budget         @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  financeAccount FinanceAccount @relation(fields: [financeAccountId], references: [id])
+  budget           Budget         @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  financeAccount   FinanceAccount @relation(fields: [financeAccountId], references: [id])
 }
 
 model FinanceDonation {
   id              String    @id @default(cuid())
   donorId         String?
   donorName       String
-  donorType       String    @default("INDIVIDUAL") // INDIVIDUAL, CORPORATE
+  donorType       String    @default("INDIVIDUAL")
   amount          Int
   date            DateTime
-  type            String    @default("ONETIME") // REGULAR, ONETIME, DESIGNATED
+  type            String    @default("ONETIME")
   designation     String?
   receiptIssued   Boolean   @default(false)
   receiptNumber   String?
   receiptIssuedAt DateTime?
   note            String?
   createdAt       DateTime  @default(now())
-
-  donor Donor? @relation(fields: [donorId], references: [id])
+  donor           Donor?    @relation(fields: [donorId], references: [id])
 }
 
 model Donor {
-  id            String    @id @default(cuid())
-  name          String
-  type          String    @default("INDIVIDUAL") // INDIVIDUAL, CORPORATE
-  residentId    String?   // 암호화
-  businessId    String?
-  phone         String?
-  email         String?
-  address       String?
-  totalDonation Int       @default(0)
-  donationCount Int       @default(0)
+  id             String            @id @default(cuid())
+  name           String
+  type           String            @default("INDIVIDUAL")
+  residentId     String?
+  businessId     String?
+  phone          String?
+  email          String?
+  address        String?
+  totalDonation  Int               @default(0)
+  donationCount  Int               @default(0)
   lastDonationAt DateTime?
-  createdAt     DateTime  @default(now())
-
-  donations FinanceDonation[]
+  createdAt      DateTime          @default(now())
+  donations      FinanceDonation[]
 }
 
-// =============================================
-// NGO 프로그램 관리 확장 모델
-// =============================================
-
 model ProgramApplication {
-  id           String    @id @default(cuid())
-  programId    String
-  userId       String
-  status       String    @default("PENDING") // PENDING, ACCEPTED, ADDITIONAL, REJECTED, NO_CONTACT
-  appliedAt    DateTime  @default(now())
-  confirmedAt  DateTime?
-  cancelledAt  DateTime?
-  cancelReason String?
-  note         String?
-
-  // 신청 정보
-  email            String?
-  hometown         String?         // 고향
-  residence        String?         // 거주지역
-  motivation       String? @db.Text // 신청동기
-  source           String?         // 신청경로: EXISTING_MEMBER, HANA_FOUNDATION, SNS, KAKAO_GROUP, KAKAO_CHANNEL, REFERRAL
-  referrer         String?         // 추천인 (source가 REFERRAL일 때)
-  facePrivacy      Boolean @default(false) // 얼굴 비공개 희망
-  privacyAgreed    Boolean @default(true)  // 개인정보 동의
-
-  // 보증금 정보
-  depositPaid    Boolean   @default(false)
-  depositAmount  Int?
-  depositPaidAt  DateTime?
-  depositNote    String?
-
-  // 독서모임용 책 조사
-  bookReceiveType      String?   // PAPER, EBOOK, OWN
-  ebookProvider        String?   // KYOBO, YES24, RIDI, ALADIN, OTHER
-  ebookProviderOther   String?   // 기타 직접입력
+  id                    String           @id @default(cuid())
+  programId             String
+  userId                String
+  status                String           @default("PENDING")
+  appliedAt             DateTime         @default(now())
+  confirmedAt           DateTime?
+  cancelledAt           DateTime?
+  cancelReason          String?
+  note                  String?
+  acceptNotifiedAt      DateTime?
+  bookReceiveType       String?
   bookSurveyCompletedAt DateTime?
-
-  // 알림 발송 이력
-  acceptNotifiedAt  DateTime?
-  rejectNotifiedAt  DateTime?
-  depositNotifiedAt DateTime?
-
-  // 커스텀 필드
-  customFields String? @db.Text // JSON
-
-  // 보증금 반환 관련 필드
-  depositStatus       String   @default("NONE")  // NONE, PENDING, PAID, REFUND_PENDING, REFUNDED, DONATED, FORFEITED
-  refundCalculation   String?  @db.Text          // JSON: { attendanceRate, reportRate, refundRate, refundAmount }
-  refundableAmount    Int?                       // 반환 예정 금액
-  refundedAmount      Int?                       // 실제 반환된 금액
-  refundedAt          DateTime?
-  refundNote          String?
-  donatedAmount       Int?                       // 후원 전환 금액
-  donatedAt           DateTime?
-  surveySubmitted     Boolean  @default(false)
-  surveySubmittedAt   DateTime?
-
-  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id])
-  surveyResponse SurveyResponse?
-  surveyReminders SurveyReminder[]
+  customFields          String?
+  depositAmount         Int?
+  depositNote           String?
+  depositNotifiedAt     DateTime?
+  depositPaid           Boolean          @default(false)
+  depositPaidAt         DateTime?
+  ebookProvider         String?
+  ebookProviderOther    String?
+  email                 String?
+  facePrivacy           Boolean          @default(false)
+  hometown              String?
+  motivation            String?
+  privacyAgreed         Boolean          @default(true)
+  referrer              String?
+  rejectNotifiedAt      DateTime?
+  residence             String?
+  source                String?
+  depositStatus         String           @default("NONE")
+  donatedAmount         Int?
+  donatedAt             DateTime?
+  refundCalculation     String?
+  refundNote            String?
+  refundableAmount      Int?
+  refundedAmount        Int?
+  refundedAt            DateTime?
+  surveySubmitted       Boolean          @default(false)
+  surveySubmittedAt     DateTime?
+  program               Program          @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user                  User             @relation(fields: [userId], references: [id])
+  surveyReminders       SurveyReminder[]
+  surveyResponse        SurveyResponse?
 
   @@unique([programId, userId])
 }
@@ -857,209 +743,186 @@ model ProgramGallery {
   caption    String?
   sortOrder  Int      @default(0)
   uploadedAt DateTime @default(now())
-
-  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  program    Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
 }
 
 model DepositSetting {
-  id              String    @id @default(cuid())
-  programId       String    @unique
-  isEnabled       Boolean   @default(true)
-  totalSessions   Int
-  depositAmount   Int
-  conditionType   String    // ONE_TIME, ATTENDANCE_ONLY, ATTENDANCE_AND_REPORT
-  attendanceRate  Int       @default(80)
-  reportRate      Int?
-
-  // 반환 정책 상세
-  refundPolicy    String?   @db.Text  // JSON: RefundPolicyCriteria[]
-
-  // 회차별 보증금 (독서모임용)
-  depositPerSession Boolean @default(false)
-  perSessionAmount  Int?
-
-  // 만족도 조사 설정
-  surveyRequired    Boolean  @default(true)
-  surveyDeadlineDays Int     @default(7)
-
-  status          String    @default("ACTIVE") // ACTIVE, SETTLING, SETTLED
-  settledAt       DateTime?
-  settledBy       String?
-  totalDeposits   Int       @default(0)
-  totalReturned   Int       @default(0)
-  totalForfeited  Int       @default(0)
-  totalDonated    Int       @default(0)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  id                 String    @id @default(cuid())
+  programId          String    @unique
+  isEnabled          Boolean   @default(true)
+  totalSessions      Int
+  depositAmount      Int
+  conditionType      String
+  attendanceRate     Int       @default(80)
+  reportRate         Int?
+  status             String    @default("ACTIVE")
+  settledAt          DateTime?
+  settledBy          String?
+  totalDeposits      Int       @default(0)
+  totalReturned      Int       @default(0)
+  totalForfeited     Int       @default(0)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  depositPerSession  Boolean   @default(false)
+  perSessionAmount   Int?
+  refundPolicy       String?
+  surveyDeadlineDays Int       @default(7)
+  surveyRequired     Boolean   @default(true)
+  totalDonated       Int       @default(0)
+  program            Program   @relation(fields: [programId], references: [id], onDelete: Cascade)
 }
 
 model ProgramParticipant {
-  id                    String    @id @default(cuid())
-  programId             String
-  userId                String
-  status                String    @default("ACTIVE") // ACTIVE, DROPPED, COMPLETED
-  joinedAt              DateTime  @default(now())
-  depositAmount         Int       @default(0)
-  depositPaidAt         DateTime?
-  depositStatus         String    @default("NONE") // NONE, UNPAID, PAID, RETURNED, FORFEITED, CARRIED
-  finalAttendanceRate   Float?
-  finalReportRate       Float?
-  returnAmount          Int?
-  forfeitAmount         Int?
-  returnMethod          String?   // TRANSFER, CARRY_OVER, CASH
-  settledAt             DateTime?
-  settleNote            String?
-  depositTransactionId  String?
-  returnTransactionId   String?
-  forfeitTransactionId  String?
-
-  program     Program               @relation(fields: [programId], references: [id], onDelete: Cascade)
-  user        User                  @relation(fields: [userId], references: [id])
-  attendances ProgramAttendance[]
-  reports     ProgramReport[]
+  id                   String              @id @default(cuid())
+  programId            String
+  userId               String
+  status               String              @default("ACTIVE")
+  joinedAt             DateTime            @default(now())
+  depositAmount        Int                 @default(0)
+  depositPaidAt        DateTime?
+  depositStatus        String              @default("NONE")
+  finalAttendanceRate  Float?
+  finalReportRate      Float?
+  returnAmount         Int?
+  forfeitAmount        Int?
+  returnMethod         String?
+  settledAt            DateTime?
+  settleNote           String?
+  depositTransactionId String?
+  returnTransactionId  String?
+  forfeitTransactionId String?
+  attendances          ProgramAttendance[]
+  program              Program             @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user                 User                @relation(fields: [userId], references: [id])
+  reports              ProgramReport[]
 
   @@unique([programId, userId])
 }
 
 model ProgramSession {
-  id             String    @id @default(cuid())
+  id             String              @id @default(cuid())
   programId      String
-  sessionNo      Int
+  title          String?
   date           DateTime
   startTime      String?
   endTime        String?
-  title          String?
-  bookTitle      String?
-  bookAuthor     String?   // 도서 저자
-  bookImage      String?   // 도서 이미지 URL
-  bookRange      String?
   location       String?
+  createdAt      DateTime            @default(now())
+  bookRange      String?
+  bookTitle      String?
   description    String?
-  qrCode         String?   @unique
+  qrCode         String?             @unique
   qrExpiresAt    DateTime?
   reportDeadline DateTime?
-  status         String    @default("SCHEDULED") // SCHEDULED, ONGOING, COMPLETED, CANCELLED
-  createdAt      DateTime  @default(now())
-
-  program     Program             @relation(fields: [programId], references: [id], onDelete: Cascade)
-  attendances ProgramAttendance[]
-  reports     ProgramReport[]
-  qrTokens    AttendanceQR[]
+  sessionNo      Int
+  status         String              @default("SCHEDULED")
+  bookAuthor     String?
+  bookImage      String?
+  qrTokens       AttendanceQR[]
+  attendances    ProgramAttendance[]
+  reports        ProgramReport[]
+  program        Program             @relation(fields: [programId], references: [id], onDelete: Cascade)
 
   @@unique([programId, sessionNo])
 }
 
 model ProgramAttendance {
-  id            String    @id @default(cuid())
+  id            String             @id @default(cuid())
   sessionId     String
   participantId String
-  status        String    @default("ABSENT") // PRESENT, ABSENT, LATE, EXCUSED
+  status        String             @default("ABSENT")
   checkedAt     DateTime?
-  checkMethod   String?   // QR, MANUAL
+  checkMethod   String?
   note          String?
-
-  // QR 출석 정보
-  qrTokenId     String?   // 사용한 QR 토큰 ID
-  qrToken       AttendanceQR? @relation(fields: [qrTokenId], references: [id])
-  deviceInfo    String?   // 디바이스 정보 (선택)
-
-  session     ProgramSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  participant ProgramParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  deviceInfo    String?
+  qrTokenId     String?
+  participant   ProgramParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  qrToken       AttendanceQR?      @relation(fields: [qrTokenId], references: [id])
+  session       ProgramSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@unique([sessionId, participantId])
   @@index([qrTokenId])
 }
 
 model ProgramReport {
-  id            String    @id @default(cuid())
+  id            String             @id @default(cuid())
   sessionId     String
   participantId String
   userId        String
   programId     String
   title         String
   content       String
-  charCount     Int       @default(0)
+  charCount     Int                @default(0)
   photoUrl      String?
   question      String?
-  status        String    @default("DRAFT") // DRAFT, SUBMITTED
+  status        String             @default("DRAFT")
   submittedAt   DateTime?
-  visibility    String    @default("PARTICIPANTS") // PARTICIPANTS, PUBLIC
-  viewCount     Int       @default(0)
-  likeCount     Int       @default(0)
-  commentCount  Int       @default(0)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  session     ProgramSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  participant ProgramParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  user        User               @relation(fields: [userId], references: [id])
-  program     Program            @relation(fields: [programId], references: [id], onDelete: Cascade)
-  comments    ReportComment[]
-  likes       ReportLike[]
+  visibility    String             @default("PARTICIPANTS")
+  viewCount     Int                @default(0)
+  likeCount     Int                @default(0)
+  commentCount  Int                @default(0)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  participant   ProgramParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  program       Program            @relation(fields: [programId], references: [id], onDelete: Cascade)
+  session       ProgramSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user          User               @relation(fields: [userId], references: [id])
+  comments      ReportComment[]
+  likes         ReportLike[]
 
   @@unique([sessionId, participantId])
 }
 
 model ReportComment {
-  id        String   @id @default(cuid())
+  id        String        @id @default(cuid())
   reportId  String
   userId    String
   content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  report ProgramReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
-  user   User          @relation(fields: [userId], references: [id])
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  report    ProgramReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id])
 }
 
 model ReportLike {
-  id        String   @id @default(cuid())
+  id        String        @id @default(cuid())
   reportId  String
   userId    String
-  createdAt DateTime @default(now())
-
-  report ProgramReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
-  user   User          @relation(fields: [userId], references: [id])
+  createdAt DateTime      @default(now())
+  report    ProgramReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id])
 
   @@unique([reportId, userId])
 }
-
-// =============================================
-// 프로그램 신청 시스템 확장 모델
-// =============================================
 
 model ProgramLike {
   id        String   @id @default(cuid())
   programId String
   userId    String
   createdAt DateTime @default(now())
-
-  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  program   Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([programId, userId])
 }
 
 model ApplicationForm {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   description String?
-  isDefault   Boolean  @default(false)
-  fields      String   @db.Text // JSON array of field definitions
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  programs Program[]
+  isDefault   Boolean   @default(false)
+  fields      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  programs    Program[]
 }
 
 model NotificationTemplate {
   id        String   @id @default(cuid())
-  type      String   // ACCEPT, ADDITIONAL, REJECT, DEPOSIT, BOOK_SURVEY, REMINDER, NEW_PROGRAM
+  type      String
   name      String
   subject   String
-  content   String   @db.Text
+  content   String
   isDefault Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1072,9 +935,9 @@ model NotificationLog {
   recipientEmail String?
   recipientPhone String?
   subject        String
-  content        String    @db.Text
-  channel        String    // EMAIL, SMS, KAKAO, PUSH
-  status         String    @default("PENDING") // PENDING, SENT, FAILED
+  content        String
+  channel        String
+  status         String    @default("PENDING")
   sentAt         DateTime?
   errorMessage   String?
   createdAt      DateTime  @default(now())
@@ -1083,121 +946,101 @@ model NotificationLog {
 model SystemSetting {
   id          String   @id @default(cuid())
   key         String   @unique
-  value       String   @db.Text
+  value       String
   description String?
   updatedAt   DateTime @updatedAt
 }
 
-// =============================================
-// 관심사(Interest) 시스템 모델
-// =============================================
-
-// 관심 키워드 (통계 및 관리용)
 model InterestKeyword {
-  id                String    @id @default(cuid())
-  keyword           String    @unique
-  category          String?   // 카테고리 분류
-  totalCount        Int       @default(0) // 전체 언급 횟수
-  monthlyCount      Int       @default(0) // 이번달 언급 횟수
-  likeCount         Int       @default(0) // 공감 수
-  relatedProgramIds String?   // JSON array - 관련 프로그램 ID들
-  isFixed           Boolean   @default(false) // 고정 키워드 여부
-  isRecommended     Boolean   @default(false) // 추천 키워드 여부
-  isHidden          Boolean   @default(false) // 숨김 처리 여부
+  id                String                @id @default(cuid())
+  keyword           String                @unique
+  category          String?
+  totalCount        Int                   @default(0)
+  monthlyCount      Int                   @default(0)
+  likeCount         Int                   @default(0)
+  relatedProgramIds String?
+  isFixed           Boolean               @default(false)
+  isRecommended     Boolean               @default(false)
+  isHidden          Boolean               @default(false)
   lastUsedAt        DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  interests   Interest[]
-  keywordLikes InterestKeywordLike[]
-  alerts      InterestAlert[]
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  interests         Interest[]
+  alerts            InterestAlert[]
+  keywordLikes      InterestKeywordLike[]
 }
 
-// 개별 관심사 입력
 model Interest {
-  id         String   @id @default(cuid())
+  id         String          @id @default(cuid())
   keywordId  String
-  content    String?  // 추가 내용 (선택)
-  userId     String?  // 회원인 경우
-  sessionId  String?  // 비회원 세션 ID
-  nickname   String?  // 표시할 닉네임 (익명, 닉네임, 실명)
-  visibility String   @default("ANONYMOUS") // ANONYMOUS, NICKNAME, MEMBER
-  likeCount  Int      @default(0) // 공감 수
-  ipHash     String?  // IP 해시 (중복 방지)
-  createdAt  DateTime @default(now())
-
-  keyword InterestKeyword @relation(fields: [keywordId], references: [id], onDelete: Cascade)
-  user    User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
-  likes   InterestLike[]
+  content    String?
+  userId     String?
+  sessionId  String?
+  nickname   String?
+  visibility String          @default("ANONYMOUS")
+  likeCount  Int             @default(0)
+  ipHash     String?
+  createdAt  DateTime        @default(now())
+  keyword    InterestKeyword @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  user       User?           @relation(fields: [userId], references: [id])
+  likes      InterestLike[]
 }
 
-// 관심사 좋아요 (개별 관심사에 대한)
 model InterestLike {
   id         String   @id @default(cuid())
   interestId String
   userId     String?
   sessionId  String?
   createdAt  DateTime @default(now())
-
-  interest Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
-  user     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  interest   Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
+  user       User?    @relation(fields: [userId], references: [id])
 
   @@unique([interestId, userId])
   @@unique([interestId, sessionId])
 }
 
-// 키워드 공감 (키워드 자체에 대한)
 model InterestKeywordLike {
-  id        String   @id @default(cuid())
+  id        String          @id @default(cuid())
   keywordId String
   userId    String?
   sessionId String?
-  createdAt DateTime @default(now())
-
-  keyword InterestKeyword @relation(fields: [keywordId], references: [id], onDelete: Cascade)
-  user    User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime        @default(now())
+  keyword   InterestKeyword @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  user      User?           @relation(fields: [userId], references: [id])
 
   @@unique([keywordId, userId])
   @@unique([keywordId, sessionId])
 }
 
-// 알림 신청
 model InterestAlert {
-  id                String    @id @default(cuid())
+  id                String          @id @default(cuid())
   keywordId         String
   userId            String?
   email             String
   name              String?
-  isActive          Boolean   @default(true)
+  isActive          Boolean         @default(true)
   notifiedAt        DateTime?
   notifiedProgramId String?
-  createdAt         DateTime  @default(now())
-
-  keyword InterestKeyword @relation(fields: [keywordId], references: [id], onDelete: Cascade)
-  user    User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt         DateTime        @default(now())
+  keyword           InterestKeyword @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  user              User?           @relation(fields: [userId], references: [id])
 
   @@unique([keywordId, email])
 }
 
-// 관심사 시스템 설정
 model InterestSetting {
   id          String   @id @default(cuid())
   key         String   @unique
-  value       String   @db.Text
+  value       String
   description String?
   updatedAt   DateTime @updatedAt
 }
 
-// =============================================
-// 협조요청 시스템
-// =============================================
-
-// 협조요청 섹션 (메인 페이지 표시용)
 model CooperationSection {
   id         String   @id @default(cuid())
   order      Int      @default(0)
   title      String
-  content    String   @db.Text
+  content    String
   image      String?
   imageAlt   String?
   buttonText String   @default("요청하기")
@@ -1207,33 +1050,31 @@ model CooperationSection {
   updatedAt  DateTime @updatedAt
 }
 
-// 자문요청
 model ConsultingRequest {
   id           String   @id @default(cuid())
   startDate    DateTime
   endDate      DateTime
-  duration     Int      // 시간
-  method       String   // OFFLINE, ONLINE
-  fee          Int?     // 만원 단위
-  requirements String   @db.Text
+  duration     Int
+  method       String
+  fee          Int?
+  requirements String
   organization String
   contactName  String
   email        String
   phone        String
   attachment   String?
-  status       String   @default("PENDING") // PENDING, REVIEWING, MATCHED, COMPLETED, REJECTED
-  adminNote    String?  @db.Text
+  status       String   @default("PENDING")
+  adminNote    String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
 
-// 강사요청
 model LecturerRequest {
   id              String   @id @default(cuid())
   topic           String
-  schedules       Json     // [{date, startTime, endTime}]
-  method          String   // OFFLINE, ONLINE
-  requirements    String   @db.Text
+  schedules       Json
+  method          String
+  requirements    String
   fee             String?
   organization    String
   contactName     String
@@ -1243,333 +1084,233 @@ model LecturerRequest {
   attachment      String?
   feeAgreement    Boolean  @default(false)
   matchedExpertId String?
-  status          String   @default("PENDING") // PENDING, REVIEWING, MATCHED, COMPLETED, REJECTED
-  adminNote       String?  @db.Text
+  status          String   @default("PENDING")
+  adminNote       String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
 
-// 설문·인터뷰 요청
 model SurveyRequest {
   id             String   @id @default(cuid())
   startDate      DateTime
   endDate        DateTime
   questionCount  Int
-  estimatedTime  Int      // 분 단위
-  serviceFee     Int?     // 만원 단위
-  participantFee Int?     // 만원 단위
-  requirements   String   @db.Text
-  requesterType  String   // INDIVIDUAL, ORGANIZATION
+  estimatedTime  Int
+  serviceFee     Int?
+  participantFee Int?
+  requirements   String
+  requesterType  String
   requesterName  String
   email          String
   phone          String
   attachment     String?
-  status         String   @default("PENDING") // PENDING, REVIEWING, IN_PROGRESS, COMPLETED, REJECTED
-  adminNote      String?  @db.Text
+  status         String   @default("PENDING")
+  adminNote      String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
 
-// =============================================
-// 리서치랩 전문가/강사 풀 시스템
-// =============================================
-
-// 전문가 프로필 (확장된 모델 - 기존 Expert 대체)
 model ExpertProfile {
-  id                String    @id @default(cuid())
-  userId            String?   @unique // 회원 연동 (선택)
-
-  // 기본 정보
-  name              String
-  nameEn            String?
-  photo             String?
-  title             String?   // 직함
-  organization      String?   // 소속
-
-  // 연락처
-  email             String
-  phone             String?
-
-  // 출신 정보
-  origin            String    @default("NORTH") // NORTH, SOUTH (기존 호환)
-  originCategory    String?   // DEFECTOR, MARRIAGE_IMMIGRANT, MIGRANT_WORKER, INTERNATIONAL_STUDENT, REFUGEE, OVERSEAS_KOREAN, MULTICULTURAL_CHILD, NATURALIZED, KOREAN
-  originCountry     String?   // 출신 국가 코드
-  arrivalYear       Int?      // 입국년도 (범용)
-  defectionYear     Int?      // 탈북년도 (북한이탈주민)
-  settlementYear    Int?      // 정착년도
-  hometown          String?   // 고향/출신지역
-
-  // 전문 대상 그룹
-  targetExpertise   String?   @db.Text // JSON array: 어떤 이주민 그룹에 전문인지
-
-  // 학력/경력
-  education         String?   @db.Text // JSON array
-  career            String?   @db.Text // JSON array
-  certifications    String?   @db.Text // JSON array
-
-  // 전문 분야
-  categories        String?   // JSON array of category IDs
-  specialties       String?   @db.Text // 세부 전문 분야
-  keywords          String?   // 검색 키워드 (쉼표 구분)
-
-  // 강연 정보
-  lectureTopics     String?   @db.Text // 강연 가능 주제
-  lectureAreas      String?   // 강연 가능 지역 (JSON array)
-  lectureFeeMin     Int?      // 최소 강연료 (만원)
-  lectureFeeMax     Int?      // 최대 강연료 (만원)
-  lectureNote       String?   @db.Text // 강연 관련 비고
-
-  // 자문/컨설팅
-  consultingAreas   String?   @db.Text // 자문 가능 분야
-  consultingFee     Int?      // 자문료 (시간당, 만원)
-
-  // 연구 참여
-  researchInterests String?   @db.Text // 관심 연구 분야
-  surveyAvailable   Boolean   @default(true)  // 설문 참여 가능
-  interviewAvailable Boolean  @default(true)  // 인터뷰 참여 가능
-
-  // 소개
-  bio               String?   @db.Text
-  portfolio         String?   // 포트폴리오 URL
-  sns               String?   // SNS JSON {linkedin, instagram, etc}
-
-  // 실적 통계
-  lectureCount      Int       @default(0)
-  consultingCount   Int       @default(0)
-  researchCount     Int       @default(0)
-  rating            Float?    // 평균 평점
-
-  // 상태
-  isVerified        Boolean   @default(false) // 인증 여부
-  isPublic          Boolean   @default(false) // 공개 여부
-  isActive          Boolean   @default(true)
-  viewCount         Int       @default(0)
-
-  // 관리
-  verifiedAt        DateTime?
-  verifiedBy        String?
-  adminNote         String?   @db.Text
-
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  // Relations
-  lectureMatches    LectureMatch[]
+  id                     String                  @id @default(cuid())
+  userId                 String?                 @unique
+  name                   String
+  nameEn                 String?
+  photo                  String?
+  title                  String?
+  organization           String?
+  email                  String
+  phone                  String?
+  origin                 String                  @default("NORTH")
+  defectionYear          Int?
+  settlementYear         Int?
+  hometown               String?
+  education              String?
+  career                 String?
+  certifications         String?
+  categories             String?
+  specialties            String?
+  keywords               String?
+  lectureTopics          String?
+  lectureAreas           String?
+  lectureFeeMin          Int?
+  lectureFeeMax          Int?
+  lectureNote            String?
+  consultingAreas        String?
+  consultingFee          Int?
+  researchInterests      String?
+  surveyAvailable        Boolean                 @default(true)
+  interviewAvailable     Boolean                 @default(true)
+  bio                    String?
+  portfolio              String?
+  sns                    String?
+  lectureCount           Int                     @default(0)
+  consultingCount        Int                     @default(0)
+  researchCount          Int                     @default(0)
+  rating                 Float?
+  isVerified             Boolean                 @default(false)
+  isPublic               Boolean                 @default(false)
+  isActive               Boolean                 @default(true)
+  viewCount              Int                     @default(0)
+  verifiedAt             DateTime?
+  verifiedBy             String?
+  adminNote              String?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  arrivalYear            Int?
+  originCategory         String?
+  originCountry          String?
+  targetExpertise        String?
+  labProfile             LabProfile?
+  lectureMatches         LectureMatch[]
   researchParticipations ResearchParticipation[]
-  labProfile        LabProfile?
 }
 
-// 리서치랩 참가자 프로필 (회원과 연동)
 model LabProfile {
-  id                String    @id @default(cuid())
-  userId            String    @unique
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // 프로필 상태
-  profileComplete   Boolean   @default(false)
-  lastActiveAt      DateTime?
-
-  // 참가자 기본 정보
-  birthYear         Int?
-  birthRegion       String?   // 출생지역
-  hometown          String?   // 고향
-  leftHometownYear  Int?      // 고향 떠난 시기
-  enteredKoreaYear  Int?      // 남한 입국 시기
-  maritalStatus     String?   // SINGLE, MARRIED, DIVORCED, WIDOWED, SEPARATED, OTHER
-  educationHometown String?   // 고향 최종학력
-  educationKorea    String?   // 남한 최종학력
-  occupations       String?   @db.Text  // JSON array - 현재 직업 (복수 선택)
-
-  // 본인인증 정보 (추후 구현)
-  phoneVerified     Boolean   @default(false)
-  phoneVerifiedAt   DateTime?
-  verificationCI    String?   @unique  // 중복 가입 방지용 CI 값
-
-  // 뱃지 정보 (JSON)
-  badges            String?   @db.Text  // { expert: {...}, instructor: {...}, participant: {...} }
-
-  // 활동 통계
-  surveyCount       Int       @default(0)   // 설문 참여 횟수
-  interviewCount    Int       @default(0)   // 인터뷰 참여 횟수
-  lectureCount      Int       @default(0)   // 강연 횟수 (전문가인 경우)
-
-  // 전문가 프로필 연결
-  expertProfileId   String?   @unique
-  expertProfile     ExpertProfile? @relation(fields: [expertProfileId], references: [id])
-
-  // 전문가 인증 상태
-  expertVerificationStatus String @default("NONE") // NONE, PENDING, VERIFIED, REJECTED
-  expertVerifiedAt  DateTime?
-  expertVerifiedBy  String?
-
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id                       String         @id @default(cuid())
+  userId                   String         @unique
+  profileComplete          Boolean        @default(false)
+  lastActiveAt             DateTime?
+  birthYear                Int?
+  birthRegion              String?
+  hometown                 String?
+  leftHometownYear         Int?
+  enteredKoreaYear         Int?
+  maritalStatus            String?
+  educationHometown        String?
+  educationKorea           String?
+  occupations              String?
+  phoneVerified            Boolean        @default(false)
+  phoneVerifiedAt          DateTime?
+  verificationCI           String?        @unique
+  badges                   String?
+  surveyCount              Int            @default(0)
+  interviewCount           Int            @default(0)
+  lectureCount             Int            @default(0)
+  expertProfileId          String?        @unique
+  expertVerificationStatus String         @default("NONE")
+  expertVerifiedAt         DateTime?
+  expertVerifiedBy         String?
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
+  expertProfile            ExpertProfile? @relation(fields: [expertProfileId], references: [id])
+  user                     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
-// 강연 매칭 (강사 요청과 전문가 연결)
 model LectureMatch {
-  id               String    @id @default(cuid())
-  requestId        String?   // LecturerRequest ID (메인 사이트 요청)
-  expertId         String
-
-  // 요청 정보 (직접 요청인 경우)
-  topic            String?
-  date             DateTime?
-  duration         Int?      // 시간
-  method           String?   // OFFLINE, ONLINE
-  location         String?
-  fee              Int?      // 만원
-
-  // 요청자 정보
-  requesterOrg     String?
-  requesterName    String?
-  requesterEmail   String?
-  requesterPhone   String?
-
-  status           String    @default("PENDING") // PENDING, ACCEPTED, REJECTED, COMPLETED, CANCELLED
-  rating           Int?      // 1-5
-  feedback         String?   @db.Text
-
-  // 정산
-  actualFee        Int?
-  isPaid           Boolean   @default(false)
-  paidAt           DateTime?
-
-  adminNote        String?   @db.Text
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-
-  expert           ExpertProfile @relation(fields: [expertId], references: [id], onDelete: Cascade)
+  id             String        @id @default(cuid())
+  requestId      String?
+  expertId       String
+  topic          String?
+  date           DateTime?
+  duration       Int?
+  method         String?
+  location       String?
+  fee            Int?
+  requesterOrg   String?
+  requesterName  String?
+  requesterEmail String?
+  requesterPhone String?
+  status         String        @default("PENDING")
+  rating         Int?
+  feedback       String?
+  actualFee      Int?
+  isPaid         Boolean       @default(false)
+  paidAt         DateTime?
+  adminNote      String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  expert         ExpertProfile @relation(fields: [expertId], references: [id], onDelete: Cascade)
 }
 
-// 리서치랩 설문조사
 model LabSurvey {
-  id               String    @id @default(cuid())
+  id               String                  @id @default(cuid())
   title            String
-  description      String?   @db.Text
-  type             String    @default("SURVEY") // SURVEY, INTERVIEW
-
-  // 모집 정보
-  targetCount      Int       @default(10) // 목표 참가자 수
-  currentCount     Int       @default(0)  // 현재 참가자 수
-
-  // 참가 자격
-  targetOrigin     String?   // NORTH, SOUTH, ANY (기존 호환)
-  targetCategories String?   @db.Text // JSON array: 대상 이주민 카테고리들
-  targetCountries  String?   @db.Text // JSON array: 대상 출신 국가들
+  description      String?
+  type             String                  @default("SURVEY")
+  targetCount      Int                     @default(10)
+  currentCount     Int                     @default(0)
+  targetOrigin     String?
   targetAgeMin     Int?
   targetAgeMax     Int?
-  targetGender     String?   // MALE, FEMALE, ANY
-  targetConditions String?   @db.Text // 기타 참가 조건
-
-  // 설문 정보
+  targetGender     String?
+  targetConditions String?
   questionCount    Int?
-  estimatedTime    Int?      // 분 단위
-  questions        String?   @db.Text // JSON - 설문 문항 (간단한 설문용)
-  externalUrl      String?   // 외부 설문 URL (구글폼 등)
-
-  // 사례비
-  rewardType       String    @default("CASH") // CASH, POINT, GIFT
-  rewardAmount     Int?      // 사례비 금액
+  estimatedTime    Int?
+  questions        String?
+  externalUrl      String?
+  rewardType       String                  @default("CASH")
+  rewardAmount     Int?
   rewardNote       String?
-
-  // 기간
   startDate        DateTime
   endDate          DateTime
-
-  // 요청자 정보 (외부 요청인 경우)
-  isExternal       Boolean   @default(false)
+  isExternal       Boolean                 @default(false)
   requesterName    String?
   requesterOrg     String?
   requesterEmail   String?
   requesterPhone   String?
-
-  // 상태
-  status           String    @default("DRAFT") // DRAFT, RECRUITING, CLOSED, COMPLETED
-  isPublic         Boolean   @default(true)
-
-  adminNote        String?   @db.Text
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-
+  status           String                  @default("DRAFT")
+  isPublic         Boolean                 @default(true)
+  adminNote        String?
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  targetCategories String?
+  targetCountries  String?
   participations   ResearchParticipation[]
   rewardClaims     RewardClaim[]
 }
 
-// 연구 참여 기록
 model ResearchParticipation {
-  id               String    @id @default(cuid())
-  surveyId         String
-  expertId         String?   // 등록된 전문가인 경우
-  userId           String?   // 일반 회원인 경우
-
-  // 참가자 정보 (비회원인 경우)
-  name             String?
-  email            String?
-  phone            String?
-  origin           String?   // NORTH, SOUTH (기존 호환)
-  originCategory   String?   // 이주민 카테고리
-  originCountry    String?   // 출신 국가
-
-  status           String    @default("APPLIED") // APPLIED, APPROVED, COMPLETED, CANCELLED, REJECTED
-
-  // 응답 데이터
-  responses        String?   @db.Text // JSON - 설문 응답 (내부 설문용)
-  completedAt      DateTime?
-
-  // 사례비 지급
-  rewardStatus     String    @default("PENDING") // PENDING, PAID, CANCELLED
-  rewardAmount     Int?
-  paidAt           DateTime?
-
-  note             String?   @db.Text
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-
-  survey           LabSurvey      @relation(fields: [surveyId], references: [id], onDelete: Cascade)
-  expert           ExpertProfile? @relation(fields: [expertId], references: [id], onDelete: SetNull)
+  id             String         @id @default(cuid())
+  surveyId       String
+  expertId       String?
+  userId         String?
+  name           String?
+  email          String?
+  phone          String?
+  origin         String?
+  status         String         @default("APPLIED")
+  responses      String?
+  completedAt    DateTime?
+  rewardStatus   String         @default("PENDING")
+  rewardAmount   Int?
+  paidAt         DateTime?
+  note           String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  originCategory String?
+  originCountry  String?
+  expert         ExpertProfile? @relation(fields: [expertId], references: [id])
+  survey         LabSurvey      @relation(fields: [surveyId], references: [id], onDelete: Cascade)
 }
 
-// 사례비 신청 (부정 방지 기능 포함)
 model RewardClaim {
-  id            String   @id @default(cuid())
-
-  // 연구 연결 (연구별 1회 제한)
-  surveyId      String
-  survey        LabSurvey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
-
-  // 신청자
-  userId        String
-  user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // 신청 정보
-  realName      String
-  phoneNumber   String
-  bankCode      String
-  bankName      String
-  accountNumber String
-  amount        Int
-
-  // 부정 탐지
-  ipAddress     String
-  userAgent     String?   @db.Text
-  fingerprint   String?   // 브라우저 핑거프린트
-  flagged       Boolean   @default(false)
-  flagReason    String?   @db.Text
-  riskScore     Int       @default(0)  // 0-100
-
-  // 상태
-  status        String    @default("PENDING")  // PENDING, APPROVED, PAID, REJECTED
+  id             String    @id @default(cuid())
+  surveyId       String
+  userId         String
+  realName       String
+  phoneNumber    String
+  bankCode       String
+  bankName       String
+  accountNumber  String
+  amount         Int
+  ipAddress      String
+  userAgent      String?
+  fingerprint    String?
+  flagged        Boolean   @default(false)
+  flagReason     String?
+  riskScore      Int       @default(0)
+  status         String    @default("PENDING")
   rejectedReason String?
-  approvedAt    DateTime?
-  approvedBy    String?
-  paidAt        DateTime?
-  paidBy        String?
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  approvedAt     DateTime?
+  approvedBy     String?
+  paidAt         DateTime?
+  paidBy         String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  survey         LabSurvey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([surveyId, userId])
   @@index([surveyId, ipAddress])
@@ -1579,177 +1320,127 @@ model RewardClaim {
   @@index([flagged])
 }
 
-// 전문가 카테고리
 model ExpertCategory {
-  id               String    @id @default(cuid())
-  name             String    @unique
-  nameEn           String?
-  description      String?
-  icon             String?
-  color            String?
-  sortOrder        Int       @default(0)
-  isActive         Boolean   @default(true)
-  createdAt        DateTime  @default(now())
+  id          String   @id @default(cuid())
+  name        String   @unique
+  nameEn      String?
+  description String?
+  icon        String?
+  color       String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
 }
 
-// 연구 동향 (크롤링 데이터)
 model ResearchTrend {
-  id               String    @id @default(cuid())
-  title            String
-  authors          String?
-  source           String    // 출처 (RISS, DBPIA, KCI 등)
-  sourceUrl        String?
-  publishedDate    DateTime?
-  abstract         String?   @db.Text
-  keywords         String?
-  category         String?
-  views            Int       @default(0)
-  isActive         Boolean   @default(true)
-  crawledAt        DateTime  @default(now())
-  createdAt        DateTime  @default(now())
+  id            String    @id @default(cuid())
+  title         String
+  authors       String?
+  source        String
+  sourceUrl     String?
+  publishedDate DateTime?
+  abstract      String?
+  keywords      String?
+  category      String?
+  views         Int       @default(0)
+  isActive      Boolean   @default(true)
+  crawledAt     DateTime  @default(now())
+  createdAt     DateTime  @default(now())
 }
-
-// =============================================
-// 회원 계좌 관리 시스템
-// =============================================
 
 model BankAccount {
-  id              String   @id @default(cuid())
+  id              String           @id @default(cuid())
   userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // 계좌 정보
-  bankCode        String   // 은행 코드 (004: KB, 088: 신한, 090: 카카오 등)
-  bankName        String   // 은행명
-  accountNumber   String   // 계좌번호
-  accountHolder   String   // 예금주
-
-  // 설정
-  isDefault       Boolean  @default(false)  // 기본 계좌 여부
-  isVerified      Boolean  @default(false)  // 검증 여부
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  // 관계
+  bankCode        String
+  bankName        String
+  accountNumber   String
+  accountHolder   String
+  isDefault       Boolean          @default(false)
+  isVerified      Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   surveyResponses SurveyResponse[]
 
+  @@unique([userId, bankCode, accountNumber])
   @@index([userId])
-  @@unique([userId, bankCode, accountNumber])  // 중복 방지
 }
 
-// =============================================
-// 만족도 조사 시스템
-// =============================================
-
 model SatisfactionSurvey {
-  id              String   @id @default(cuid())
+  id              String           @id @default(cuid())
   programId       String
-  program         Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
-
-  // 조사 정보
   title           String
-  description     String?  @db.Text
-
-  // 질문 목록
-  questions       String   @db.Text  // JSON: [{id, type, question, options?, required}]
-
-  // 설정
-  deadline        DateTime                     // 응답 기한
-  reminderSent    Boolean  @default(false)     // 리마인더 발송 여부 (레거시)
-
-  // 자동 리마인더 설정
-  reminderEnabled Boolean  @default(true)      // 자동 리마인더 활성화
-  reminderDays    String?  @default("[3, 1]")  // JSON: 마감 N일 전에 발송 (예: [7, 3, 1])
-  lastReminderAt  DateTime?                    // 마지막 리마인더 발송 시각
-
-  // 상태
-  status          String   @default("DRAFT")   // DRAFT, SENT, CLOSED
+  description     String?
+  questions       String
+  deadline        DateTime
+  reminderSent    Boolean          @default(false)
+  status          String           @default("DRAFT")
   sentAt          DateTime?
   closedAt        DateTime?
-
-  // 통계
-  targetCount     Int      @default(0)         // 대상자 수
-  responseCount   Int      @default(0)         // 응답자 수
-
-  // 관계
-  responses       SurveyResponse[]
+  targetCount     Int              @default(0)
+  responseCount   Int              @default(0)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  lastReminderAt  DateTime?
+  reminderDays    String?          @default("[3, 1]")
+  reminderEnabled Boolean          @default(true)
+  program         Program          @relation(fields: [programId], references: [id], onDelete: Cascade)
   reminders       SurveyReminder[]
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  responses       SurveyResponse[]
 
   @@index([programId])
 }
 
 model SurveyResponse {
-  id              String   @id @default(cuid())
-  surveyId        String
-  survey          SatisfactionSurvey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
-  applicationId   String   @unique
-  application     ProgramApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  userId          String
-  user            User     @relation(fields: [userId], references: [id])
-
-  // 응답 내용
-  answers         String   @db.Text  // JSON: [{questionId, answer}]
-
-  // 보증금 반환 선택
-  refundChoice    String   @default("REFUND")  // REFUND, DONATE
-
-  // 반환 선택 시 계좌 정보
-  bankAccountId   String?                      // 기존 계좌 선택
-  bankAccount     BankAccount? @relation(fields: [bankAccountId], references: [id])
-  // 또는 새 계좌 입력
-  newBankCode     String?
-  newBankName     String?
+  id               String             @id @default(cuid())
+  surveyId         String
+  applicationId    String             @unique
+  userId           String
+  answers          String
+  refundChoice     String             @default("REFUND")
+  bankAccountId    String?
+  newBankCode      String?
+  newBankName      String?
   newAccountNumber String?
   newAccountHolder String?
-  saveNewAccount  Boolean  @default(false)     // 새 계좌 프로필에 저장
-
-  // 후원 선택 시
-  donationMessage String?                      // 후원 메시지
-  isAnonymous     Boolean  @default(false)     // 익명 후원
-  receiptRequested Boolean @default(false)     // 기부금 영수증 요청
-
-  // 상태
-  submittedAt     DateTime @default(now())
+  saveNewAccount   Boolean            @default(false)
+  donationMessage  String?
+  isAnonymous      Boolean            @default(false)
+  receiptRequested Boolean            @default(false)
+  submittedAt      DateTime           @default(now())
+  application      ProgramApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  bankAccount      BankAccount?       @relation(fields: [bankAccountId], references: [id])
+  survey           SatisfactionSurvey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  user             User               @relation(fields: [userId], references: [id])
 
   @@index([surveyId])
   @@index([userId])
 }
 
-// 리마인더 발송 기록
 model SurveyReminder {
-  id              String   @id @default(cuid())
-  surveyId        String
-  survey          SatisfactionSurvey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
-  applicationId   String
-  application     ProgramApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  userId          String
-
-  // 발송 정보
-  daysBeforeDeadline Int              // 마감 N일 전 발송
-  sentAt          DateTime @default(now())
-  channel         String   @default("KAKAO")  // KAKAO, SMS, LMS
-  status          String   @default("SENT")   // SENT, FAILED
+  id                 String             @id @default(cuid())
+  surveyId           String
+  applicationId      String
+  userId             String
+  daysBeforeDeadline Int
+  sentAt             DateTime           @default(now())
+  channel            String             @default("KAKAO")
+  status             String             @default("SENT")
+  application        ProgramApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  survey             SatisfactionSurvey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
 
   @@unique([surveyId, applicationId, daysBeforeDeadline])
   @@index([surveyId])
   @@index([sentAt])
 }
 
-// =============================================
-// 콘텐츠 템플릿 시스템
-// =============================================
-
 model ContentTemplate {
   id          String   @id @default(cuid())
   name        String
   description String?
-  category    String   // PROGRAM, BLOG, NOTICE, EMAIL, COOPERATION
-  content     String   @db.Text // HTML 콘텐츠
-  thumbnail   String?  // 미리보기 이미지
+  category    String
+  content     String
+  thumbnail   String?
   isDefault   Boolean  @default(false)
   isPublic    Boolean  @default(true)
   useCount    Int      @default(0)
@@ -1758,32 +1449,745 @@ model ContentTemplate {
   updatedAt   DateTime @updatedAt
 }
 
-// =============================================
-// QR 출석 시스템
-// =============================================
-
 model AttendanceQR {
-  id          String   @id @default(cuid())
+  id          String              @id @default(cuid())
   sessionId   String
-  session     ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-
-  // 토큰 정보
-  token       String   @unique  // 랜덤 토큰 (UUID)
-
-  // 유효 시간
-  validFrom   DateTime          // 시작 시간
-  validUntil  DateTime          // 종료 시간 (기본 30분)
-
-  // 상태
-  isActive    Boolean  @default(true)
-
-  // 생성 정보
-  createdBy   String            // 관리자 ID
-  createdAt   DateTime @default(now())
-
-  // 이 QR로 출석한 기록들
+  token       String              @unique
+  validFrom   DateTime
+  validUntil  DateTime
+  isActive    Boolean             @default(true)
+  createdBy   String
+  createdAt   DateTime            @default(now())
+  session     ProgramSession      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   attendances ProgramAttendance[]
 
   @@index([sessionId])
   @@index([token])
+}
+
+model SiteSection {
+  id          String   @id @default(cuid())
+  sectionKey  String   @unique
+  sectionName String
+  content     Json
+  isVisible   Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SiteSettings {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  category    String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AnnouncementBanner {
+  id               String            @id @default(cuid())
+  title            String
+  content          String?
+  type             String            @default("INFO")
+  backgroundColor  String?
+  textColor        String?
+  icon             String?
+  linkUrl          String?
+  linkText         String?
+  openInNewTab     Boolean           @default(false)
+  position         String            @default("TOP")
+  isSticky         Boolean           @default(false)
+  showCloseButton  Boolean           @default(true)
+  autoDismiss      Boolean           @default(false)
+  autoDismissDelay Int?
+  isScheduled      Boolean           @default(false)
+  startDate        DateTime?
+  endDate          DateTime?
+  targetPages      String?
+  targetRoles      String?
+  excludePages     String?
+  isActive         Boolean           @default(true)
+  priority         Int               @default(0)
+  maxDisplayCount  Int?
+  impressionCount  Int               @default(0)
+  clickCount       Int               @default(0)
+  dismissCount     Int               @default(0)
+  createdBy        String?
+  updatedBy        String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  analytics        BannerAnalytics[]
+  userDismissals   BannerDismissal[]
+}
+
+model BannerDismissal {
+  id          String             @id @default(cuid())
+  bannerId    String
+  userId      String?
+  sessionId   String?
+  ipHash      String?
+  dismissedAt DateTime           @default(now())
+  banner      AnnouncementBanner @relation(fields: [bannerId], references: [id], onDelete: Cascade)
+
+  @@unique([bannerId, userId])
+  @@unique([bannerId, sessionId])
+  @@index([bannerId])
+}
+
+model BannerAnalytics {
+  id          String             @id @default(cuid())
+  bannerId    String
+  date        DateTime
+  impressions Int                @default(0)
+  clicks      Int                @default(0)
+  dismissals  Int                @default(0)
+  uniqueUsers Int                @default(0)
+  banner      AnnouncementBanner @relation(fields: [bannerId], references: [id], onDelete: Cascade)
+
+  @@unique([bannerId, date])
+  @@index([bannerId])
+  @@index([date])
+}
+
+model FloatingButton {
+  id              String                    @id @default(cuid())
+  title           String
+  icon            String?
+  color           String                    @default("#2563eb")
+  hoverColor      String?
+  textColor       String                    @default("#ffffff")
+  linkUrl         String
+  openInNewTab    Boolean                   @default(false)
+  position        String                    @default("BOTTOM_RIGHT")
+  offsetX         Int                       @default(20)
+  offsetY         Int                       @default(20)
+  size            String                    @default("MEDIUM")
+  showLabel       Boolean                   @default(true)
+  animation       String                    @default("NONE")
+  animationDelay  Int                       @default(0)
+  showOn          String                    @default("ALL")
+  scrollThreshold Int?
+  isScheduled     Boolean                   @default(false)
+  startDate       DateTime?
+  endDate         DateTime?
+  targetPages     String?
+  targetRoles     String?
+  excludePages    String?
+  isActive        Boolean                   @default(true)
+  priority        Int                       @default(0)
+  maxDisplayCount Int?
+  impressionCount Int                       @default(0)
+  clickCount      Int                       @default(0)
+  createdBy       String?
+  updatedBy       String?
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+  analytics       FloatingButtonAnalytics[]
+  dismissals      FloatingButtonDismissal[]
+}
+
+model FloatingButtonDismissal {
+  id          String         @id @default(cuid())
+  buttonId    String
+  userId      String?
+  sessionId   String?
+  ipHash      String?
+  dismissedAt DateTime       @default(now())
+  button      FloatingButton @relation(fields: [buttonId], references: [id], onDelete: Cascade)
+
+  @@unique([buttonId, userId])
+  @@unique([buttonId, sessionId])
+  @@index([buttonId])
+}
+
+model FloatingButtonAnalytics {
+  id          String         @id @default(cuid())
+  buttonId    String
+  date        DateTime
+  impressions Int            @default(0)
+  clicks      Int            @default(0)
+  uniqueUsers Int            @default(0)
+  button      FloatingButton @relation(fields: [buttonId], references: [id], onDelete: Cascade)
+
+  @@unique([buttonId, date])
+  @@index([buttonId])
+  @@index([date])
+}
+
+model SeoSetting {
+  id                 String   @id @default(cuid())
+  pageKey            String   @unique
+  pageName           String
+  title              String?
+  description        String?
+  keywords           String?
+  canonical          String?
+  ogTitle            String?
+  ogDescription      String?
+  ogImage            String?
+  ogImageAlt         String?
+  ogType             String   @default("website")
+  ogUrl              String?
+  twitterCard        String   @default("summary_large_image")
+  twitterTitle       String?
+  twitterDescription String?
+  twitterImage       String?
+  twitterImageAlt    String?
+  twitterSite        String?
+  twitterCreator     String?
+  schemaType         String?
+  schemaData         String?
+  customHead         String?
+  robots             String   @default("index,follow")
+  isActive           Boolean  @default(true)
+  priority           Int      @default(0)
+  createdBy          String?
+  updatedBy          String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model SeoTemplate {
+  id                         String   @id @default(cuid())
+  templateKey                String   @unique
+  templateName               String
+  titleTemplate              String?
+  descriptionTemplate        String?
+  keywordsTemplate           String?
+  ogTitleTemplate            String?
+  ogDescriptionTemplate      String?
+  ogImageTemplate            String?
+  twitterTitleTemplate       String?
+  twitterDescriptionTemplate String?
+  twitterImageTemplate       String?
+  schemaTemplate             String?
+  isActive                   Boolean  @default(true)
+  createdBy                  String?
+  updatedBy                  String?
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+}
+
+model GlobalSeoSetting {
+  id                     String   @id @default(cuid())
+  settingKey             String   @unique
+  siteName               String?
+  siteDescription        String?
+  siteUrl                String?
+  defaultImage           String?
+  twitterHandle          String?
+  facebookPage           String?
+  linkedinPage           String?
+  youtubeChannel         String?
+  googleSiteVerification String?
+  googleAnalyticsId      String?
+  googleTagManagerId     String?
+  naverSiteVerification  String?
+  bingSiteVerification   String?
+  robotsTxt              String?
+  sitemapEnabled         Boolean  @default(true)
+  sitemapPriority        Float    @default(0.5)
+  sitemapChangefreq      String   @default("weekly")
+  updatedBy              String?
+  updatedAt              DateTime @updatedAt
+}
+
+model PreviewSession {
+  id           String            @id @default(cuid())
+  userId       String
+  sessionKey   String            @unique
+  title        String
+  description  String?
+  isActive     Boolean           @default(true)
+  expiresAt    DateTime?
+  password     String?
+  allowEdit    Boolean           @default(false)
+  isPublic     Boolean           @default(false)
+  shareUrl     String?
+  lastViewedAt DateTime?
+  viewCount    Int               @default(0)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  changes      PreviewChange[]
+  snapshots    PreviewSnapshot[]
+
+  @@index([userId])
+  @@index([sessionKey])
+}
+
+model PreviewSnapshot {
+  id            String         @id @default(cuid())
+  sessionId     String
+  name          String
+  description   String?
+  dataType      String
+  data          Json
+  checksum      String
+  device        String         @default("desktop")
+  theme         String         @default("light")
+  screenshotUrl String?
+  createdBy     String
+  createdAt     DateTime       @default(now())
+  session       PreviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([dataType])
+}
+
+model PreviewDevice {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  type       String
+  width      Int
+  height     Int
+  pixelRatio Float    @default(1.0)
+  userAgent  String?
+  isDefault  Boolean  @default(false)
+  isActive   Boolean  @default(true)
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([type])
+  @@index([isDefault])
+}
+
+model PreviewChange {
+  id         String         @id @default(cuid())
+  sessionId  String
+  changeType String
+  action     String
+  targetId   String
+  targetType String
+  before     Json?
+  after      Json?
+  userId     String
+  ipAddress  String?
+  userAgent  String?
+  timestamp  DateTime       @default(now())
+  session    PreviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([changeType])
+  @@index([timestamp])
+}
+
+model PopupTemplate {
+  id              String   @id @default(cuid())
+  name            String
+  category        String   @default("modal")
+  width           Int      @default(600)
+  height          Int      @default(400)
+  borderRadius    Int      @default(12)
+  shadow          String   @default("large")
+  backgroundColor String   @default("#ffffff")
+  borderColor     String   @default("#e2e8f0")
+  textColor       String   @default("#1e293b")
+  animation       String   @default("fade")
+  duration        Int      @default(300)
+  overlayColor    String   @default("rgba(0,0,0,0.5)")
+  blurBackground  Boolean  @default(false)
+  isDefault       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  popups          Popup[]
+
+  @@index([category])
+  @@index([isDefault])
+}
+
+model Popup {
+  id                   String             @id @default(cuid())
+  title                String
+  content              String?
+  templateId           String?
+  customCss            String?
+  trigger              String             @default("pageload")
+  triggerValue         String?
+  triggerSelector      String?
+  showOn               String             @default("all")
+  targetPages          String?
+  targetRoles          String?
+  excludePages         String?
+  newVisitorOnly       Boolean            @default(false)
+  returningVisitorOnly Boolean            @default(false)
+  minVisitCount        Int?
+  targetCountries      String?
+  targetLanguages      String?
+  showAfterDate        DateTime?
+  showUntilDate        DateTime?
+  showTimeSlots        String?
+  showOncePerSession   Boolean            @default(false)
+  showOncePerUser      Boolean            @default(false)
+  maxDisplayPerDay     Int?
+  delayBetweenShows    Int?
+  showCloseButton      Boolean            @default(true)
+  closeOnOverlay       Boolean            @default(false)
+  closeOnEscape        Boolean            @default(true)
+  autoClose            Boolean            @default(false)
+  autoCloseDelay       Int?
+  primaryButton        String?
+  secondaryButton      String?
+  isActive             Boolean            @default(true)
+  priority             Int                @default(0)
+  impressionCount      Int                @default(0)
+  clickCount           Int                @default(0)
+  conversionCount      Int                @default(0)
+  dismissCount         Int                @default(0)
+  createdBy            String?
+  updatedBy            String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  template             PopupTemplate?     @relation(fields: [templateId], references: [id])
+  analytics            PopupAnalytics[]
+  dismissals           PopupDismissal[]
+  interactions         PopupInteraction[]
+
+  @@index([isActive])
+  @@index([trigger])
+  @@index([priority])
+}
+
+model PopupDismissal {
+  id          String   @id @default(cuid())
+  popupId     String
+  userId      String?
+  sessionId   String?
+  ipHash      String?
+  reason      String?
+  dismissedAt DateTime @default(now())
+  popup       Popup    @relation(fields: [popupId], references: [id], onDelete: Cascade)
+
+  @@unique([popupId, userId])
+  @@unique([popupId, sessionId])
+  @@index([popupId])
+}
+
+model PopupInteraction {
+  id              String   @id @default(cuid())
+  popupId         String
+  userId          String?
+  sessionId       String
+  interactionType String
+  buttonType      String?
+  value           String?
+  timestamp       DateTime @default(now())
+  popup           Popup    @relation(fields: [popupId], references: [id], onDelete: Cascade)
+
+  @@index([popupId])
+  @@index([interactionType])
+  @@index([timestamp])
+}
+
+model PopupAnalytics {
+  id             String   @id @default(cuid())
+  popupId        String
+  date           DateTime
+  impressions    Int      @default(0)
+  clicks         Int      @default(0)
+  conversions    Int      @default(0)
+  dismissals     Int      @default(0)
+  uniqueUsers    Int      @default(0)
+  bounceRate     Float?
+  conversionRate Float?
+  popup          Popup    @relation(fields: [popupId], references: [id], onDelete: Cascade)
+
+  @@unique([popupId, date])
+  @@index([popupId])
+  @@index([date])
+}
+
+model ChangeHistory {
+  id            String     @id @default(cuid())
+  entityType    String
+  entityId      String
+  action        String
+  fieldName     String?
+  previousValue Json?
+  newValue      Json?
+  fullSnapshot  Json
+  userId        String
+  ipAddress     String?
+  userAgent     String?
+  description   String?
+  changeVersion Int        @default(autoincrement())
+  isAutoSave    Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  rollbacks     Rollback[]
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([changeVersion])
+}
+
+model Rollback {
+  id               String        @id @default(cuid())
+  targetHistoryId  String
+  rollbackType     String
+  affectedEntities Json
+  userId           String
+  reason           String?
+  rolledBackAt     DateTime      @default(now())
+  targetHistory    ChangeHistory @relation(fields: [targetHistoryId], references: [id], onDelete: Cascade)
+
+  @@index([targetHistoryId])
+  @@index([userId])
+  @@index([rolledBackAt])
+}
+
+model BackupConfig {
+  id                String   @id @default(cuid())
+  entityType        String   @unique
+  enableAutoBackup  Boolean  @default(true)
+  backupInterval    Int      @default(24)
+  maxVersions       Int      @default(100)
+  enableCompression Boolean  @default(true)
+  compressAfterDays Int      @default(7)
+  autoCleanup       Boolean  @default(true)
+  retentionDays     Int      @default(90)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([entityType])
+}
+
+model RestorePoint {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  snapshot    Json
+  userId      String
+  isAutomatic Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([isAutomatic])
+}
+
+model ThemeSettings {
+  id                String                @id @default(cuid())
+  name              String                @unique
+  displayName       String
+  description       String?
+  primary           String                @default("#2563eb")
+  secondary         String                @default("#64748b")
+  background        String                @default("#ffffff")
+  surface           String                @default("#f8fafc")
+  textPrimary       String                @default("#1e293b")
+  textSecondary     String                @default("#64748b")
+  textMuted         String                @default("#94a3b8")
+  border            String                @default("#e2e8f0")
+  divider           String                @default("#f1f5f9")
+  success           String                @default("#10b981")
+  warning           String                @default("#f59e0b")
+  error             String                @default("#ef4444")
+  info              String                @default("#3b82f6")
+  accent            String                @default("#8b5cf6")
+  accentForeground  String                @default("#ffffff")
+  input             String                @default("#ffffff")
+  inputBorder       String                @default("#d1d5db")
+  card              String                @default("#ffffff")
+  cardBorder        String                @default("#e5e7eb")
+  navBackground     String                @default("#ffffff")
+  navText           String                @default("#374151")
+  navHover          String                @default("#f3f4f6")
+  sidebarBackground String                @default("#f9fafb")
+  sidebarText       String                @default("#374151")
+  sidebarHover      String                @default("#f3f4f6")
+  footerBackground  String                @default("#1f2937")
+  footerText        String                @default("#d1d5db")
+  customCss         String?
+  isDefault         Boolean               @default(false)
+  isActive          Boolean               @default(true)
+  isSystemTheme     Boolean               @default(false)
+  autoApply         Boolean               @default(false)
+  autoApplyStart    String?
+  autoApplyEnd      String?
+  createdBy         String?
+  updatedBy         String?
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  userPreferences   UserThemePreference[]
+
+  @@index([name])
+  @@index([isDefault])
+  @@index([isActive])
+}
+
+model UserThemePreference {
+  id             String         @id @default(cuid())
+  userId         String         @unique
+  themeId        String?
+  preferAuto     Boolean        @default(true)
+  followSystem   Boolean        @default(true)
+  lightThemeId   String?
+  darkThemeId    String?
+  autoSwitchTime Boolean        @default(false)
+  lightModeStart String?
+  lightModeEnd   String?
+  lastUsedTheme  String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  theme          ThemeSettings? @relation(fields: [themeId], references: [id])
+
+  @@index([userId])
+  @@index([themeId])
+}
+
+model ThemeAnalytics {
+  id           String   @id @default(cuid())
+  themeId      String
+  date         DateTime
+  activeUsers  Int      @default(0)
+  sessions     Int      @default(0)
+  duration     Int      @default(0)
+  desktopUsers Int      @default(0)
+  mobileUsers  Int      @default(0)
+  tabletUsers  Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@unique([themeId, date])
+  @@index([themeId])
+  @@index([date])
+}
+
+model CustomCode {
+  id              String                 @id @default(cuid())
+  name            String
+  description     String?
+  type            String
+  code            String
+  language        String?
+  position        String                 @default("head")
+  priority        Int                    @default(0)
+  conditionalLoad Boolean                @default(false)
+  conditions      Json?
+  targetPages     String?
+  excludePages    String?
+  targetDevices   String?
+  targetRoles     String?
+  isScheduled     Boolean                @default(false)
+  startDate       DateTime?
+  endDate         DateTime?
+  async           Boolean                @default(false)
+  defer           Boolean                @default(false)
+  preload         Boolean                @default(false)
+  version         String                 @default("1.0.0")
+  changelog       String?
+  isTrusted       Boolean                @default(false)
+  hashVerified    Boolean                @default(false)
+  codeHash        String?
+  isActive        Boolean                @default(true)
+  isDevelopment   Boolean                @default(false)
+  loadCount       Int                    @default(0)
+  errorCount      Int                    @default(0)
+  lastLoaded      DateTime?
+  lastError       String?
+  createdBy       String?
+  updatedBy       String?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  dependents      CustomCodeDependency[] @relation("DependentCode")
+  dependencies    CustomCodeDependency[] @relation("ParentCode")
+  executions      CustomCodeExecution[]
+
+  @@index([type])
+  @@index([position])
+  @@index([isActive])
+  @@index([priority])
+}
+
+model CustomCodeDependency {
+  id             String     @id @default(cuid())
+  parentId       String
+  dependentId    String
+  dependencyType String     @default("requires")
+  loadOrder      Int        @default(0)
+  createdAt      DateTime   @default(now())
+  dependent      CustomCode @relation("DependentCode", fields: [dependentId], references: [id], onDelete: Cascade)
+  parent         CustomCode @relation("ParentCode", fields: [parentId], references: [id], onDelete: Cascade)
+
+  @@unique([parentId, dependentId])
+  @@index([parentId])
+  @@index([dependentId])
+}
+
+model CustomCodeExecution {
+  id            String     @id @default(cuid())
+  codeId        String
+  userId        String?
+  sessionId     String?
+  executionTime DateTime   @default(now())
+  loadTime      Int?
+  success       Boolean
+  errorMessage  String?
+  userAgent     String?
+  ipAddress     String?
+  pageUrl       String?
+  deviceType    String?
+  code          CustomCode @relation(fields: [codeId], references: [id], onDelete: Cascade)
+
+  @@index([codeId])
+  @@index([executionTime])
+  @@index([success])
+}
+
+model CodeLibrary {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  displayName   String
+  description   String?
+  category      String   @default("utility")
+  type          String
+  code          String
+  documentation String?
+  configSchema  Json?
+  defaultConfig Json?
+  version       String   @default("1.0.0")
+  author        String?
+  license       String?
+  tags          String?
+  isPublic      Boolean  @default(false)
+  isVerified    Boolean  @default(false)
+  downloadCount Int      @default(0)
+  createdBy     String?
+  updatedBy     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([category])
+  @@index([type])
+  @@index([isPublic])
+}
+
+model GlobalScript {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  displayName     String
+  scriptType      String
+  provider        String?
+  headCode        String?
+  bodyStartCode   String?
+  bodyEndCode     String?
+  trackingId      String?
+  apiKey          String?
+  configuration   Json?
+  requiresConsent Boolean  @default(false)
+  consentCategory String?
+  loadOnPages     String?
+  excludePages    String?
+  userRoles       String?
+  isActive        Boolean  @default(true)
+  testMode        Boolean  @default(false)
+  createdBy       String?
+  updatedBy       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([scriptType])
+  @@index([isActive])
 }

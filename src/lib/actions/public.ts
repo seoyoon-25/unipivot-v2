@@ -9,58 +9,73 @@ import { authOptions } from '@/lib/auth'
 // =============================================
 
 export async function getHomePageData() {
-  const [programs, notices, stats] = await Promise.all([
-    // 최근 프로그램 (모집중, 진행중)
-    prisma.program.findMany({
-      where: {
-        status: { in: ['RECRUITING', 'RECRUIT_CLOSED', 'ONGOING', 'OPEN', 'CLOSED'] }
-      },
-      take: 8,
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        type: true,
-        description: true,
-        image: true,
-        thumbnailSquare: true,
-        isOnline: true,
-        feeType: true,
-        feeAmount: true,
-        status: true,
-        recruitStartDate: true,
-        recruitEndDate: true,
-        startDate: true,
-        endDate: true,
-        likeCount: true,
-        applicationCount: true,
-        capacity: true,
-        location: true,
-        _count: { select: { registrations: true, applications: true } }
-      }
-    }),
-    // 최근 공지사항
-    prisma.notice.findMany({
-      where: { isPublic: true },
-      take: 5,
-      orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }]
-    }),
-    // 통계
-    Promise.all([
-      prisma.user.count(),
-      prisma.program.count({ where: { status: 'COMPLETED' } }),
-      prisma.registration.count({ where: { status: 'APPROVED' } })
+  try {
+    const [programs, notices, stats] = await Promise.all([
+      // 최근 프로그램 (모집중, 진행중)
+      prisma.program.findMany({
+        where: {
+          status: { in: ['RECRUITING', 'RECRUIT_CLOSED', 'ONGOING', 'OPEN', 'CLOSED'] }
+        },
+        take: 8,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          type: true,
+          description: true,
+          image: true,
+          thumbnailSquare: true,
+          isOnline: true,
+          feeType: true,
+          feeAmount: true,
+          status: true,
+          recruitStartDate: true,
+          recruitEndDate: true,
+          startDate: true,
+          endDate: true,
+          likeCount: true,
+          applicationCount: true,
+          capacity: true,
+          location: true,
+          _count: { select: { registrations: true, applications: true } }
+        }
+      }).catch(() => []), // 에러시 빈 배열 반환
+      // 최근 공지사항
+      prisma.notice.findMany({
+        where: { isPublic: true },
+        take: 5,
+        orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }]
+      }).catch(() => []), // 에러시 빈 배열 반환
+      // 통계
+      Promise.all([
+        prisma.user.count().catch(() => 0),
+        prisma.program.count({ where: { status: 'COMPLETED' } }).catch(() => 0),
+        prisma.registration.count({ where: { status: 'APPROVED' } }).catch(() => 0)
+      ])
     ])
-  ])
 
-  return {
-    programs,
-    notices,
-    stats: {
-      members: stats[0],
-      completedPrograms: stats[1],
-      totalParticipations: stats[2]
+    return {
+      programs: programs || [],
+      notices: notices || [],
+      stats: {
+        members: stats[0] || 0,
+        completedPrograms: stats[1] || 0,
+        totalParticipations: stats[2] || 0
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching home page data:', error)
+
+    // 에러 발생시 기본값 반환
+    return {
+      programs: [],
+      notices: [],
+      stats: {
+        members: 0,
+        completedPrograms: 0,
+        totalParticipations: 0
+      }
     }
   }
 }

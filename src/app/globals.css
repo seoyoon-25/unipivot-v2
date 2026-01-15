@@ -26,6 +26,8 @@
   body {
     @apply text-gray-900 antialiased;
     font-family: var(--font-primary);
+    color: #111827; /* Ensure dark text */
+    background-color: #ffffff; /* Ensure white background */
   }
 
   h1, h2, h3, h4, h5, h6 {

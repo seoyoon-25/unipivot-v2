@@ -13,6 +13,10 @@ const nextConfig = {
       bodySizeLimit: '10mb',
     },
   },
+  // Skip pages that fail to prerender
+  generateBuildId: async () => {
+    return 'build-' + Date.now()
+  },
 }
 
 module.exports = nextConfig

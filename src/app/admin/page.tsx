@@ -1,4 +1,4 @@
-import { Users, BookOpen, Wallet, TrendingUp, ClipboardList, Clock, CheckCircle, AlertCircle, ChevronRight } from 'lucide-react'
+import { Users, BookOpen, Wallet, TrendingUp, ClipboardList, Clock, CheckCircle, AlertCircle, ChevronRight, Palette } from 'lucide-react'
 import Link from 'next/link'
 import { getDashboardStats } from '@/lib/actions/admin'
 import { formatDistanceToNow } from 'date-fns'
@@ -71,6 +71,28 @@ export default async function AdminDashboardPage() {
             <p className="text-gray-500 text-sm">{stat.label}</p>
           </div>
         ))}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-6 shadow-sm mb-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+              <Palette className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">디자인 관리</h2>
+              <p className="text-white/80 text-sm">사이트 디자인과 콘텐츠를 편집하세요</p>
+            </div>
+          </div>
+          <Link
+            href="/admin/design"
+            className="flex items-center gap-2 px-6 py-3 bg-white text-orange-600 rounded-xl font-semibold hover:bg-orange-50 transition-colors"
+          >
+            디자인 관리
+            <ChevronRight className="w-4 h-4" />
+          </Link>
+        </div>
       </div>
 
       {/* Survey Status Widget */}

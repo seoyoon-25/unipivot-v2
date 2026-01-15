@@ -11,6 +11,14 @@ const DEFAULT_SETTINGS = {
   'theme.siteName': '유니피벗',
   'theme.siteDescription': '',
   'theme.fontFamily': 'Pretendard',
+  // Dark mode settings
+  'theme.darkModeEnabled': 'false',
+  'theme.darkModeDefault': 'light',
+  'theme.darkBgColor': '#1a1a2e',
+  'theme.darkTextColor': '#e2e8f0',
+  'theme.darkPrimaryColor': '#60a5fa',
+  'theme.darkSecondaryColor': '#34d399',
+  'theme.darkCardBgColor': '#16213e',
 }
 
 async function getThemeSettings() {

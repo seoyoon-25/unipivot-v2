@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import type { Metadata } from 'next'
 import { Gift } from 'lucide-react'
 import Link from 'next/link'
