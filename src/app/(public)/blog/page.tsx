@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Calendar, Eye, Search, Tag, User } from 'lucide-react'
 import { getPublicBlogPosts } from '@/lib/actions/public'
+import { prisma } from '@/lib/db'
 
 export const metadata: Metadata = {
   title: '블로그',
@@ -15,24 +16,55 @@ interface Props {
   searchParams: { page?: string; category?: string; search?: string }
 }
 
+// Default header content
+const defaultHeader = {
+  hero: {
+    badge: 'Blog',
+    title: '블로그',
+    subtitle: '유니피벗의 이야기와 인사이트를 공유합니다',
+  },
+}
+
+async function getHeaderContent() {
+  try {
+    const section = await prisma.siteSection.findUnique({
+      where: { sectionKey: 'page.blog' },
+    })
+    if (section?.content) {
+      return section.content as typeof defaultHeader
+    }
+  } catch (error) {
+    console.error('Failed to load blog header:', error)
+  }
+  return defaultHeader
+}
+
 export default async function BlogPage({ searchParams }: Props) {
   const page = parseInt(searchParams.page || '1')
-  const { posts, total, pages, categories } = await getPublicBlogPosts({
-    page,
-    limit: 12,
-    category: searchParams.category,
-    search: searchParams.search,
-  })
+  const [header, blogData] = await Promise.all([
+    getHeaderContent(),
+    getPublicBlogPosts({
+      page,
+      limit: 12,
+      category: searchParams.category,
+      search: searchParams.search,
+    }),
+  ])
+  const { posts, total, pages, categories } = blogData
 
   return (
     <>
       {/* Hero Section */}
       <section className="pt-32 pb-16 bg-gradient-to-b from-gray-900 to-gray-800">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <span className="text-primary text-sm font-semibold tracking-wider uppercase">Blog</span>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mt-2 mb-4">블로그</h1>
+          <span className="text-primary text-sm font-semibold tracking-wider uppercase">
+            {header.hero.badge}
+          </span>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mt-2 mb-4">
+            {header.hero.title}
+          </h1>
           <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            유니피벗의 이야기와 인사이트를 공유합니다
+            {header.hero.subtitle}
           </p>
         </div>
       </section>

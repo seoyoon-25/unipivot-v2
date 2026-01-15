@@ -6,6 +6,7 @@ import { Pin, Calendar, Eye, Plus } from 'lucide-react'
 import { getPublicNotices } from '@/lib/actions/public'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/db'
 
 export const metadata: Metadata = {
   title: '공지사항',
@@ -16,12 +17,36 @@ interface Props {
   searchParams: { page?: string }
 }
 
+// Default header content
+const defaultHeader = {
+  hero: {
+    badge: 'Notice',
+    title: '공지사항',
+    subtitle: '유니피벗의 소식과 안내사항을 확인하세요',
+  },
+}
+
+async function getHeaderContent() {
+  try {
+    const section = await prisma.siteSection.findUnique({
+      where: { sectionKey: 'page.notice' },
+    })
+    if (section?.content) {
+      return section.content as typeof defaultHeader
+    }
+  } catch (error) {
+    console.error('Failed to load notice header:', error)
+  }
+  return defaultHeader
+}
+
 export default async function NoticePage({ searchParams }: Props) {
-  const [session, noticeData] = await Promise.all([
-    getServerSession(authOptions),
-    getPublicNotices({ page: parseInt(searchParams.page || '1'), limit: 10 })
-  ])
   const page = parseInt(searchParams.page || '1')
+  const [session, header, noticeData] = await Promise.all([
+    getServerSession(authOptions),
+    getHeaderContent(),
+    getPublicNotices({ page, limit: 10 }),
+  ])
   const { notices, total, pages } = noticeData
   const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN'
 
@@ -29,9 +54,15 @@ export default async function NoticePage({ searchParams }: Props) {
     <>
       <section className="pt-32 pb-16 bg-gradient-to-b from-gray-900 to-gray-800">
         <div className="max-w-7xl mx-auto px-4 text-center relative">
-          <span className="text-primary text-sm font-semibold tracking-wider uppercase">Notice</span>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mt-2 mb-4">공지사항</h1>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto">유니피벗의 소식과 공지사항</p>
+          <span className="text-primary text-sm font-semibold tracking-wider uppercase">
+            {header.hero.badge}
+          </span>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mt-2 mb-4">
+            {header.hero.title}
+          </h1>
+          <p className="text-xl text-white/80 max-w-2xl mx-auto">
+            {header.hero.subtitle}
+          </p>
           {/* 관리자 전용 글쓰기 버튼 */}
           {isAdmin && (
             <Link

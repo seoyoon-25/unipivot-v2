@@ -19,6 +19,7 @@ import { StoryEditor } from '@/components/admin/sections/StoryEditor'
 import { ProgramEditor } from '@/components/admin/sections/ProgramEditor'
 import { InstagramEditor } from '@/components/admin/sections/InstagramEditor'
 import { SectionManager } from '@/components/admin/sections/SectionManager'
+import { AboutPageEditor, DonatePageEditor, PageHeaderEditor } from '@/components/admin/sections/PageSectionEditor'
 
 interface SiteSection {
   id: string
@@ -309,6 +310,15 @@ export default function SectionsPage() {
         return <ProgramEditor {...editorProps} />
       case 'instagram':
         return <InstagramEditor {...editorProps} />
+      // Page section editors
+      case 'page.about':
+        return <AboutPageEditor {...editorProps} />
+      case 'page.donate':
+        return <DonatePageEditor {...editorProps} />
+      case 'page.programs':
+      case 'page.blog':
+      case 'page.notice':
+        return <PageHeaderEditor {...editorProps} />
       default:
         return <SimpleTextEditor {...editorProps} />
     }
@@ -340,27 +350,59 @@ export default function SectionsPage() {
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10">
-          {sections.map((section) => (
-            <TabsTrigger
-              key={section.sectionKey}
-              value={section.sectionKey}
-              className="relative"
-            >
-              <span className="mr-2">{section.sectionName}</span>
-              <div className="flex items-center gap-1">
-                {!section.isVisible && (
-                  <Badge variant="secondary" className="text-xs px-1 py-0">
-                    숨김
-                  </Badge>
-                )}
-                {saving === section.sectionKey && (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                )}
-              </div>
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        {/* Homepage Sections */}
+        <div className="mb-6">
+          <h3 className="text-sm font-medium text-muted-foreground mb-2">홈페이지 섹션</h3>
+          <TabsList className="flex flex-wrap gap-1 h-auto">
+            {sections.filter(s => !s.sectionKey.startsWith('page.')).map((section) => (
+              <TabsTrigger
+                key={section.sectionKey}
+                value={section.sectionKey}
+                className="relative"
+              >
+                <span className="mr-2">{section.sectionName}</span>
+                <div className="flex items-center gap-1">
+                  {!section.isVisible && (
+                    <Badge variant="secondary" className="text-xs px-1 py-0">
+                      숨김
+                    </Badge>
+                  )}
+                  {saving === section.sectionKey && (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  )}
+                </div>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
+
+        {/* Page Sections */}
+        {sections.filter(s => s.sectionKey.startsWith('page.')).length > 0 && (
+          <div className="mb-6">
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">페이지별 콘텐츠</h3>
+            <TabsList className="flex flex-wrap gap-1 h-auto">
+              {sections.filter(s => s.sectionKey.startsWith('page.')).map((section) => (
+                <TabsTrigger
+                  key={section.sectionKey}
+                  value={section.sectionKey}
+                  className="relative"
+                >
+                  <span className="mr-2">{section.sectionName}</span>
+                  <div className="flex items-center gap-1">
+                    {!section.isVisible && (
+                      <Badge variant="secondary" className="text-xs px-1 py-0">
+                        숨김
+                      </Badge>
+                    )}
+                    {saving === section.sectionKey && (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    )}
+                  </div>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
+        )}
 
         {sections.map((section) => (
           <TabsContent key={section.sectionKey} value={section.sectionKey}>

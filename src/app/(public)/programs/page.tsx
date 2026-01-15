@@ -22,9 +22,35 @@ interface PageProps {
   }>
 }
 
+// Default header content
+const defaultHeader = {
+  hero: {
+    badge: 'Programs',
+    title: '프로그램',
+    subtitle: '유니피벗과 함께하는 다양한 프로그램을 만나보세요',
+  },
+}
+
+async function getHeaderContent() {
+  try {
+    const section = await prisma.siteSection.findUnique({
+      where: { sectionKey: 'page.programs' },
+    })
+    if (section?.content) {
+      return section.content as typeof defaultHeader
+    }
+  } catch (error) {
+    console.error('Failed to load programs header:', error)
+  }
+  return defaultHeader
+}
+
 export default async function ProgramsPage({ searchParams }: PageProps) {
-  const session = await getServerSession(authOptions)
-  const params = await searchParams
+  const [session, header, params] = await Promise.all([
+    getServerSession(authOptions),
+    getHeaderContent(),
+    searchParams,
+  ])
 
   const statusFilter = params.status || 'all'
   const typeFilter = params.type || 'all'
@@ -97,76 +123,86 @@ export default async function ProgramsPage({ searchParams }: PageProps) {
     userApplications = new Set(applications.map((a) => a.programId))
   }
 
+  const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN'
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="mb-8 flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">프로그램</h1>
-            <p className="text-gray-600">
-              유니피벗에서 진행하는 다양한 프로그램을 만나보세요.
-            </p>
-          </div>
+    <>
+      {/* Hero Section */}
+      <section className="pt-32 pb-16 bg-gradient-to-b from-gray-900 to-gray-800">
+        <div className="max-w-7xl mx-auto px-4 text-center relative">
+          <span className="text-primary text-sm font-semibold tracking-wider uppercase">
+            {header.hero.badge}
+          </span>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mt-2 mb-4">
+            {header.hero.title}
+          </h1>
+          <p className="text-xl text-white/80 max-w-2xl mx-auto">
+            {header.hero.subtitle}
+          </p>
           {/* 관리자 전용 글쓰기 버튼 */}
-          {(session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN') && (
+          {isAdmin && (
             <Link
               href="/programs/write"
-              className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl font-medium transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-100 text-primary rounded-xl font-medium transition-colors shadow-lg"
             >
               <Plus className="w-5 h-5" />
               <span className="hidden sm:inline">프로그램 등록</span>
             </Link>
           )}
         </div>
+      </section>
 
-        {/* Filters */}
-        <ProgramFilters
-          currentStatus={statusFilter}
-          currentType={typeFilter}
-          currentMode={modeFilter}
-        />
+      {/* Content Section */}
+      <section className="py-12 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4">
+          {/* Filters */}
+          <ProgramFilters
+            currentStatus={statusFilter}
+            currentType={typeFilter}
+            currentMode={modeFilter}
+          />
 
-        {/* Programs Grid */}
-        {programs.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {programs.map((program) => (
-              <ProgramCard
-                key={program.id}
-                id={program.id}
-                title={program.title}
-                slug={program.slug}
-                type={program.type}
-                description={program.description}
-                image={program.image}
-                thumbnailSquare={program.thumbnailSquare}
-                isOnline={program.isOnline}
-                feeType={program.feeType}
-                feeAmount={program.feeAmount}
-                status={program.status}
-                recruitStartDate={program.recruitStartDate}
-                recruitEndDate={program.recruitEndDate}
-                startDate={program.startDate}
-                endDate={program.endDate}
-                likeCount={program.likeCount}
-                applicationCount={program.applicationCount}
-                isLiked={userLikes.has(program.id)}
-                hasApplied={userApplications.has(program.id)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20">
-            <div className="text-gray-400 text-6xl mb-4">📚</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              프로그램이 없습니다
-            </h3>
-            <p className="text-gray-500">
-              조건에 맞는 프로그램이 없습니다. 다른 필터를 선택해 보세요.
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
+          {/* Programs Grid */}
+          {programs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {programs.map((program) => (
+                <ProgramCard
+                  key={program.id}
+                  id={program.id}
+                  title={program.title}
+                  slug={program.slug}
+                  type={program.type}
+                  description={program.description}
+                  image={program.image}
+                  thumbnailSquare={program.thumbnailSquare}
+                  isOnline={program.isOnline}
+                  feeType={program.feeType}
+                  feeAmount={program.feeAmount}
+                  status={program.status}
+                  recruitStartDate={program.recruitStartDate}
+                  recruitEndDate={program.recruitEndDate}
+                  startDate={program.startDate}
+                  endDate={program.endDate}
+                  likeCount={program.likeCount}
+                  applicationCount={program.applicationCount}
+                  isLiked={userLikes.has(program.id)}
+                  hasApplied={userApplications.has(program.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20">
+              <div className="text-gray-400 text-6xl mb-4">📚</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                프로그램이 없습니다
+              </h3>
+              <p className="text-gray-500">
+                조건에 맞는 프로그램이 없습니다. 다른 필터를 선택해 보세요.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+    </>
   )
 }
