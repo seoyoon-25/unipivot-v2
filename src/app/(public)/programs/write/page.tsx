@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { ArrowLeft, Save, Upload, Image, Loader2, Plus, Trash2, BookOpen } from 'lucide-react'
+import { ArrowLeft, Save, Upload, Image, Loader2, Plus, Trash2, BookOpen, Copy } from 'lucide-react'
 import { RichTextEditor } from '@/components/editor'
 import { useAutoSave } from '@/hooks/useAutoSave'
 import { DraftRestoreAlert, AutoSaveIndicator } from '@/components/common/DraftRestoreAlert'
@@ -94,6 +94,26 @@ export default function WriteProgramPage() {
         bookAuthor: '',
         bookImage: '',
         bookRange: '',
+      },
+    ])
+  }
+
+  // 회차 복제
+  const duplicateSession = (index: number) => {
+    const source = sessions[index]
+    const nextNo = sessions.length + 1
+    setSessions([
+      ...sessions,
+      {
+        sessionNo: nextNo,
+        date: '',  // 날짜는 비워둠 (새로 입력 필요)
+        startTime: source.startTime,
+        endTime: source.endTime,
+        title: `${nextNo}회차`,
+        bookTitle: source.bookTitle,
+        bookAuthor: source.bookAuthor,
+        bookImage: source.bookImage,
+        bookRange: source.bookRange,
       },
     ])
   }
@@ -559,33 +579,6 @@ export default function WriteProgramPage() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    일정 안내
-                  </label>
-                  <RichTextEditor
-                    content={form.scheduleContent}
-                    onChange={(html) => setForm({ ...form, scheduleContent: html })}
-                    placeholder="일정 안내 내용을 입력하세요..."
-                    minHeight="200px"
-                    autoSaveKey={`program-write-schedule`}
-                  />
-                </div>
-
-                {form.type === 'BOOKCLUB' && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      현재 진행 도서 안내
-                    </label>
-                    <RichTextEditor
-                      content={form.currentBookContent}
-                      onChange={(html) => setForm({ ...form, currentBookContent: html })}
-                      placeholder="현재 진행 중인 도서에 대한 안내를 입력하세요..."
-                      minHeight="200px"
-                      autoSaveKey={`program-write-book`}
-                    />
-                  </div>
-                )}
               </div>
             </div>
 
@@ -624,13 +617,23 @@ export default function WriteProgramPage() {
                             </span>
                             <span className="font-medium text-gray-900">{s.sessionNo}회차</span>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => removeSession(index)}
-                            className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => duplicateSession(index)}
+                              className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                              title="이 회차 복제"
+                            >
+                              <Copy className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeSession(index)}
+                              className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
 
                         <div className="grid md:grid-cols-2 gap-4">
