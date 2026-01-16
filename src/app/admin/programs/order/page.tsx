@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { toast } from '@/hooks/use-toast'
-import { Loader2, GripVertical, Save, ArrowUp, ArrowDown, RotateCcw, ArrowLeft, Trash2 } from 'lucide-react'
+import { Loader2, GripVertical, Save, ArrowUp, ArrowDown, RotateCcw, ArrowLeft, Trash2, Undo2 } from 'lucide-react'
 
 interface Program {
   id: string
@@ -50,9 +50,9 @@ export default function ProgramOrderPage() {
   const [selectedType, setSelectedType] = useState<string>('all')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [deleting, setDeleting] = useState<string | null>(null)
   const [hasChanges, setHasChanges] = useState(false)
-  const [originalOrder, setOriginalOrder] = useState<string[]>([])
+  const [originalPrograms, setOriginalPrograms] = useState<Program[]>([])
+  const [pendingDeletes, setPendingDeletes] = useState<Set<string>>(new Set())
 
   // Redirect if not admin
   useEffect(() => {
@@ -76,9 +76,10 @@ export default function ProgramOrderPage() {
 
       const data = await response.json()
       setPrograms(data.programs)
+      setOriginalPrograms(data.programs)
       setTypes(data.types)
-      setOriginalOrder(data.programs.map((p: Program) => p.id))
       setHasChanges(false)
+      setPendingDeletes(new Set())
     } catch (error) {
       console.error('Error fetching programs:', error)
       toast({
@@ -104,77 +105,107 @@ export default function ProgramOrderPage() {
     setHasChanges(true)
   }
 
-  const resetOrder = () => {
-    fetchPrograms()
+  const moveToPosition = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return
+
+    const newPrograms = [...programs]
+    const [removed] = newPrograms.splice(fromIndex, 1)
+    newPrograms.splice(toIndex, 0, removed)
+
+    setPrograms(newPrograms)
+    setHasChanges(true)
+  }
+
+  const markForDelete = (programId: string) => {
+    setPendingDeletes(prev => {
+      const next = new Set(prev)
+      next.add(programId)
+      return next
+    })
+    setHasChanges(true)
+  }
+
+  const unmarkForDelete = (programId: string) => {
+    setPendingDeletes(prev => {
+      const next = new Set(prev)
+      next.delete(programId)
+      return next
+    })
+    // Check if there are still changes
+    const stillHasOrderChanges = JSON.stringify(programs.map(p => p.id)) !== JSON.stringify(originalPrograms.map(p => p.id))
+    if (!stillHasOrderChanges && pendingDeletes.size <= 1) {
+      setHasChanges(false)
+    }
+  }
+
+  const resetChanges = () => {
+    setPrograms(originalPrograms)
+    setPendingDeletes(new Set())
     setHasChanges(false)
   }
 
-  const saveOrder = async () => {
+  const saveChanges = async () => {
     try {
       setSaving(true)
-      const response = await fetch('/api/admin/programs/reorder', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          programIds: programs.map(p => p.id),
-          type: selectedType !== 'all' ? selectedType : undefined
+
+      // 1. 삭제 예정 프로그램들 삭제
+      const deleteErrors: string[] = []
+      const deleteIds = Array.from(pendingDeletes)
+      for (const id of deleteIds) {
+        const program = programs.find(p => p.id === id)
+        try {
+          const response = await fetch(`/api/admin/programs/${id}`, {
+            method: 'DELETE'
+          })
+          if (!response.ok) {
+            const data = await response.json()
+            deleteErrors.push(`${program?.title || id}: ${data.error}`)
+          }
+        } catch (error) {
+          deleteErrors.push(`${program?.title || id}: 삭제 실패`)
+        }
+      }
+
+      // 삭제 오류가 있으면 알림
+      if (deleteErrors.length > 0) {
+        toast({
+          title: '일부 삭제 실패',
+          description: deleteErrors.join('\n'),
+          variant: 'destructive',
         })
-      })
+      }
 
-      if (!response.ok) throw new Error('Failed to save order')
+      // 2. 삭제되지 않은 프로그램들의 순서 저장
+      const remainingPrograms = programs.filter(p => !pendingDeletes.has(p.id))
+      if (remainingPrograms.length > 0) {
+        const response = await fetch('/api/admin/programs/reorder', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            programIds: remainingPrograms.map(p => p.id),
+            type: selectedType !== 'all' ? selectedType : undefined
+          })
+        })
 
-      const data = await response.json()
+        if (!response.ok) throw new Error('Failed to save order')
+      }
+
       toast({
         title: '성공',
-        description: data.message,
+        description: `변경사항이 저장되었습니다.${pendingDeletes.size > 0 ? ` (${pendingDeletes.size - deleteErrors.length}개 삭제됨)` : ''}`,
       })
 
-      setOriginalOrder(programs.map(p => p.id))
-      setHasChanges(false)
+      // Refresh the list
+      await fetchPrograms()
     } catch (error) {
-      console.error('Error saving order:', error)
+      console.error('Error saving changes:', error)
       toast({
         title: '오류',
-        description: '순서 저장 중 오류가 발생했습니다.',
+        description: '변경사항 저장 중 오류가 발생했습니다.',
         variant: 'destructive',
       })
     } finally {
       setSaving(false)
-    }
-  }
-
-  const handleDelete = async (programId: string, programTitle: string) => {
-    if (!confirm(`"${programTitle}" 프로그램을 삭제하시겠습니까?\n\n⚠️ 이 작업은 되돌릴 수 없습니다.`)) {
-      return
-    }
-
-    try {
-      setDeleting(programId)
-      const response = await fetch(`/api/admin/programs/${programId}`, {
-        method: 'DELETE'
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || '삭제 실패')
-      }
-
-      // 목록에서 제거
-      setPrograms(prev => prev.filter(p => p.id !== programId))
-
-      toast({
-        title: '성공',
-        description: `"${programTitle}" 프로그램이 삭제되었습니다.`,
-      })
-    } catch (error: any) {
-      console.error('Error deleting program:', error)
-      toast({
-        title: '삭제 실패',
-        description: error.message || '프로그램 삭제 중 오류가 발생했습니다.',
-        variant: 'destructive',
-      })
-    } finally {
-      setDeleting(null)
     }
   }
 
@@ -190,6 +221,10 @@ export default function ProgramOrderPage() {
     ? programs
     : programs.filter(p => p.type === selectedType)
 
+  // 삭제 예정이 아닌 프로그램만 순서 계산에 포함
+  const visiblePrograms = filteredPrograms.filter(p => !pendingDeletes.has(p.id))
+  const deletedCount = pendingDeletes.size
+
   return (
     <div className="container mx-auto py-6">
       {/* Header */}
@@ -204,7 +239,7 @@ export default function ProgramOrderPage() {
         </div>
         <h1 className="text-2xl font-bold">프로그램 순서 관리</h1>
         <p className="text-muted-foreground">
-          프로그램의 표시 순서를 변경합니다. 낮은 순서가 먼저 표시됩니다.
+          프로그램의 표시 순서를 변경하고 삭제합니다. 변경 후 저장 버튼을 눌러야 적용됩니다.
         </p>
       </div>
 
@@ -227,20 +262,25 @@ export default function ProgramOrderPage() {
                 </SelectContent>
               </Select>
               <Badge variant="outline">
-                {filteredPrograms.length}개 프로그램
+                {visiblePrograms.length}개 프로그램
               </Badge>
+              {deletedCount > 0 && (
+                <Badge variant="destructive">
+                  {deletedCount}개 삭제 예정
+                </Badge>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
-                onClick={resetOrder}
+                onClick={resetChanges}
                 disabled={!hasChanges}
               >
                 <RotateCcw className="h-4 w-4 mr-2" />
                 초기화
               </Button>
               <Button
-                onClick={saveOrder}
+                onClick={saveChanges}
                 disabled={!hasChanges || saving}
               >
                 {saving ? (
@@ -248,7 +288,7 @@ export default function ProgramOrderPage() {
                 ) : (
                   <Save className="h-4 w-4 mr-2" />
                 )}
-                순서 저장
+                변경사항 저장
               </Button>
             </div>
           </div>
@@ -264,90 +304,145 @@ export default function ProgramOrderPage() {
             </CardContent>
           </Card>
         ) : (
-          filteredPrograms.map((program, index) => (
-            <Card key={program.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                  {/* Drag Handle & Order */}
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <GripVertical className="h-5 w-5" />
-                    <span className="w-8 text-center font-mono text-sm">
-                      {index + 1}
-                    </span>
-                  </div>
+          filteredPrograms.map((program, index) => {
+            const isMarkedForDelete = pendingDeletes.has(program.id)
+            // 삭제 예정이 아닌 것들 중에서의 순서
+            const visibleIndex = visiblePrograms.findIndex(p => p.id === program.id)
 
-                  {/* Thumbnail */}
-                  <div className="w-16 h-16 relative rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                    {program.thumbnailSquare || program.image ? (
-                      <Image
-                        src={program.thumbnailSquare || program.image || ''}
-                        alt={program.title}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                        No Image
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Program Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge variant="outline">
-                        {TYPE_LABELS[program.type] || program.type}
-                      </Badge>
-                      <Badge variant={STATUS_LABELS[program.status]?.variant || 'secondary'}>
-                        {STATUS_LABELS[program.status]?.label || program.status}
-                      </Badge>
-                    </div>
-                    <h3 className="font-medium truncate">{program.title}</h3>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(program.createdAt).toLocaleDateString('ko-KR')} 생성
-                    </p>
-                  </div>
-
-                  {/* Move Buttons */}
-                  <div className="flex items-center gap-2">
-                    <div className="flex flex-col gap-1">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => moveProgram(index, 'up')}
-                        disabled={index === 0}
-                      >
-                        <ArrowUp className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => moveProgram(index, 'down')}
-                        disabled={index === filteredPrograms.length - 1}
-                      >
-                        <ArrowDown className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
-                      onClick={() => handleDelete(program.id, program.title)}
-                      disabled={deleting === program.id}
-                    >
-                      {deleting === program.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+            return (
+              <Card
+                key={program.id}
+                className={`transition-all ${
+                  isMarkedForDelete
+                    ? 'border-red-300 bg-red-50/50 opacity-60'
+                    : 'hover:shadow-md'
+                }`}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-4">
+                    {/* Order Number with Dropdown */}
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <GripVertical className="h-5 w-5" />
+                      {isMarkedForDelete ? (
+                        <span className="w-16 text-center font-mono text-sm text-red-500 line-through">
+                          삭제
+                        </span>
                       ) : (
-                        <Trash2 className="h-4 w-4" />
+                        <Select
+                          value={String(visibleIndex + 1)}
+                          onValueChange={(val) => {
+                            const fromIdx = programs.findIndex(p => p.id === program.id)
+                            const targetVisibleIdx = parseInt(val) - 1
+                            // 실제 programs 배열에서의 목표 인덱스 계산
+                            const targetProgram = visiblePrograms[targetVisibleIdx]
+                            const toIdx = programs.findIndex(p => p.id === targetProgram?.id)
+                            if (toIdx !== -1) {
+                              moveToPosition(fromIdx, toIdx)
+                            }
+                          }}
+                        >
+                          <SelectTrigger className="w-16 h-8">
+                            <SelectValue>{visibleIndex + 1}</SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {visiblePrograms.map((_, i) => (
+                              <SelectItem key={i} value={String(i + 1)}>
+                                {i + 1}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       )}
-                    </Button>
+                    </div>
+
+                    {/* Thumbnail */}
+                    <div className={`w-16 h-16 relative rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 ${isMarkedForDelete ? 'grayscale' : ''}`}>
+                      {program.thumbnailSquare || program.image ? (
+                        <Image
+                          src={program.thumbnailSquare || program.image || ''}
+                          alt={program.title}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                          No Image
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Program Info */}
+                    <div className={`flex-1 min-w-0 ${isMarkedForDelete ? 'line-through text-muted-foreground' : ''}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Badge variant="outline">
+                          {TYPE_LABELS[program.type] || program.type}
+                        </Badge>
+                        <Badge variant={STATUS_LABELS[program.status]?.variant || 'secondary'}>
+                          {STATUS_LABELS[program.status]?.label || program.status}
+                        </Badge>
+                      </div>
+                      <h3 className="font-medium truncate">{program.title}</h3>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(program.createdAt).toLocaleDateString('ko-KR')} 생성
+                      </p>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-2">
+                      {isMarkedForDelete ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-blue-600 hover:text-blue-700"
+                          onClick={() => unmarkForDelete(program.id)}
+                        >
+                          <Undo2 className="h-4 w-4 mr-1" />
+                          취소
+                        </Button>
+                      ) : (
+                        <>
+                          <div className="flex flex-col gap-1">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => {
+                                const fromIdx = programs.findIndex(p => p.id === program.id)
+                                moveProgram(fromIdx, 'up')
+                              }}
+                              disabled={visibleIndex === 0}
+                            >
+                              <ArrowUp className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => {
+                                const fromIdx = programs.findIndex(p => p.id === program.id)
+                                moveProgram(fromIdx, 'down')
+                              }}
+                              disabled={visibleIndex === visiblePrograms.length - 1}
+                            >
+                              <ArrowDown className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                            onClick={() => markForDelete(program.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
+                </CardContent>
+              </Card>
+            )
+          })
         )}
       </div>
 
@@ -357,11 +452,11 @@ export default function ProgramOrderPage() {
           <CardTitle className="text-sm">사용 방법</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
-          <p>• 화살표 버튼을 클릭하여 프로그램 순서를 변경합니다.</p>
-          <p>• 유형별로 필터링하여 해당 유형의 프로그램만 순서를 변경할 수 있습니다.</p>
-          <p>• 변경 후 &quot;순서 저장&quot; 버튼을 클릭해야 변경사항이 적용됩니다.</p>
-          <p>• 순서가 낮은 프로그램이 목록에서 먼저 표시됩니다.</p>
-          <p>• 휴지통 버튼으로 프로그램을 삭제할 수 있습니다. (신청자가 있는 프로그램은 삭제 불가)</p>
+          <p>• 순서 번호를 클릭하여 원하는 위치로 바로 이동할 수 있습니다.</p>
+          <p>• 화살표 버튼으로 한 단계씩 순서를 변경할 수 있습니다.</p>
+          <p>• 휴지통 버튼을 클릭하면 삭제 예정으로 표시됩니다.</p>
+          <p>• 모든 변경사항은 &quot;변경사항 저장&quot; 버튼을 클릭해야 적용됩니다.</p>
+          <p>• 신청자가 있는 프로그램은 삭제할 수 없습니다.</p>
         </CardContent>
       </Card>
     </div>
