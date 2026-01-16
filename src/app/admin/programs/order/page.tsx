@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { toast } from '@/hooks/use-toast'
-import { Loader2, GripVertical, Save, ArrowUp, ArrowDown, RotateCcw, ArrowLeft } from 'lucide-react'
+import { Loader2, GripVertical, Save, ArrowUp, ArrowDown, RotateCcw, ArrowLeft, Trash2 } from 'lucide-react'
 
 interface Program {
   id: string
@@ -50,6 +50,7 @@ export default function ProgramOrderPage() {
   const [selectedType, setSelectedType] = useState<string>('all')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState<string | null>(null)
   const [hasChanges, setHasChanges] = useState(false)
   const [originalOrder, setOriginalOrder] = useState<string[]>([])
 
@@ -139,6 +140,41 @@ export default function ProgramOrderPage() {
       })
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleDelete = async (programId: string, programTitle: string) => {
+    if (!confirm(`"${programTitle}" 프로그램을 삭제하시겠습니까?\n\n⚠️ 이 작업은 되돌릴 수 없습니다.`)) {
+      return
+    }
+
+    try {
+      setDeleting(programId)
+      const response = await fetch(`/api/admin/programs/${programId}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || '삭제 실패')
+      }
+
+      // 목록에서 제거
+      setPrograms(prev => prev.filter(p => p.id !== programId))
+
+      toast({
+        title: '성공',
+        description: `"${programTitle}" 프로그램이 삭제되었습니다.`,
+      })
+    } catch (error: any) {
+      console.error('Error deleting program:', error)
+      toast({
+        title: '삭제 실패',
+        description: error.message || '프로그램 삭제 중 오류가 발생했습니다.',
+        variant: 'destructive',
+      })
+    } finally {
+      setDeleting(null)
     }
   }
 
@@ -273,24 +309,39 @@ export default function ProgramOrderPage() {
                   </div>
 
                   {/* Move Buttons */}
-                  <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <div className="flex flex-col gap-1">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => moveProgram(index, 'up')}
+                        disabled={index === 0}
+                      >
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => moveProgram(index, 'down')}
+                        disabled={index === filteredPrograms.length - 1}
+                      >
+                        <ArrowDown className="h-4 w-4" />
+                      </Button>
+                    </div>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="icon"
-                      className="h-8 w-8"
-                      onClick={() => moveProgram(index, 'up')}
-                      disabled={index === 0}
+                      className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                      onClick={() => handleDelete(program.id, program.title)}
+                      disabled={deleting === program.id}
                     >
-                      <ArrowUp className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => moveProgram(index, 'down')}
-                      disabled={index === filteredPrograms.length - 1}
-                    >
-                      <ArrowDown className="h-4 w-4" />
+                      {deleting === program.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -310,6 +361,7 @@ export default function ProgramOrderPage() {
           <p>• 유형별로 필터링하여 해당 유형의 프로그램만 순서를 변경할 수 있습니다.</p>
           <p>• 변경 후 &quot;순서 저장&quot; 버튼을 클릭해야 변경사항이 적용됩니다.</p>
           <p>• 순서가 낮은 프로그램이 목록에서 먼저 표시됩니다.</p>
+          <p>• 휴지통 버튼으로 프로그램을 삭제할 수 있습니다. (신청자가 있는 프로그램은 삭제 불가)</p>
         </CardContent>
       </Card>
     </div>
