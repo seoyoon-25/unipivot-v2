@@ -11,6 +11,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge'
 import { toast } from '@/hooks/use-toast'
 import { Loader2, GripVertical, Save, ArrowUp, ArrowDown, RotateCcw, ArrowLeft, Trash2, Undo2 } from 'lucide-react'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 interface Program {
   id: string
@@ -42,6 +59,187 @@ const STATUS_LABELS: Record<string, { label: string; variant: 'default' | 'secon
   CANCELLED: { label: '취소', variant: 'destructive' },
 }
 
+interface SortableItemProps {
+  program: Program
+  visibleIndex: number
+  visiblePrograms: Program[]
+  isMarkedForDelete: boolean
+  onMoveToPosition: (fromIdx: number, toIdx: number) => void
+  onMoveProgram: (index: number, direction: 'up' | 'down') => void
+  onMarkForDelete: (id: string) => void
+  onUnmarkForDelete: (id: string) => void
+  programs: Program[]
+}
+
+function SortableItem({
+  program,
+  visibleIndex,
+  visiblePrograms,
+  isMarkedForDelete,
+  onMoveToPosition,
+  onMoveProgram,
+  onMarkForDelete,
+  onUnmarkForDelete,
+  programs,
+}: SortableItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: program.id, disabled: isMarkedForDelete })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  return (
+    <Card
+      ref={setNodeRef}
+      style={style}
+      className={`transition-all ${
+        isDragging
+          ? 'opacity-50 shadow-lg z-50'
+          : isMarkedForDelete
+          ? 'border-red-300 bg-red-50/50 opacity-60'
+          : 'hover:shadow-md'
+      }`}
+    >
+      <CardContent className="p-4">
+        <div className="flex items-center gap-4">
+          {/* Drag Handle & Order Number */}
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <button
+              {...attributes}
+              {...listeners}
+              className={`touch-none ${isMarkedForDelete ? 'cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'}`}
+              disabled={isMarkedForDelete}
+            >
+              <GripVertical className="h-5 w-5" />
+            </button>
+            {isMarkedForDelete ? (
+              <span className="w-16 text-center font-mono text-sm text-red-500 line-through">
+                삭제
+              </span>
+            ) : (
+              <Select
+                value={String(visibleIndex + 1)}
+                onValueChange={(val) => {
+                  const fromIdx = programs.findIndex(p => p.id === program.id)
+                  const targetVisibleIdx = parseInt(val) - 1
+                  const targetProgram = visiblePrograms[targetVisibleIdx]
+                  const toIdx = programs.findIndex(p => p.id === targetProgram?.id)
+                  if (toIdx !== -1) {
+                    onMoveToPosition(fromIdx, toIdx)
+                  }
+                }}
+              >
+                <SelectTrigger className="w-16 h-8">
+                  <SelectValue>{visibleIndex + 1}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {visiblePrograms.map((_, i) => (
+                    <SelectItem key={i} value={String(i + 1)}>
+                      {i + 1}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+
+          {/* Thumbnail */}
+          <div className={`w-16 h-16 relative rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 ${isMarkedForDelete ? 'grayscale' : ''}`}>
+            {program.thumbnailSquare || program.image ? (
+              <Image
+                src={program.thumbnailSquare || program.image || ''}
+                alt={program.title}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                No Image
+              </div>
+            )}
+          </div>
+
+          {/* Program Info */}
+          <div className={`flex-1 min-w-0 ${isMarkedForDelete ? 'line-through text-muted-foreground' : ''}`}>
+            <div className="flex items-center gap-2 mb-1">
+              <Badge variant="outline">
+                {TYPE_LABELS[program.type] || program.type}
+              </Badge>
+              <Badge variant={STATUS_LABELS[program.status]?.variant || 'secondary'}>
+                {STATUS_LABELS[program.status]?.label || program.status}
+              </Badge>
+            </div>
+            <h3 className="font-medium truncate">{program.title}</h3>
+            <p className="text-xs text-muted-foreground">
+              {new Date(program.createdAt).toLocaleDateString('ko-KR')} 생성
+            </p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2">
+            {isMarkedForDelete ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-blue-600 hover:text-blue-700"
+                onClick={() => onUnmarkForDelete(program.id)}
+              >
+                <Undo2 className="h-4 w-4 mr-1" />
+                취소
+              </Button>
+            ) : (
+              <>
+                <div className="flex flex-col gap-1">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => {
+                      const fromIdx = programs.findIndex(p => p.id === program.id)
+                      onMoveProgram(fromIdx, 'up')
+                    }}
+                    disabled={visibleIndex === 0}
+                  >
+                    <ArrowUp className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => {
+                      const fromIdx = programs.findIndex(p => p.id === program.id)
+                      onMoveProgram(fromIdx, 'down')
+                    }}
+                    disabled={visibleIndex === visiblePrograms.length - 1}
+                  >
+                    <ArrowDown className="h-4 w-4" />
+                  </Button>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                  onClick={() => onMarkForDelete(program.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 export default function ProgramOrderPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -53,6 +251,17 @@ export default function ProgramOrderPage() {
   const [hasChanges, setHasChanges] = useState(false)
   const [originalPrograms, setOriginalPrograms] = useState<Program[]>([])
   const [pendingDeletes, setPendingDeletes] = useState<Set<string>>(new Set())
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   // Redirect if not admin
   useEffect(() => {
@@ -89,6 +298,18 @@ export default function ProgramOrderPage() {
       })
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (over && active.id !== over.id) {
+      const oldIndex = programs.findIndex(p => p.id === active.id)
+      const newIndex = programs.findIndex(p => p.id === over.id)
+
+      setPrograms(arrayMove(programs, oldIndex, newIndex))
+      setHasChanges(true)
     }
   }
 
@@ -131,7 +352,6 @@ export default function ProgramOrderPage() {
       next.delete(programId)
       return next
     })
-    // Check if there are still changes
     const stillHasOrderChanges = JSON.stringify(programs.map(p => p.id)) !== JSON.stringify(originalPrograms.map(p => p.id))
     if (!stillHasOrderChanges && pendingDeletes.size <= 1) {
       setHasChanges(false)
@@ -148,7 +368,6 @@ export default function ProgramOrderPage() {
     try {
       setSaving(true)
 
-      // 1. 삭제 예정 프로그램들 삭제
       const deleteErrors: string[] = []
       const deleteIds = Array.from(pendingDeletes)
       for (const id of deleteIds) {
@@ -166,7 +385,6 @@ export default function ProgramOrderPage() {
         }
       }
 
-      // 삭제 오류가 있으면 알림
       if (deleteErrors.length > 0) {
         toast({
           title: '일부 삭제 실패',
@@ -175,7 +393,6 @@ export default function ProgramOrderPage() {
         })
       }
 
-      // 2. 삭제되지 않은 프로그램들의 순서 저장
       const remainingPrograms = programs.filter(p => !pendingDeletes.has(p.id))
       if (remainingPrograms.length > 0) {
         const response = await fetch('/api/admin/programs/reorder', {
@@ -195,7 +412,6 @@ export default function ProgramOrderPage() {
         description: `변경사항이 저장되었습니다.${pendingDeletes.size > 0 ? ` (${pendingDeletes.size - deleteErrors.length}개 삭제됨)` : ''}`,
       })
 
-      // Refresh the list
       await fetchPrograms()
     } catch (error) {
       console.error('Error saving changes:', error)
@@ -221,7 +437,6 @@ export default function ProgramOrderPage() {
     ? programs
     : programs.filter(p => p.type === selectedType)
 
-  // 삭제 예정이 아닌 프로그램만 순서 계산에 포함
   const visiblePrograms = filteredPrograms.filter(p => !pendingDeletes.has(p.id))
   const deletedCount = pendingDeletes.size
 
@@ -295,7 +510,7 @@ export default function ProgramOrderPage() {
         </CardHeader>
       </Card>
 
-      {/* Program List */}
+      {/* Program List with Drag and Drop */}
       <div className="space-y-2">
         {filteredPrograms.length === 0 ? (
           <Card>
@@ -304,145 +519,36 @@ export default function ProgramOrderPage() {
             </CardContent>
           </Card>
         ) : (
-          filteredPrograms.map((program, index) => {
-            const isMarkedForDelete = pendingDeletes.has(program.id)
-            // 삭제 예정이 아닌 것들 중에서의 순서
-            const visibleIndex = visiblePrograms.findIndex(p => p.id === program.id)
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={filteredPrograms.map(p => p.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {filteredPrograms.map((program) => {
+                const isMarkedForDelete = pendingDeletes.has(program.id)
+                const visibleIndex = visiblePrograms.findIndex(p => p.id === program.id)
 
-            return (
-              <Card
-                key={program.id}
-                className={`transition-all ${
-                  isMarkedForDelete
-                    ? 'border-red-300 bg-red-50/50 opacity-60'
-                    : 'hover:shadow-md'
-                }`}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-4">
-                    {/* Order Number with Dropdown */}
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <GripVertical className="h-5 w-5" />
-                      {isMarkedForDelete ? (
-                        <span className="w-16 text-center font-mono text-sm text-red-500 line-through">
-                          삭제
-                        </span>
-                      ) : (
-                        <Select
-                          value={String(visibleIndex + 1)}
-                          onValueChange={(val) => {
-                            const fromIdx = programs.findIndex(p => p.id === program.id)
-                            const targetVisibleIdx = parseInt(val) - 1
-                            // 실제 programs 배열에서의 목표 인덱스 계산
-                            const targetProgram = visiblePrograms[targetVisibleIdx]
-                            const toIdx = programs.findIndex(p => p.id === targetProgram?.id)
-                            if (toIdx !== -1) {
-                              moveToPosition(fromIdx, toIdx)
-                            }
-                          }}
-                        >
-                          <SelectTrigger className="w-16 h-8">
-                            <SelectValue>{visibleIndex + 1}</SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {visiblePrograms.map((_, i) => (
-                              <SelectItem key={i} value={String(i + 1)}>
-                                {i + 1}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    </div>
-
-                    {/* Thumbnail */}
-                    <div className={`w-16 h-16 relative rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 ${isMarkedForDelete ? 'grayscale' : ''}`}>
-                      {program.thumbnailSquare || program.image ? (
-                        <Image
-                          src={program.thumbnailSquare || program.image || ''}
-                          alt={program.title}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                          No Image
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Program Info */}
-                    <div className={`flex-1 min-w-0 ${isMarkedForDelete ? 'line-through text-muted-foreground' : ''}`}>
-                      <div className="flex items-center gap-2 mb-1">
-                        <Badge variant="outline">
-                          {TYPE_LABELS[program.type] || program.type}
-                        </Badge>
-                        <Badge variant={STATUS_LABELS[program.status]?.variant || 'secondary'}>
-                          {STATUS_LABELS[program.status]?.label || program.status}
-                        </Badge>
-                      </div>
-                      <h3 className="font-medium truncate">{program.title}</h3>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(program.createdAt).toLocaleDateString('ko-KR')} 생성
-                      </p>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex items-center gap-2">
-                      {isMarkedForDelete ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-blue-600 hover:text-blue-700"
-                          onClick={() => unmarkForDelete(program.id)}
-                        >
-                          <Undo2 className="h-4 w-4 mr-1" />
-                          취소
-                        </Button>
-                      ) : (
-                        <>
-                          <div className="flex flex-col gap-1">
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => {
-                                const fromIdx = programs.findIndex(p => p.id === program.id)
-                                moveProgram(fromIdx, 'up')
-                              }}
-                              disabled={visibleIndex === 0}
-                            >
-                              <ArrowUp className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => {
-                                const fromIdx = programs.findIndex(p => p.id === program.id)
-                                moveProgram(fromIdx, 'down')
-                              }}
-                              disabled={visibleIndex === visiblePrograms.length - 1}
-                            >
-                              <ArrowDown className="h-4 w-4" />
-                            </Button>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
-                            onClick={() => markForDelete(program.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })
+                return (
+                  <SortableItem
+                    key={program.id}
+                    program={program}
+                    visibleIndex={visibleIndex}
+                    visiblePrograms={visiblePrograms}
+                    isMarkedForDelete={isMarkedForDelete}
+                    onMoveToPosition={moveToPosition}
+                    onMoveProgram={moveProgram}
+                    onMarkForDelete={markForDelete}
+                    onUnmarkForDelete={unmarkForDelete}
+                    programs={programs}
+                  />
+                )
+              })}
+            </SortableContext>
+          </DndContext>
         )}
       </div>
 
@@ -452,6 +558,7 @@ export default function ProgramOrderPage() {
           <CardTitle className="text-sm">사용 방법</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
+          <p>• <strong>드래그 앤 드롭:</strong> 점 6개 아이콘을 클릭한 채로 끌어서 순서를 변경할 수 있습니다.</p>
           <p>• 순서 번호를 클릭하여 원하는 위치로 바로 이동할 수 있습니다.</p>
           <p>• 화살표 버튼으로 한 단계씩 순서를 변경할 수 있습니다.</p>
           <p>• 휴지통 버튼을 클릭하면 삭제 예정으로 표시됩니다.</p>
