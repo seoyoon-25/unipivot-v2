@@ -109,6 +109,7 @@ model Program {
   status             String               @default("DRAFT")
   startDate          DateTime?
   endDate            DateTime?
+  displayOrder       Int                  @default(0)
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
   applicationCount   Int                  @default(0)

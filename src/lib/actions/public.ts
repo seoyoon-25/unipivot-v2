@@ -87,7 +87,10 @@ export async function getHomePageData() {
 export async function getProgramsByType(type: string) {
   return prisma.program.findMany({
     where: { type },
-    orderBy: { createdAt: 'desc' },
+    orderBy: [
+      { displayOrder: 'asc' },
+      { createdAt: 'desc' }
+    ],
     include: {
       _count: { select: { registrations: { where: { status: 'APPROVED' } } } }
     }

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Plus, Search, Calendar, Users, Edit3, Trash2, ExternalLink } from 'lucide-react'
+import { Plus, Search, Calendar, Users, Edit3, Trash2, ExternalLink, ArrowUpDown } from 'lucide-react'
 import { deleteProgram } from '@/lib/actions/admin'
 
 interface Program {
@@ -96,13 +96,22 @@ export default function ProgramsGrid({ programs, total, pages, currentPage, sear
     <div>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold text-gray-900">프로그램 관리</h1>
-        <Link
-          href="/admin/programs/new"
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          새 프로그램
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/admin/programs/order"
+            className="flex items-center gap-2 px-4 py-2 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            <ArrowUpDown className="w-4 h-4" />
+            순서 관리
+          </Link>
+          <Link
+            href="/admin/programs/new"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            새 프로그램
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}
