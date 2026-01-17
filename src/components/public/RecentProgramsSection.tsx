@@ -12,6 +12,7 @@ import {
   getModeLabel,
   type ProgramStatus,
 } from '@/lib/program/status-calculator'
+import { useCardSettings, getStatusBadgeBaseClass, getModeBadgeBaseClass } from '@/hooks/useCardSettings'
 
 interface Program {
   id: string
@@ -86,6 +87,7 @@ export function RecentProgramsSection({ programs }: Props) {
 }
 
 function ProgramCard({ program }: { program: Program }) {
+  const { settings: cardSettings } = useCardSettings()
   const programStatus = getProgramStatus({
     status: program.status ?? undefined,
     recruitStartDate: program.recruitStartDate,
@@ -118,7 +120,7 @@ function ProgramCard({ program }: { program: Program }) {
         />
         {/* Status Badge */}
         <span
-          className={`absolute top-3 left-3 px-2.5 py-1 text-xs font-semibold rounded-full ${statusBadgeClass}`}
+          className={`absolute top-3 left-3 ${getStatusBadgeBaseClass(cardSettings)} ${statusBadgeClass}`}
         >
           {statusLabel}
         </span>
@@ -138,7 +140,7 @@ function ProgramCard({ program }: { program: Program }) {
 
         {/* Info Badges */}
         <div className="flex flex-wrap gap-2 mb-3">
-          <span className={`inline-block px-2 py-0.5 text-xs rounded ${
+          <span className={`${getModeBadgeBaseClass(cardSettings)} ${
             program.isOnline ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
           }`}>
             {modeLabel}

@@ -14,6 +14,7 @@ import {
   getModeLabel,
   type ProgramStatus,
 } from '@/lib/program/status-calculator'
+import { useCardSettings, getStatusBadgeBaseClass, getModeBadgeBaseClass } from '@/hooks/useCardSettings'
 
 interface ProgramCardProps {
   id: string
@@ -61,6 +62,7 @@ export function ProgramCard({
   const [liked, setLiked] = useState(isLiked)
   const [likes, setLikes] = useState(likeCount)
   const [isPending, startTransition] = useTransition()
+  const { settings: cardSettings } = useCardSettings()
 
   const programStatus = getProgramStatus({
     status: manualStatus,
@@ -137,7 +139,7 @@ export function ProgramCard({
           />
           {/* Status Badge - Top Left */}
           <span
-            className={`absolute top-3 left-3 px-2.5 py-1 text-xs font-semibold rounded-full ${statusBadgeClass}`}
+            className={`absolute top-3 left-3 ${getStatusBadgeBaseClass(cardSettings)} ${statusBadgeClass}`}
           >
             {statusLabel}
           </span>
@@ -174,7 +176,7 @@ export function ProgramCard({
 
         {/* Mode Badge */}
         <div className="mb-2">
-          <span className={`inline-block px-2 py-0.5 text-xs rounded ${
+          <span className={`${getModeBadgeBaseClass(cardSettings)} ${
             isOnline ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
           }`}>
             {modeLabel}
