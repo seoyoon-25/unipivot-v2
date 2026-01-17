@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 
-// PUT /api/admin/programs/reorder - 프로그램 순서 변경
+// PUT /api/admin/programs/reorder - 프로그램 순서 변경 및 필드 수정
 export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -12,21 +12,35 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: '권한이 없습니다.' }, { status: 403 })
     }
 
-    const { programIds, type } = await request.json()
+    const { programIds, type, edits } = await request.json()
 
     if (!Array.isArray(programIds) || programIds.length === 0) {
       return NextResponse.json({ error: '프로그램 ID 목록이 필요합니다.' }, { status: 400 })
     }
 
-    // 순서대로 displayOrder 업데이트
-    const updates = programIds.map((id: string, index: number) =>
-      prisma.program.update({
-        where: { id },
-        data: { displayOrder: index + 1 }
-      })
-    )
+    const operations: any[] = []
 
-    await prisma.$transaction(updates)
+    // 순서대로 displayOrder 업데이트 (DESC 정렬 기준: 첫 번째가 가장 높은 숫자)
+    programIds.forEach((id: string, index: number) => {
+      const updateData: any = { displayOrder: programIds.length - index }
+
+      // 필드 수정사항이 있으면 함께 업데이트
+      if (edits && edits[id]) {
+        const edit = edits[id]
+        if (edit.title !== undefined) updateData.title = edit.title
+        if (edit.status !== undefined) updateData.status = edit.status
+        if (edit.type !== undefined) updateData.type = edit.type
+      }
+
+      operations.push(
+        prisma.program.update({
+          where: { id },
+          data: updateData
+        })
+      )
+    })
+
+    await prisma.$transaction(operations)
 
     return NextResponse.json({
       success: true,
@@ -55,7 +69,7 @@ export async function GET(request: NextRequest) {
     const programs = await prisma.program.findMany({
       where,
       orderBy: [
-        { displayOrder: 'asc' },
+        { displayOrder: 'desc' },
         { createdAt: 'desc' }
       ],
       select: {

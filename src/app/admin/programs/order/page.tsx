@@ -10,7 +10,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { toast } from '@/hooks/use-toast'
-import { Loader2, GripVertical, Save, ArrowUp, ArrowDown, RotateCcw, ArrowLeft, Trash2, Undo2 } from 'lucide-react'
+import { Loader2, GripVertical, Save, ArrowUp, ArrowDown, RotateCcw, ArrowLeft, Trash2, Undo2, ArrowUpDown, Pencil, Check, X } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import {
   DndContext,
   closestCenter,
@@ -59,6 +71,12 @@ const STATUS_LABELS: Record<string, { label: string; variant: 'default' | 'secon
   CANCELLED: { label: '취소', variant: 'destructive' },
 }
 
+interface ProgramEdit {
+  title?: string
+  status?: string
+  type?: string
+}
+
 interface SortableItemProps {
   program: Program
   visibleIndex: number
@@ -69,6 +87,8 @@ interface SortableItemProps {
   onMarkForDelete: (id: string) => void
   onUnmarkForDelete: (id: string) => void
   programs: Program[]
+  pendingEdit?: ProgramEdit
+  onFieldChange: (programId: string, field: keyof ProgramEdit, value: string) => void
 }
 
 function SortableItem({
@@ -81,7 +101,12 @@ function SortableItem({
   onMarkForDelete,
   onUnmarkForDelete,
   programs,
+  pendingEdit,
+  onFieldChange,
 }: SortableItemProps) {
+  const [isEditingTitle, setIsEditingTitle] = useState(false)
+  const [titleInput, setTitleInput] = useState(program.title)
+
   const {
     attributes,
     listeners,
@@ -96,6 +121,22 @@ function SortableItem({
     transition,
   }
 
+  const currentTitle = pendingEdit?.title ?? program.title
+  const currentType = pendingEdit?.type ?? program.type
+  const currentStatus = pendingEdit?.status ?? program.status
+
+  const handleTitleSave = () => {
+    if (titleInput.trim() && titleInput !== program.title) {
+      onFieldChange(program.id, 'title', titleInput.trim())
+    }
+    setIsEditingTitle(false)
+  }
+
+  const handleTitleCancel = () => {
+    setTitleInput(pendingEdit?.title ?? program.title)
+    setIsEditingTitle(false)
+  }
+
   return (
     <Card
       ref={setNodeRef}
@@ -105,6 +146,8 @@ function SortableItem({
           ? 'opacity-50 shadow-lg z-50'
           : isMarkedForDelete
           ? 'border-red-300 bg-red-50/50 opacity-60'
+          : pendingEdit
+          ? 'border-blue-300 bg-blue-50/30'
           : 'hover:shadow-md'
       }`}
     >
@@ -170,14 +213,93 @@ function SortableItem({
           {/* Program Info */}
           <div className={`flex-1 min-w-0 ${isMarkedForDelete ? 'line-through text-muted-foreground' : ''}`}>
             <div className="flex items-center gap-2 mb-1">
-              <Badge variant="outline">
-                {TYPE_LABELS[program.type] || program.type}
-              </Badge>
-              <Badge variant={STATUS_LABELS[program.status]?.variant || 'secondary'}>
-                {STATUS_LABELS[program.status]?.label || program.status}
-              </Badge>
+              {/* Type Select */}
+              <Select
+                value={currentType}
+                onValueChange={(val) => onFieldChange(program.id, 'type', val)}
+                disabled={isMarkedForDelete}
+              >
+                <SelectTrigger className="h-6 w-auto px-2 text-xs">
+                  <Badge variant="outline" className="pointer-events-none">
+                    {TYPE_LABELS[currentType] || currentType}
+                  </Badge>
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(TYPE_LABELS).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* Status Select */}
+              <Select
+                value={currentStatus}
+                onValueChange={(val) => onFieldChange(program.id, 'status', val)}
+                disabled={isMarkedForDelete}
+              >
+                <SelectTrigger className="h-6 w-auto px-2 text-xs">
+                  <Badge variant={STATUS_LABELS[currentStatus]?.variant || 'secondary'} className="pointer-events-none">
+                    {STATUS_LABELS[currentStatus]?.label || currentStatus}
+                  </Badge>
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(STATUS_LABELS).map(([value, { label }]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <h3 className="font-medium truncate">{program.title}</h3>
+
+            {/* Editable Title */}
+            {isEditingTitle && !isMarkedForDelete ? (
+              <div className="flex items-center gap-1">
+                <Input
+                  value={titleInput}
+                  onChange={(e) => setTitleInput(e.target.value)}
+                  className="h-7 text-sm"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleTitleSave()
+                    if (e.key === 'Escape') handleTitleCancel()
+                  }}
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-green-600"
+                  onClick={handleTitleSave}
+                >
+                  <Check className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-gray-500"
+                  onClick={handleTitleCancel}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div
+                className="flex items-center gap-1 group cursor-pointer"
+                onClick={() => {
+                  if (!isMarkedForDelete) {
+                    setTitleInput(currentTitle)
+                    setIsEditingTitle(true)
+                  }
+                }}
+              >
+                <h3 className="font-medium truncate">{currentTitle}</h3>
+                {!isMarkedForDelete && (
+                  <Pencil className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                )}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground">
               {new Date(program.createdAt).toLocaleDateString('ko-KR')} 생성
             </p>
@@ -248,9 +370,11 @@ export default function ProgramOrderPage() {
   const [selectedType, setSelectedType] = useState<string>('all')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [reversing, setReversing] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
   const [originalPrograms, setOriginalPrograms] = useState<Program[]>([])
   const [pendingDeletes, setPendingDeletes] = useState<Set<string>>(new Set())
+  const [pendingEdits, setPendingEdits] = useState<Map<string, ProgramEdit>>(new Map())
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -289,6 +413,7 @@ export default function ProgramOrderPage() {
       setTypes(data.types)
       setHasChanges(false)
       setPendingDeletes(new Set())
+      setPendingEdits(new Map())
     } catch (error) {
       console.error('Error fetching programs:', error)
       toast({
@@ -353,7 +478,8 @@ export default function ProgramOrderPage() {
       return next
     })
     const stillHasOrderChanges = JSON.stringify(programs.map(p => p.id)) !== JSON.stringify(originalPrograms.map(p => p.id))
-    if (!stillHasOrderChanges && pendingDeletes.size <= 1) {
+    const stillHasEdits = pendingEdits.size > 0
+    if (!stillHasOrderChanges && !stillHasEdits && pendingDeletes.size <= 1) {
       setHasChanges(false)
     }
   }
@@ -361,7 +487,50 @@ export default function ProgramOrderPage() {
   const resetChanges = () => {
     setPrograms(originalPrograms)
     setPendingDeletes(new Set())
+    setPendingEdits(new Map())
     setHasChanges(false)
+  }
+
+  const handleFieldChange = (programId: string, field: keyof ProgramEdit, value: string) => {
+    setPendingEdits(prev => {
+      const next = new Map(prev)
+      const current = next.get(programId) || {}
+      next.set(programId, { ...current, [field]: value })
+      return next
+    })
+    setHasChanges(true)
+  }
+
+  const reverseOrder = async () => {
+    try {
+      setReversing(true)
+      const response = await fetch('/api/admin/programs/reorder/reverse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: selectedType !== 'all' ? selectedType : undefined
+        })
+      })
+
+      if (!response.ok) throw new Error('Failed to reverse order')
+
+      const data = await response.json()
+      toast({
+        title: '성공',
+        description: data.message,
+      })
+
+      await fetchPrograms()
+    } catch (error) {
+      console.error('Error reversing order:', error)
+      toast({
+        title: '오류',
+        description: '순서 뒤집기 중 오류가 발생했습니다.',
+        variant: 'destructive',
+      })
+    } finally {
+      setReversing(false)
+    }
   }
 
   const saveChanges = async () => {
@@ -395,12 +564,21 @@ export default function ProgramOrderPage() {
 
       const remainingPrograms = programs.filter(p => !pendingDeletes.has(p.id))
       if (remainingPrograms.length > 0) {
+        // pendingEdits를 객체로 변환
+        const edits: { [id: string]: ProgramEdit } = {}
+        pendingEdits.forEach((edit, id) => {
+          if (!pendingDeletes.has(id)) {
+            edits[id] = edit
+          }
+        })
+
         const response = await fetch('/api/admin/programs/reorder', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             programIds: remainingPrograms.map(p => p.id),
-            type: selectedType !== 'all' ? selectedType : undefined
+            type: selectedType !== 'all' ? selectedType : undefined,
+            edits: Object.keys(edits).length > 0 ? edits : undefined
           })
         })
 
@@ -486,6 +664,41 @@ export default function ProgramOrderPage() {
               )}
             </div>
             <div className="flex items-center gap-2">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    disabled={reversing || hasChanges}
+                  >
+                    {reversing ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <ArrowUpDown className="h-4 w-4 mr-2" />
+                    )}
+                    순서 뒤집기
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>순서 뒤집기</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {selectedType !== 'all'
+                        ? `${TYPE_LABELS[selectedType] || selectedType} 프로그램의 순서를 완전히 뒤집습니다.`
+                        : '모든 프로그램의 순서를 완전히 뒤집습니다.'}
+                      <br />
+                      현재 1번이 마지막으로, 마지막이 1번으로 변경됩니다.
+                      <br /><br />
+                      이 작업은 즉시 저장됩니다. 계속하시겠습니까?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>취소</AlertDialogCancel>
+                    <AlertDialogAction onClick={reverseOrder}>
+                      뒤집기
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
               <Button
                 variant="outline"
                 onClick={resetChanges}
@@ -544,6 +757,8 @@ export default function ProgramOrderPage() {
                     onMarkForDelete={markForDelete}
                     onUnmarkForDelete={unmarkForDelete}
                     programs={programs}
+                    pendingEdit={pendingEdits.get(program.id)}
+                    onFieldChange={handleFieldChange}
                   />
                 )
               })}
@@ -561,6 +776,8 @@ export default function ProgramOrderPage() {
           <p>• <strong>드래그 앤 드롭:</strong> 점 6개 아이콘을 클릭한 채로 끌어서 순서를 변경할 수 있습니다.</p>
           <p>• 순서 번호를 클릭하여 원하는 위치로 바로 이동할 수 있습니다.</p>
           <p>• 화살표 버튼으로 한 단계씩 순서를 변경할 수 있습니다.</p>
+          <p>• <strong>인라인 수정:</strong> 제목을 클릭하여 직접 수정할 수 있습니다. 타입과 상태 배지를 클릭하여 변경할 수 있습니다.</p>
+          <p>• <strong>순서 뒤집기:</strong> 전체 순서를 한 번에 역순으로 변경할 수 있습니다.</p>
           <p>• 휴지통 버튼을 클릭하면 삭제 예정으로 표시됩니다.</p>
           <p>• 모든 변경사항은 &quot;변경사항 저장&quot; 버튼을 클릭해야 적용됩니다.</p>
           <p>• 신청자가 있는 프로그램은 삭제할 수 없습니다.</p>

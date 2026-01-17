@@ -88,7 +88,7 @@ export async function getProgramsByType(type: string) {
   return prisma.program.findMany({
     where: { type },
     orderBy: [
-      { displayOrder: 'asc' },
+      { displayOrder: 'desc' },
       { createdAt: 'desc' }
     ],
     include: {

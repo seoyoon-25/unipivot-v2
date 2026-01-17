@@ -79,6 +79,7 @@ export default async function ProgramsPage({ searchParams }: PageProps) {
   const programs = await prisma.program.findMany({
     where,
     orderBy: [
+      { displayOrder: 'desc' },
       { status: 'asc' },
       { createdAt: 'desc' },
     ],
