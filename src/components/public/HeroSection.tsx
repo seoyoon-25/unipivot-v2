@@ -71,7 +71,7 @@ export function HeroSection({ stats }: Props) {
           style={{ backgroundImage: 'url(https://cdn.imweb.me/thumbnail/20230721/83853103377f0.jpg)' }}
         />
         {/* 그래디언트 오버레이 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-gray-800/85 to-primary/60" />
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/50 via-gray-800/40 to-primary/30" />
         <div className="absolute inset-0 opacity-40">
           <motion.div
             className="absolute top-20 left-10 w-72 h-72 bg-primary rounded-full blur-[120px]"
