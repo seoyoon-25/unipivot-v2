@@ -65,7 +65,13 @@ export function HeroSection({ stats }: Props) {
     <section className="relative min-h-screen flex items-center overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-primary/30" />
+        {/* 배경 이미지 */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: 'url(https://cdn.imweb.me/thumbnail/20230721/83853103377f0.jpg)' }}
+        />
+        {/* 그래디언트 오버레이 */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-gray-800/70 to-primary/40" />
         <div className="absolute inset-0 opacity-40">
           <motion.div
             className="absolute top-20 left-10 w-72 h-72 bg-primary rounded-full blur-[120px]"
