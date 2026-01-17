@@ -540,6 +540,327 @@ export function DonatePageEditor({ section, onUpdate, onSave }: PageSectionEdito
   )
 }
 
+// About Us Page Editor (/p/about-us) - 단체 소개
+export function AboutUsPageEditor({ section, onUpdate, onSave }: PageSectionEditorProps) {
+  const content = section.content || {}
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({
+    images: true,
+    about: false,
+    vision: false,
+  })
+
+  const handleChange = (path: string[], value: any) => {
+    const newContent = JSON.parse(JSON.stringify(content))
+    let current = newContent
+    for (let i = 0; i < path.length - 1; i++) {
+      if (!current[path[i]]) current[path[i]] = {}
+      current = current[path[i]]
+    }
+    current[path[path.length - 1]] = value
+    onUpdate(section.sectionKey, newContent)
+  }
+
+  const toggleSection = (key: string) => {
+    setExpanded(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>단체 소개 페이지 (/p/about-us)</CardTitle>
+        <CardDescription>단체 소개 페이지의 콘텐츠를 편집합니다.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Images Section */}
+        <div className="border rounded-lg">
+          <button
+            onClick={() => toggleSection('images')}
+            className="w-full flex items-center justify-between p-4 hover:bg-gray-50"
+          >
+            <h3 className="font-semibold">이미지 URL</h3>
+            {expanded.images ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+          </button>
+          {expanded.images && (
+            <div className="p-4 border-t space-y-4">
+              <div>
+                <Label>소개 섹션 이미지 1</Label>
+                <Input
+                  value={content.images?.about?.[0] || ''}
+                  onChange={(e) => {
+                    const about = [...(content.images?.about || ['', '', ''])]
+                    about[0] = e.target.value
+                    handleChange(['images', 'about'], about)
+                  }}
+                  placeholder="https://..."
+                />
+              </div>
+              <div>
+                <Label>소개 섹션 이미지 2</Label>
+                <Input
+                  value={content.images?.about?.[1] || ''}
+                  onChange={(e) => {
+                    const about = [...(content.images?.about || ['', '', ''])]
+                    about[1] = e.target.value
+                    handleChange(['images', 'about'], about)
+                  }}
+                  placeholder="https://..."
+                />
+              </div>
+              <div>
+                <Label>소개 섹션 이미지 3</Label>
+                <Input
+                  value={content.images?.about?.[2] || ''}
+                  onChange={(e) => {
+                    const about = [...(content.images?.about || ['', '', ''])]
+                    about[2] = e.target.value
+                    handleChange(['images', 'about'], about)
+                  }}
+                  placeholder="https://..."
+                />
+              </div>
+              <div>
+                <Label>비전 이미지</Label>
+                <Input
+                  value={content.images?.vision || ''}
+                  onChange={(e) => handleChange(['images', 'vision'], e.target.value)}
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* About Section */}
+        <div className="border rounded-lg">
+          <button
+            onClick={() => toggleSection('about')}
+            className="w-full flex items-center justify-between p-4 hover:bg-gray-50"
+          >
+            <h3 className="font-semibold">소개 섹션</h3>
+            {expanded.about ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+          </button>
+          {expanded.about && (
+            <div className="p-4 border-t space-y-4">
+              <div>
+                <Label>제목</Label>
+                <Input
+                  value={content.about?.title || ''}
+                  onChange={(e) => handleChange(['about', 'title'], e.target.value)}
+                  placeholder="유니피벗은 어떤 곳인가요?"
+                />
+              </div>
+              <div>
+                <Label>본문 (각 줄이 하나의 문단)</Label>
+                <Textarea
+                  value={(content.about?.paragraphs || []).join('\n\n')}
+                  onChange={(e) => handleChange(['about', 'paragraphs'], e.target.value.split('\n\n').filter((p: string) => p.trim()))}
+                  rows={12}
+                  placeholder="각 빈 줄로 구분된 텍스트가 하나의 문단이 됩니다."
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Vision Section */}
+        <div className="border rounded-lg">
+          <button
+            onClick={() => toggleSection('vision')}
+            className="w-full flex items-center justify-between p-4 hover:bg-gray-50"
+          >
+            <h3 className="font-semibold">비전 섹션</h3>
+            {expanded.vision ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+          </button>
+          {expanded.vision && (
+            <div className="p-4 border-t space-y-4">
+              <div>
+                <Label>제목</Label>
+                <Input
+                  value={content.vision?.title || ''}
+                  onChange={(e) => handleChange(['vision', 'title'], e.target.value)}
+                  placeholder="유니피벗이 추구하는 가치"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <Button onClick={() => onSave(section.sectionKey)} className="w-full">
+          <Save className="w-4 h-4 mr-2" />
+          저장
+        </Button>
+      </CardContent>
+    </Card>
+  )
+}
+
+// History Page Editor (/p/history) - 연혁
+export function HistoryPageEditor({ section, onUpdate, onSave }: PageSectionEditorProps) {
+  const content = section.content || {}
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({
+    images: true,
+    hero: false,
+    timeline: false,
+  })
+
+  const handleChange = (path: string[], value: any) => {
+    const newContent = JSON.parse(JSON.stringify(content))
+    let current = newContent
+    for (let i = 0; i < path.length - 1; i++) {
+      if (!current[path[i]]) current[path[i]] = {}
+      current = current[path[i]]
+    }
+    current[path[path.length - 1]] = value
+    onUpdate(section.sectionKey, newContent)
+  }
+
+  const toggleSection = (key: string) => {
+    setExpanded(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>연혁 페이지 (/p/history)</CardTitle>
+        <CardDescription>연혁 페이지의 콘텐츠를 편집합니다.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Images Section */}
+        <div className="border rounded-lg">
+          <button
+            onClick={() => toggleSection('images')}
+            className="w-full flex items-center justify-between p-4 hover:bg-gray-50"
+          >
+            <h3 className="font-semibold">이미지 URL</h3>
+            {expanded.images ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+          </button>
+          {expanded.images && (
+            <div className="p-4 border-t space-y-4">
+              <div>
+                <Label>배경 이미지</Label>
+                <Input
+                  value={content.images?.background || ''}
+                  onChange={(e) => handleChange(['images', 'background'], e.target.value)}
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Hero Section */}
+        <div className="border rounded-lg">
+          <button
+            onClick={() => toggleSection('hero')}
+            className="w-full flex items-center justify-between p-4 hover:bg-gray-50"
+          >
+            <h3 className="font-semibold">히어로 섹션</h3>
+            {expanded.hero ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+          </button>
+          {expanded.hero && (
+            <div className="p-4 border-t space-y-4">
+              <div>
+                <Label>제목</Label>
+                <Input
+                  value={content.hero?.title || ''}
+                  onChange={(e) => handleChange(['hero', 'title'], e.target.value)}
+                  placeholder="유니피벗이 걸어온 여정"
+                />
+              </div>
+              <div>
+                <Label>부제목</Label>
+                <Input
+                  value={content.hero?.subtitle || ''}
+                  onChange={(e) => handleChange(['hero', 'subtitle'], e.target.value)}
+                  placeholder="남북청년이 함께 만들어가는 새로운 한반도"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Timeline Section */}
+        <div className="border rounded-lg">
+          <button
+            onClick={() => toggleSection('timeline')}
+            className="w-full flex items-center justify-between p-4 hover:bg-gray-50"
+          >
+            <h3 className="font-semibold">타임라인</h3>
+            {expanded.timeline ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+          </button>
+          {expanded.timeline && (
+            <div className="p-4 border-t space-y-4">
+              <Label>연혁 항목</Label>
+              {(content.timeline?.items || []).map((item: any, index: number) => (
+                <div key={index} className="flex items-start gap-4 p-3 bg-gray-50 rounded-lg">
+                  <GripVertical className="w-4 h-4 text-gray-400 mt-3" />
+                  <div className="flex-1 grid gap-2">
+                    <div className="grid grid-cols-3 gap-2">
+                      <Input
+                        value={item.year || ''}
+                        onChange={(e) => {
+                          const items = [...(content.timeline?.items || [])]
+                          items[index] = { ...items[index], year: e.target.value }
+                          handleChange(['timeline', 'items'], items)
+                        }}
+                        placeholder="연도"
+                      />
+                      <Input
+                        value={item.title || ''}
+                        onChange={(e) => {
+                          const items = [...(content.timeline?.items || [])]
+                          items[index] = { ...items[index], title: e.target.value }
+                          handleChange(['timeline', 'items'], items)
+                        }}
+                        placeholder="제목"
+                        className="col-span-2"
+                      />
+                    </div>
+                    <Input
+                      value={item.description || ''}
+                      onChange={(e) => {
+                        const items = [...(content.timeline?.items || [])]
+                        items[index] = { ...items[index], description: e.target.value }
+                        handleChange(['timeline', 'items'], items)
+                      }}
+                      placeholder="설명"
+                    />
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      const items = (content.timeline?.items || []).filter((_: any, i: number) => i !== index)
+                      handleChange(['timeline', 'items'], items)
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                  </Button>
+                </div>
+              ))}
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const items = [...(content.timeline?.items || []), { year: '', title: '', description: '' }]
+                  handleChange(['timeline', 'items'], items)
+                }}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                연혁 추가
+              </Button>
+            </div>
+          )}
+        </div>
+
+        <Button onClick={() => onSave(section.sectionKey)} className="w-full">
+          <Save className="w-4 h-4 mr-2" />
+          저장
+        </Button>
+      </CardContent>
+    </Card>
+  )
+}
+
 // Simple Header Editor (for programs, blog, notice)
 export function PageHeaderEditor({ section, onUpdate, onSave }: PageSectionEditorProps) {
   const content = section.content || {}

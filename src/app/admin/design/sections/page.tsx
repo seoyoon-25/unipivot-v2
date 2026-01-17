@@ -19,7 +19,7 @@ import { StoryEditor } from '@/components/admin/sections/StoryEditor'
 import { ProgramEditor } from '@/components/admin/sections/ProgramEditor'
 import { InstagramEditor } from '@/components/admin/sections/InstagramEditor'
 import { SectionManager } from '@/components/admin/sections/SectionManager'
-import { AboutPageEditor, DonatePageEditor, PageHeaderEditor } from '@/components/admin/sections/PageSectionEditor'
+import { AboutPageEditor, DonatePageEditor, PageHeaderEditor, AboutUsPageEditor, HistoryPageEditor } from '@/components/admin/sections/PageSectionEditor'
 
 interface SiteSection {
   id: string
@@ -313,6 +313,10 @@ export default function SectionsPage() {
       // Page section editors
       case 'page.about':
         return <AboutPageEditor {...editorProps} />
+      case 'page.about-us':
+        return <AboutUsPageEditor {...editorProps} />
+      case 'page.history':
+        return <HistoryPageEditor {...editorProps} />
       case 'page.donate':
         return <DonatePageEditor {...editorProps} />
       case 'page.programs':
