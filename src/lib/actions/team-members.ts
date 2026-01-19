@@ -1,6 +1,6 @@
 'use server';
 
-import { prisma } from '@/lib/db';
+import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 
 export type TeamMemberRole = 'STAFF' | 'ADVISOR' | 'ALUMNI';

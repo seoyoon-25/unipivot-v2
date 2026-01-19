@@ -1,6 +1,6 @@
 'use server';
 
-import { prisma } from '@/lib/db';
+import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 
 // 모든 페이지 조회 (어드민용)
