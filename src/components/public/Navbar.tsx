@@ -25,13 +25,13 @@ type MenuItem = {
 
 const LAB_DOMAIN = process.env.NEXT_PUBLIC_LAB_DOMAIN || 'lab.bestcome.org'
 
-const menuItems: MenuItem[] = [
+// 기본 메뉴 (서버에서 메뉴를 못 가져온 경우 폴백으로 사용)
+const defaultMenuItems: MenuItem[] = [
   {
     label: '소개',
     children: [
       { label: '유니피벗 소개', href: '/about', description: '미션과 핵심 가치' },
       { label: '연혁', href: '/history', description: '유니피벗 히스토리' },
-      { label: '함께하는 사람들', href: '/people', description: '운영진 소개' },
     ],
   },
   {
@@ -49,7 +49,6 @@ const menuItems: MenuItem[] = [
     children: [
       { label: '공지사항', href: '/notice', description: '단체 소식' },
       { label: '활동 블로그', href: '/blog', description: '모임 기록, 후기' },
-      { label: '읽고 싶은 책', href: '/books', description: '함께 읽고 싶은 책 공유' },
       { label: '한반도이슈', href: '/korea-issue', description: 'AI 피봇이와 함께' },
     ],
   },
@@ -69,7 +68,11 @@ const menuItems: MenuItem[] = [
   },
 ]
 
-export function Navbar() {
+interface NavbarProps {
+  menuItems?: MenuItem[]
+}
+
+export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)

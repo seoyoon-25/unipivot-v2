@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { SocialIcons } from './SocialIcons'
+import { getFooterMenu } from '@/lib/navigation'
 
 const LAB_DOMAIN = process.env.NEXT_PUBLIC_LAB_DOMAIN || 'lab.bestcome.org'
 
@@ -14,13 +15,13 @@ type FooterSection = {
   links: FooterLink[]
 }
 
-const footerLinks: FooterSection[] = [
+// 기본 푸터 링크 (DB 조회 실패 시 폴백)
+const defaultFooterLinks: FooterSection[] = [
   {
     title: '소개',
     links: [
       { label: '유니피벗 소개', href: '/about' },
       { label: '연혁', href: '/history' },
-      { label: '함께하는 사람들', href: '/people' },
     ],
   },
   {
@@ -38,7 +39,6 @@ const footerLinks: FooterSection[] = [
     links: [
       { label: '공지사항', href: '/notice' },
       { label: '활동 블로그', href: '/blog' },
-      { label: '읽고 싶은 책', href: '/books' },
       { label: '한반도이슈', href: '/korea-issue' },
     ],
   },
@@ -62,7 +62,45 @@ const footerLinks: FooterSection[] = [
   },
 ]
 
-export function Footer() {
+// 네비게이션 메뉴를 푸터 형식으로 변환
+function convertMenuToFooterLinks(menuItems: Awaited<ReturnType<typeof getFooterMenu>>): FooterSection[] {
+  const footerSections: FooterSection[] = []
+
+  for (const item of menuItems) {
+    if ('children' in item && item.children) {
+      footerSections.push({
+        title: item.label,
+        links: item.children.map((child: { label: string; href: string; description?: string; external?: boolean }) => ({
+          label: child.label,
+          href: child.href,
+          external: child.external,
+        })),
+      })
+    }
+  }
+
+  // 단체 섹션 추가
+  footerSections.push({
+    title: '단체',
+    links: [
+      { label: '소개', href: '/about' },
+      { label: '개인정보처리방침', href: '/privacy' },
+      { label: '이용약관', href: '/terms' },
+    ],
+  })
+
+  return footerSections
+}
+
+export async function Footer() {
+  let footerLinks: FooterSection[] = defaultFooterLinks
+
+  try {
+    const menuItems = await getFooterMenu()
+    footerLinks = convertMenuToFooterLinks(menuItems)
+  } catch (error) {
+    console.error('Failed to fetch footer menu:', error)
+  }
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-16">

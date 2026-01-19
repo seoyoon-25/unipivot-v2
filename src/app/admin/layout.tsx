@@ -5,7 +5,8 @@ import Link from 'next/link'
 import {
   LayoutDashboard, Users, BookOpen, Briefcase, Wallet,
   FileText, Bot, Palette, Settings, Home,
-  ChevronDown, Bell, Handshake, FlaskConical, ClipboardList
+  ChevronDown, Bell, Handshake, FlaskConical, ClipboardList,
+  Layout, UserCircle
 } from 'lucide-react'
 import AdminMobileNav from './AdminMobileNav'
 import AdminHeader from './AdminHeader'
@@ -79,6 +80,8 @@ const sidebarItems = [
     children: [
       { label: '공지사항', href: '/admin/contents/notices' },
       { label: '블로그', href: '/admin/contents/blog' },
+      { label: '페이지 관리', href: '/admin/pages' },
+      { label: '함께하는 사람들', href: '/admin/team-members' },
     ],
   },
   {

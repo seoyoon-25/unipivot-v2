@@ -1,5 +1,5 @@
 import { Providers } from '@/components/Providers'
-import { Navbar } from '@/components/public/Navbar'
+import { NavbarWrapper } from '@/components/public/NavbarWrapper'
 import { Footer } from '@/components/public/Footer'
 import { ChatbotButton } from '@/components/public/ChatbotButton'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -28,7 +28,7 @@ export default function PublicLayout({
           </ErrorBoundary>
 
           <ErrorBoundary>
-            <Navbar />
+            <NavbarWrapper />
           </ErrorBoundary>
 
           <main className="flex-1 pt-16 lg:pt-20">

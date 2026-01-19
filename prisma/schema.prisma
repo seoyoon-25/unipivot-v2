@@ -2203,3 +2203,36 @@ model GlobalScript {
   @@index([scriptType])
   @@index([isActive])
 }
+
+// 페이지 관리
+model Page {
+  id                 String   @id @default(cuid())
+  slug               String   @unique
+  title              String
+  description        String?
+  isPublished        Boolean  @default(false)
+  unpublishedMessage String?  @default("페이지 준비 중입니다.")
+  showInMenu         Boolean  @default(true)
+  menuGroup          String?
+  menuOrder          Int      @default(0)
+  seoTitle           String?
+  seoDescription     String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+// 팀 멤버 (함께하는 사람들)
+model TeamMember {
+  id           String   @id @default(cuid())
+  name         String
+  role         String
+  position     String?
+  photo        String?
+  programs     String?
+  introduction String?
+  period       String?
+  displayOrder Int      @default(0)
+  isVisible    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
