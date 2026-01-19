@@ -39,7 +39,6 @@ const defaultMenuItems: MenuItem[] = [
     children: [
       { label: '전체 프로그램', href: '/programs', description: '모든 프로그램 보기' },
       { label: '독서모임', href: '/programs?type=BOOKCLUB', description: '남Book북한걸음' },
-      { label: '읽고 싶은 책', href: '/books', description: '함께 읽고 싶은 책 투표' },
       { label: '강연 및 세미나', href: '/programs?type=SEMINAR', description: '정기 교육 세미나' },
       { label: 'K-Move', href: '/programs?type=KMOVE', description: '현장 탐방' },
       { label: '토론회', href: '/programs?type=DEBATE', description: '주제별 토론회' },
@@ -50,6 +49,7 @@ const defaultMenuItems: MenuItem[] = [
     children: [
       { label: '공지사항', href: '/notice', description: '단체 소식' },
       { label: '활동 블로그', href: '/blog', description: '모임 기록, 후기' },
+      { label: '읽고 싶은 책', href: '/books', description: '함께 읽고 싶은 책 공유' },
       { label: '한반도이슈', href: '/korea-issue', description: 'AI 피봇이와 함께' },
     ],
   },
