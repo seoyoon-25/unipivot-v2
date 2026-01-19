@@ -4,6 +4,7 @@ import type { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 import KakaoProvider from 'next-auth/providers/kakao'
+import NaverProvider from 'next-auth/providers/naver'
 import { prisma } from './db'
 
 // OAuth providers - 환경변수가 설정된 경우에만 활성화
@@ -45,6 +46,7 @@ const getProviders = () => {
           image: user.image,
           role: user.role,
           grade: user.grade,
+          profileCompleted: user.profileCompleted,
         }
       },
     }),
@@ -66,6 +68,16 @@ const getProviders = () => {
       KakaoProvider({
         clientId: process.env.KAKAO_CLIENT_ID,
         clientSecret: process.env.KAKAO_CLIENT_SECRET,
+      })
+    )
+  }
+
+  // Naver OAuth - 환경변수가 모두 설정된 경우에만 활성화
+  if (process.env.NAVER_CLIENT_ID && process.env.NAVER_CLIENT_SECRET) {
+    providers.push(
+      NaverProvider({
+        clientId: process.env.NAVER_CLIENT_ID,
+        clientSecret: process.env.NAVER_CLIENT_SECRET,
       })
     )
   }
@@ -102,16 +114,18 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id
         token.role = (user as { role?: string }).role ?? 'USER'
         token.grade = (user as { grade?: number }).grade ?? 1
+        token.profileCompleted = (user as { profileCompleted?: boolean }).profileCompleted ?? true
       }
       // 세션 업데이트 시 등급 정보 갱신
       if (trigger === 'update') {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { role: true, grade: true }
+          select: { role: true, grade: true, profileCompleted: true }
         })
         if (dbUser) {
           token.role = dbUser.role
           token.grade = dbUser.grade
+          token.profileCompleted = dbUser.profileCompleted
         }
       }
       return token
@@ -121,6 +135,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as { id?: string }).id = token.id as string
         (session.user as { role?: string }).role = token.role as string
         (session.user as { grade?: number }).grade = token.grade as number
+        (session.user as { profileCompleted?: boolean }).profileCompleted = token.profileCompleted as boolean
       }
       return session
     },
@@ -131,14 +146,28 @@ export const authOptions: NextAuthOptions = {
         })
 
         if (!existingUser) {
-          await prisma.user.create({
+          // 소셜 로그인으로 신규 가입 시 profileCompleted = false
+          const newUser = await prisma.user.create({
             data: {
               email: user.email!,
               name: user.name,
               image: user.image,
+              profileCompleted: false,
             },
           })
+          // 신규 사용자의 profileCompleted 상태를 user 객체에 추가
+          ;(user as { profileCompleted?: boolean }).profileCompleted = false
+        } else {
+          // 기존 사용자의 profileCompleted 상태를 user 객체에 추가
+          ;(user as { profileCompleted?: boolean }).profileCompleted = existingUser.profileCompleted
         }
+      } else {
+        // 일반 로그인의 경우 DB에서 profileCompleted 상태 조회
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email! },
+          select: { profileCompleted: true }
+        })
+        ;(user as { profileCompleted?: boolean }).profileCompleted = dbUser?.profileCompleted ?? true
       }
       return true
     },

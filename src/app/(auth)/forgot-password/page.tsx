@@ -16,8 +16,18 @@ export default function ForgotPasswordPage() {
     setError('')
 
     try {
-      // TODO: Implement password reset API
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+        setError(data.error || '요청 처리 중 오류가 발생했습니다.')
+        return
+      }
+
       setIsSubmitted(true)
     } catch {
       setError('비밀번호 재설정 이메일 발송 중 오류가 발생했습니다.')

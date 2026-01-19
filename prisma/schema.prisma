@@ -31,6 +31,7 @@ model User {
   originDetails        String?
   grade                Int                   @default(1)
   gradeUpdatedAt       DateTime?
+  profileCompleted     Boolean               @default(false)
   accounts             Account[]
   activityLogs         ActivityLog[]
   bankAccounts         BankAccount[]
@@ -92,6 +93,16 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
 }
 
 model Program {

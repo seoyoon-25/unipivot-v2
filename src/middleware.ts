@@ -63,12 +63,35 @@ export async function middleware(req: NextRequest) {
   const isAdminRoute = pathname.startsWith('/admin')
 
   // 인증 페이지 (로그인한 사용자는 접근 불가)
-  const authRoutes = ['/login', '/register', '/forgot-password']
-  const isAuthRoute = authRoutes.includes(pathname)
+  const authRoutes = ['/login', '/register', '/forgot-password', '/reset-password']
+  const isAuthRoute = authRoutes.includes(pathname) || pathname.startsWith('/reset-password')
+
+  // 프로필 완성 페이지
+  const isCompleteProfilePage = pathname === '/complete-profile'
 
   // 로그인한 사용자가 인증 페이지에 접근하면 메인으로 리다이렉트
+  // 단, 프로필 미완성 사용자는 complete-profile로
   if (isAuthRoute && isLoggedIn) {
+    if (token?.profileCompleted === false) {
+      return NextResponse.redirect(new URL('/complete-profile', req.nextUrl))
+    }
     return NextResponse.redirect(new URL('/', req.nextUrl))
+  }
+
+  // 프로필 미완성 사용자가 다른 페이지에 접근하면 complete-profile로 리다이렉트
+  // (API 경로, 정적 파일, 인증 페이지, complete-profile 페이지 제외)
+  const isExemptFromProfileCheck =
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/images') ||
+    isAuthRoute ||
+    isCompleteProfilePage ||
+    pathname === '/' // 메인 페이지는 허용
+
+  if (isLoggedIn && token?.profileCompleted === false && !isExemptFromProfileCheck) {
+    const completeProfileUrl = new URL('/complete-profile', req.nextUrl)
+    completeProfileUrl.searchParams.set('callbackUrl', pathname)
+    return NextResponse.redirect(completeProfileUrl)
   }
 
   // 회원 전용 페이지에 비로그인 사용자가 접근하면 로그인으로 리다이렉트
@@ -99,6 +122,8 @@ export const config = {
     '/login',
     '/register',
     '/forgot-password',
+    '/reset-password',
+    '/complete-profile',
     '/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)' // 리서치랩 도메인용 catch-all
   ],
 }
