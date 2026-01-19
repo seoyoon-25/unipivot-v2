@@ -59,7 +59,7 @@ export async function GET(
 
     // 각 신청자의 반환 정보 계산
     const refundList = program.applications.map((app) => {
-      const participant = participantMap.get(app.userId)
+      const participant = app.userId ? participantMap.get(app.userId) : undefined
       const depositSetting = program.depositSetting
 
       const totalSessions = depositSetting?.totalSessions || 0
@@ -233,7 +233,7 @@ export async function POST(
           })
 
           // 알림 대상 추가
-          if (app.user.phone) {
+          if (app.user?.phone) {
             notificationRecipients.push({
               userId: app.user.id,
               name: app.user.name || '회원',

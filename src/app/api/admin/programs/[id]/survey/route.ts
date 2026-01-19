@@ -115,11 +115,11 @@ export async function POST(
     let notificationResult = null
     if (sendNow) {
       const recipients = program.applications
-        .filter((app) => app.user.phone)
+        .filter((app) => app.user?.phone)
         .map((app) => ({
-          userId: app.user.id,
-          name: app.user.name || '회원',
-          phone: app.user.phone!,
+          userId: app.user!.id,
+          name: app.user!.name || '회원',
+          phone: app.user!.phone!,
         }))
 
       if (recipients.length > 0) {
@@ -199,11 +199,11 @@ export async function PUT(
 
       // 알림톡 발송
       const recipients = program.applications
-        .filter((app) => app.user.phone)
+        .filter((app) => app.user?.phone)
         .map((app) => ({
-          userId: app.user.id,
-          name: app.user.name || '회원',
-          phone: app.user.phone!,
+          userId: app.user!.id,
+          name: app.user!.name || '회원',
+          phone: app.user!.phone!,
         }))
 
       let notificationResult = null
@@ -247,12 +247,12 @@ export async function PUT(
       const nonRespondents = program.applications
         .filter(
           (app) =>
-            app.user.phone && !respondedUserIds.includes(app.user.id)
+            app.user?.phone && !respondedUserIds.includes(app.user.id)
         )
         .map((app) => ({
-          userId: app.user.id,
-          name: app.user.name || '회원',
-          phone: app.user.phone!,
+          userId: app.user!.id,
+          name: app.user!.name || '회원',
+          phone: app.user!.phone!,
         }))
 
       let notificationResult = null

@@ -104,7 +104,7 @@ export async function PUT(
       })
 
       // If deposit marked as paid, update participant if exists
-      if (body.depositPaid && body.depositAmount) {
+      if (body.depositPaid && body.depositAmount && application.userId) {
         await tx.programParticipant.updateMany({
           where: {
             programId,

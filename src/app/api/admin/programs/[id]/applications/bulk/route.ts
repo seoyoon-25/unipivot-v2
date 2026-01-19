@@ -53,11 +53,13 @@ export async function PUT(
       // If accepted, create participants
       if (['ACCEPTED', 'ADDITIONAL'].includes(status)) {
         const applications = await tx.programApplication.findMany({
-          where: { id: { in: ids }, programId },
+          where: { id: { in: ids }, programId, userId: { not: null } },
           select: { userId: true, depositAmount: true },
         })
 
         for (const app of applications) {
+          if (!app.userId) continue
+
           // Check if already a participant
           const existing = await tx.programParticipant.findUnique({
             where: {
@@ -111,7 +113,7 @@ export async function PUT(
             break
         }
 
-        if (notificationTitle) {
+        if (notificationTitle && app.userId) {
           await tx.notification.create({
             data: {
               userId: app.userId,

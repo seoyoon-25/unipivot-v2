@@ -82,9 +82,9 @@ export async function GET(
 
         return [
           index + 1,
-          app.user.name || '',
-          app.user.email || '',
-          app.user.phone || '',
+          app.user?.name || '',
+          app.user?.email || '',
+          app.user?.phone || '',
           refundAmount,
           bankName,
           accountNumber,

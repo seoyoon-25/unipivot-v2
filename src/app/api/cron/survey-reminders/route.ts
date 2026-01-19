@@ -129,12 +129,12 @@ export async function POST(request: NextRequest) {
 
       // 전화번호가 있는 수신자만 필터링
       const recipients = pendingApplications
-        .filter((app) => app.user.phone)
+        .filter((app) => app.user?.phone)
         .map((app) => ({
           applicationId: app.id,
-          userId: app.user.id,
-          name: app.user.name || '회원',
-          phone: app.user.phone!,
+          userId: app.user!.id,
+          name: app.user!.name || '회원',
+          phone: app.user!.phone!,
         }))
 
       const skipped = pendingApplications.length - recipients.length

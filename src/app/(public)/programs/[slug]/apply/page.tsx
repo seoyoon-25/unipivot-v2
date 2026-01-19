@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { ApplicationForm } from './ApplicationForm'
 import { getProgramStatus } from '@/lib/program/status-calculator'
+import Link from 'next/link'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -26,11 +27,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
+function getStatusLabel(status: string) {
+  const labels: Record<string, string> = {
+    PENDING: '검토 중',
+    APPROVED: '승인됨',
+    REJECTED: '거절됨',
+    WAITLIST: '대기 중',
+    CANCELLED: '취소됨',
+  }
+  return labels[status] || status
+}
+
 export default async function ApplyPage({ params }: PageProps) {
   const session = await getServerSession(authOptions)
   const { slug } = await params
 
-  // Get program
+  // Get program with application settings
   const program = await prisma.program.findUnique({
     where: { slug },
     select: {
@@ -47,6 +59,24 @@ export default async function ApplyPage({ params }: PageProps) {
       endDate: true,
       capacity: true,
       applicationCount: true,
+      applicationOpen: true,
+      applicationStartAt: true,
+      applicationEndAt: true,
+      maxParticipants: true,
+      depositAmountSetting: true,
+      requireMotivation: true,
+      requireSelfIntro: true,
+      customQuestions: true,
+      autoApproveVVIP: true,
+      autoApproveVIP: true,
+      autoRejectBlocked: true,
+      _count: {
+        select: {
+          applications: {
+            where: { status: 'APPROVED' }
+          }
+        }
+      }
     },
   })
 
@@ -54,7 +84,7 @@ export default async function ApplyPage({ params }: PageProps) {
     notFound()
   }
 
-  // Check if program is recruiting
+  // Check if program is recruiting or applicationOpen
   const programStatus = getProgramStatus({
     status: program.status,
     recruitStartDate: program.recruitStartDate,
@@ -63,64 +93,126 @@ export default async function ApplyPage({ params }: PageProps) {
     endDate: program.endDate,
   })
 
-  if (programStatus !== 'RECRUITING') {
-    redirect(`/programs/${slug}`)
+  // Check if application is open
+  const isApplicationOpen = program.applicationOpen || programStatus === 'RECRUITING'
+
+  if (!isApplicationOpen) {
+    return (
+      <main className="min-h-screen bg-gray-50 py-12">
+        <div className="container mx-auto px-4 max-w-2xl">
+          <div className="bg-white rounded-xl p-8 text-center">
+            <p className="text-gray-500">현재 신청을 받고 있지 않습니다.</p>
+            <Link
+              href={`/programs/${slug}`}
+              className="mt-4 inline-block text-orange-500 hover:underline"
+            >
+              프로그램 페이지로 돌아가기
+            </Link>
+          </div>
+        </div>
+      </main>
+    )
   }
 
-  // Check if user has already applied
+  // Get user data and member data
+  let userData = null
+  let member = null
+  let existingApplication = null
+
   if (session?.user?.id) {
-    const existingApplication = await prisma.programApplication.findUnique({
-      where: {
-        programId_userId: {
-          programId: program.id,
-          userId: session.user.id,
-        },
+    // Get user info
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        origin: true,
+        gender: true,
+        birthYear: true,
+        organization: true,
+        residenceRegion: true,
+        residenceCity: true,
+        birthRegion: true,
+        birthCity: true,
+      },
+    })
+    userData = user
+
+    // Get linked member data
+    member = await prisma.member.findUnique({
+      where: { userId: session.user.id },
+      include: {
+        stats: true,
       },
     })
 
-    if (existingApplication) {
-      redirect(`/programs/${slug}`)
-    }
+    // Check for existing application
+    existingApplication = await prisma.programApplication.findFirst({
+      where: {
+        programId: program.id,
+        OR: [
+          { userId: session.user.id },
+          ...(member ? [{ memberId: member.id }] : []),
+        ],
+      },
+    })
   }
 
-  // Get user data for auto-fill
-  let userData = null
+  // Already applied
+  if (existingApplication) {
+    return (
+      <main className="min-h-screen bg-gray-50 py-12">
+        <div className="container mx-auto px-4 max-w-2xl">
+          <div className="bg-white rounded-xl p-8 text-center">
+            <h2 className="text-xl font-bold mb-4">이미 신청하셨습니다</h2>
+            <p className="text-gray-500 mb-2">
+              신청 상태: <span className="font-medium">{getStatusLabel(existingApplication.status)}</span>
+            </p>
+            <Link
+              href="/mypage/applications"
+              className="text-orange-500 hover:underline"
+            >
+              마이페이지에서 확인하기
+            </Link>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  // Get previous application for auto-fill if no member
   let previousApplication = null
-  if (session?.user?.id) {
-    const [user, prevApp] = await Promise.all([
-      prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
-        },
-      }),
-      // Get previous application for auto-fill hometown/residence
-      prisma.programApplication.findFirst({
-        where: { userId: session.user.id },
-        orderBy: { appliedAt: 'desc' },
-        select: {
-          hometown: true,
-          residence: true,
-        },
-      }),
-    ])
-    userData = user
-    previousApplication = prevApp
+  if (!member && session?.user?.id) {
+    previousApplication = await prisma.programApplication.findFirst({
+      where: { userId: session.user.id },
+      orderBy: { appliedAt: 'desc' },
+      select: {
+        hometown: true,
+        residence: true,
+        origin: true,
+        organization: true,
+      },
+    })
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-2xl mx-auto px-4">
+    <main className="min-h-screen bg-gray-50 py-12">
+      <div className="container mx-auto px-4 max-w-2xl">
         <ApplicationForm
-          program={program}
+          program={{
+            ...program,
+            depositAmount: program.depositAmountSetting,
+            currentCount: program._count.applications,
+          }}
+          user={session?.user}
           userData={userData}
+          member={member}
           previousApplication={previousApplication}
           isLoggedIn={!!session}
         />
       </div>
-    </div>
+    </main>
   )
 }
