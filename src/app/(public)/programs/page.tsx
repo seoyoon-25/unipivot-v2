@@ -1,48 +1,47 @@
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
 
-import { Metadata } from 'next'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/db'
-import { ProgramCard } from '@/components/public/ProgramCard'
-import { ProgramFilters } from './ProgramFilters'
-import Link from 'next/link'
-import { Plus } from 'lucide-react'
+import { Metadata } from 'next';
+import { Suspense } from 'react';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/db';
+import { getFilteredProgramsByStatus, ProgramType } from '@/lib/actions/programs';
+import ProgramTypeFilters from './ProgramTypeFilters';
+import ProgramSection from './ProgramSection';
+import CompletedProgramsSection from './CompletedProgramsSection';
+import Link from 'next/link';
+import { Plus } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: '프로그램 | 유니피벗',
-  description: '유니피벗에서 진행하는 다양한 프로그램을 만나보세요.',
-}
-
-interface PageProps {
-  searchParams: Promise<{
-    status?: string
-    type?: string
-    mode?: string
-  }>
-}
+  title: '전체 프로그램 | 유니피벗',
+  description: '유니피벗의 다양한 프로그램을 확인하고 참여해보세요.',
+};
 
 // Default header content
 const defaultHeader = {
   hero: {
     badge: 'Programs',
-    title: '프로그램',
-    subtitle: '유니피벗과 함께하는 다양한 프로그램을 만나보세요',
+    title: '전체 프로그램',
+    subtitle: '유니피벗의 다양한 프로그램을 확인하고 참여해보세요',
   },
-}
+};
 
 async function getHeaderContent() {
   try {
     const section = await prisma.siteSection.findUnique({
       where: { sectionKey: 'page.programs' },
-    })
+    });
     if (section?.content) {
-      return section.content as typeof defaultHeader
+      return section.content as typeof defaultHeader;
     }
   } catch (error) {
-    console.error('Failed to load programs header:', error)
+    console.error('Failed to load programs header:', error);
   }
-  return defaultHeader
+  return defaultHeader;
+}
+
+interface PageProps {
+  searchParams: Promise<{ type?: string }>;
 }
 
 export default async function ProgramsPage({ searchParams }: PageProps) {
@@ -50,63 +49,19 @@ export default async function ProgramsPage({ searchParams }: PageProps) {
     getServerSession(authOptions),
     getHeaderContent(),
     searchParams,
-  ])
+  ]);
 
-  const statusFilter = params.status || 'all'
-  const typeFilter = params.type || 'all'
-  const modeFilter = params.mode || 'all'
+  const type = (params.type as ProgramType) || 'ALL';
+  const { recruiting, ongoing, completed } = await getFilteredProgramsByStatus(type);
 
-  // Build where clause
-  const where: any = {
-    status: { not: 'DRAFT' },
-  }
-
-  if (statusFilter !== 'all') {
-    where.status = statusFilter
-  }
-
-  if (typeFilter !== 'all') {
-    where.type = typeFilter
-  }
-
-  if (modeFilter === 'online') {
-    where.isOnline = true
-  } else if (modeFilter === 'offline') {
-    where.isOnline = false
-  }
-
-  // Get programs
-  const programs = await prisma.program.findMany({
-    where,
-    orderBy: [
-      { displayOrder: 'desc' },
-      { status: 'asc' },
-      { createdAt: 'desc' },
-    ],
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      type: true,
-      description: true,
-      image: true,
-      thumbnailSquare: true,
-      isOnline: true,
-      feeType: true,
-      feeAmount: true,
-      status: true,
-      recruitStartDate: true,
-      recruitEndDate: true,
-      startDate: true,
-      endDate: true,
-      likeCount: true,
-      applicationCount: true,
-    },
-  })
+  // 완료는 처음 6개만
+  const initialCompleted = completed.slice(0, 6);
+  const hasMoreCompleted = completed.length > 6;
+  const remainingCount = Math.max(0, completed.length - 6);
 
   // Get user's likes and applications if logged in
-  let userLikes: Set<string> = new Set()
-  let userApplications: Set<string> = new Set()
+  let userLikes: Set<string> = new Set();
+  let userApplications: Set<string> = new Set();
 
   if (session?.user?.id) {
     const [likes, applications] = await Promise.all([
@@ -118,13 +73,13 @@ export default async function ProgramsPage({ searchParams }: PageProps) {
         where: { userId: session.user.id },
         select: { programId: true },
       }),
-    ])
+    ]);
 
-    userLikes = new Set(likes.map((l) => l.programId))
-    userApplications = new Set(applications.map((a) => a.programId))
+    userLikes = new Set(likes.map((l) => l.programId));
+    userApplications = new Set(applications.map((a) => a.programId));
   }
 
-  const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN'
+  const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN';
 
   return (
     <>
@@ -156,54 +111,45 @@ export default async function ProgramsPage({ searchParams }: PageProps) {
       {/* Content Section */}
       <section className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
-          {/* Filters */}
-          <ProgramFilters
-            currentStatus={statusFilter}
-            currentType={typeFilter}
-            currentMode={modeFilter}
+          {/* 필터 */}
+          <ProgramTypeFilters currentType={type} />
+
+          {/* 모집중 */}
+          <ProgramSection
+            title="모집중"
+            emoji="🔥"
+            programs={recruiting}
+            emptyMessage="현재 모집중인 프로그램이 없습니다."
+            showAll
+            userLikes={userLikes}
+            userApplications={userApplications}
           />
 
-          {/* Programs Grid */}
-          {programs.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {programs.map((program) => (
-                <ProgramCard
-                  key={program.id}
-                  id={program.id}
-                  title={program.title}
-                  slug={program.slug}
-                  type={program.type}
-                  description={program.description}
-                  image={program.image}
-                  thumbnailSquare={program.thumbnailSquare}
-                  isOnline={program.isOnline}
-                  feeType={program.feeType}
-                  feeAmount={program.feeAmount}
-                  status={program.status}
-                  recruitStartDate={program.recruitStartDate}
-                  recruitEndDate={program.recruitEndDate}
-                  startDate={program.startDate}
-                  endDate={program.endDate}
-                  likeCount={program.likeCount}
-                  applicationCount={program.applicationCount}
-                  isLiked={userLikes.has(program.id)}
-                  hasApplied={userApplications.has(program.id)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20">
-              <div className="text-gray-400 text-6xl mb-4">📚</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                프로그램이 없습니다
-              </h3>
-              <p className="text-gray-500">
-                조건에 맞는 프로그램이 없습니다. 다른 필터를 선택해 보세요.
-              </p>
-            </div>
-          )}
+          {/* 진행중 */}
+          <ProgramSection
+            title="진행중"
+            emoji="🔄"
+            programs={ongoing}
+            emptyMessage="현재 진행중인 프로그램이 없습니다."
+            showAll
+            userLikes={userLikes}
+            userApplications={userApplications}
+          />
+
+          {/* 완료 */}
+          <Suspense fallback={<div className="animate-pulse bg-gray-200 h-96 rounded-xl" />}>
+            <CompletedProgramsSection
+              initialPrograms={initialCompleted}
+              totalCount={completed.length}
+              hasMore={hasMoreCompleted}
+              remainingCount={remainingCount}
+              type={type}
+              userLikes={userLikes}
+              userApplications={userApplications}
+            />
+          </Suspense>
         </div>
       </section>
     </>
-  )
+  );
 }
