@@ -32,6 +32,31 @@ model User {
   grade                Int                   @default(1)
   gradeUpdatedAt       DateTime?
   profileCompleted     Boolean               @default(false)
+
+  // 활동명
+  displayName          String?
+
+  // 출생지 (상세)
+  birthRegion          String?
+  birthCity            String?
+
+  // 거주지
+  residenceRegion      String?
+  residenceCity        String?
+
+  // 추가 정보
+  gender               String?
+  organization         String?
+  referralSource       String?
+
+  // 약관 동의
+  termsAgreed          Boolean               @default(false)
+  privacyAgreed        Boolean               @default(false)
+  marketingAgreed      Boolean               @default(false)
+  termsAgreedAt        DateTime?
+  privacyAgreedAt      DateTime?
+  marketingAgreedAt    DateTime?
+
   accounts             Account[]
   activityLogs         ActivityLog[]
   bankAccounts         BankAccount[]
