@@ -1,30 +1,55 @@
 import Link from 'next/link'
 import { SocialIcons } from './SocialIcons'
 
-const footerLinks = [
+const LAB_DOMAIN = process.env.NEXT_PUBLIC_LAB_DOMAIN || 'lab.bestcome.org'
+
+type FooterLink = {
+  label: string
+  href: string
+  external?: boolean
+}
+
+type FooterSection = {
+  title: string
+  links: FooterLink[]
+}
+
+const footerLinks: FooterSection[] = [
+  {
+    title: '소개',
+    links: [
+      { label: '유니피벗 소개', href: '/about' },
+      { label: '연혁', href: '/history' },
+      { label: '함께하는 사람들', href: '/people' },
+    ],
+  },
   {
     title: '프로그램',
     links: [
-      { label: '독서모임', href: '/bookclub' },
-      { label: '세미나', href: '/seminar' },
-      { label: 'K-Move', href: '/kmove' },
+      { label: '전체 프로그램', href: '/programs' },
+      { label: '독서모임', href: '/programs?type=BOOKCLUB' },
+      { label: '강연 및 세미나', href: '/programs?type=SEMINAR' },
+      { label: 'K-Move', href: '/programs?type=KMOVE' },
+      { label: '토론회', href: '/programs?type=DEBATE' },
     ],
   },
   {
     title: '소통마당',
     links: [
-      { label: '제안하기', href: '/suggest' },
       { label: '공지사항', href: '/notice' },
+      { label: '활동 블로그', href: '/blog' },
+      { label: '읽고 싶은 책', href: '/books' },
       { label: '한반도이슈', href: '/korea-issue' },
     ],
   },
   {
-    title: '연대하기',
+    title: '함께하기',
     links: [
-      { label: '강연요청', href: '/request' },
-      { label: '전문가 풀', href: '/experts' },
-      { label: '재능나눔', href: '/talent' },
       { label: '후원하기', href: '/donate' },
+      { label: '프로그램 제안', href: '/suggest' },
+      { label: '협조 요청', href: '/cooperation' },
+      { label: '재능나눔', href: '/talent' },
+      { label: '리서치랩', href: `https://${LAB_DOMAIN}`, external: true },
     ],
   },
   {
@@ -64,12 +89,26 @@ export function Footer() {
               <ul className="space-y-2">
                 {section.links.map((link) => (
                   <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-gray-400 hover:text-primary transition-colors text-sm"
-                    >
-                      {link.label}
-                    </Link>
+                    {link.external ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-400 hover:text-primary transition-colors text-sm inline-flex items-center gap-1"
+                      >
+                        {link.label}
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="text-gray-400 hover:text-primary transition-colors text-sm"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

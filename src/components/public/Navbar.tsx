@@ -20,6 +20,7 @@ type MenuItem = {
   label: string
   href?: string
   children?: SubMenuItem[]
+  external?: boolean
 }
 
 const LAB_DOMAIN = process.env.NEXT_PUBLIC_LAB_DOMAIN || 'lab.bestcome.org'
@@ -28,36 +29,43 @@ const menuItems: MenuItem[] = [
   {
     label: '소개',
     children: [
-      { label: '단체 소개', href: '/p/about-us', description: '미션과 핵심 가치' },
-      { label: '연혁', href: '/p/history', description: '유니피벗 히스토리' },
+      { label: '유니피벗 소개', href: '/about', description: '미션과 핵심 가치' },
+      { label: '연혁', href: '/history', description: '유니피벗 히스토리' },
+      { label: '함께하는 사람들', href: '/people', description: '운영진 소개' },
     ],
   },
   {
     label: '프로그램',
     children: [
+      { label: '전체 프로그램', href: '/programs', description: '모든 프로그램 보기' },
       { label: '독서모임', href: '/programs?type=BOOKCLUB', description: '남Book북한걸음' },
       { label: '강연 및 세미나', href: '/programs?type=SEMINAR', description: '정기 교육 세미나' },
-      { label: 'K-move', href: '/programs?type=KMOVE', description: 'K-move 프로그램' },
+      { label: 'K-Move', href: '/programs?type=KMOVE', description: '현장 탐방' },
       { label: '토론회', href: '/programs?type=DEBATE', description: '주제별 토론회' },
     ],
   },
   {
     label: '소통마당',
     children: [
-      { label: '블로그', href: '/blog', description: '이야기와 인사이트' },
-      { label: '제안하기', href: '/suggest', description: '새로운 아이디어' },
       { label: '공지사항', href: '/notice', description: '단체 소식' },
+      { label: '활동 블로그', href: '/blog', description: '모임 기록, 후기' },
+      { label: '읽고 싶은 책', href: '/books', description: '함께 읽고 싶은 책 공유' },
       { label: '한반도이슈', href: '/korea-issue', description: 'AI 피봇이와 함께' },
     ],
   },
   {
-    label: '연대하기',
+    label: '함께하기',
     children: [
-      { label: '협조요청', href: '/cooperation', description: '자문/강사/설문 요청' },
-      { label: '리서치랩', href: `https://${LAB_DOMAIN}`, description: '연구 매칭 플랫폼', external: true },
-      { label: '재능나눔', href: '/talent', description: '재능 기부' },
       { label: '후원하기', href: '/donate', description: '유니피벗 후원' },
+      { label: '프로그램 제안', href: '/suggest', description: '새로운 아이디어' },
+      { label: '협조 요청', href: '/cooperation', description: '자문/강사/설문 요청' },
+      { label: '재능나눔', href: '/talent', description: '재능 기부' },
     ],
+  },
+  {
+    label: '리서치랩',
+    href: `https://${LAB_DOMAIN}`,
+    external: true,
   },
 ]
 
@@ -166,13 +174,20 @@ export function Navbar() {
                   </div>
                 </div>
               ) : (
-                <Link
+                <a
                   key={item.label}
                   href={item.href!}
-                  className="inline-flex items-center justify-center h-10 px-6 py-3 text-sm font-semibold text-white bg-white/10 border border-white/20 rounded-xl transition-all duration-200 hover:bg-white/20"
+                  target={item.external ? '_blank' : undefined}
+                  rel={item.external ? 'noopener noreferrer' : undefined}
+                  className="inline-flex items-center justify-center h-10 px-6 py-3 text-sm font-semibold text-white bg-white/10 border border-white/20 rounded-xl transition-all duration-200 hover:bg-white/20 gap-1"
                 >
                   {item.label}
-                </Link>
+                  {item.external && (
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  )}
+                </a>
               )
             )}
           </div>
@@ -293,14 +308,21 @@ export function Navbar() {
                   ))}
                 </div>
               ) : (
-                <Link
+                <a
                   key={item.label}
                   href={item.href!}
-                  className="block py-2 text-gray-700 hover:text-orange-600 font-medium"
+                  target={item.external ? '_blank' : undefined}
+                  rel={item.external ? 'noopener noreferrer' : undefined}
+                  className="flex items-center gap-1 py-2 text-gray-700 hover:text-orange-600 font-medium"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.label}
-                </Link>
+                  {item.external && (
+                    <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  )}
+                </a>
               )
             )}
             <div className="mt-4 pt-4 border-t border-gray-100">

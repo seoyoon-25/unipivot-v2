@@ -17,6 +17,20 @@ const nextConfig = {
   generateBuildId: async () => {
     return 'build-' + Date.now()
   },
+  async redirects() {
+    return [
+      {
+        source: '/p/about-us',
+        destination: '/about',
+        permanent: true,
+      },
+      {
+        source: '/p/history',
+        destination: '/history',
+        permanent: true,
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig
