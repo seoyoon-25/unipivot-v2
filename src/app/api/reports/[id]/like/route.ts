@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import prisma from '@/lib/db'
+import { prisma } from '@/lib/db'
 
-// POST /api/reports/[id]/like - 좋아요 추가
+// POST /api/reports/[id]/like - 좋아요 토글 (BookReport용)
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -14,75 +14,112 @@ export async function POST(
       return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 })
     }
 
-    const { id } = await params
+    const { id: reportId } = await params
 
-    // Check if already liked
-    const existing = await prisma.reportLike.findUnique({
-      where: {
-        reportId_userId: {
-          reportId: id,
-          userId: session.user.id
-        }
-      }
+    // 현재 사용자의 Member 찾기
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: { member: true }
     })
 
-    if (existing) {
-      return NextResponse.json({ error: '이미 좋아요를 누르셨습니다.' }, { status: 400 })
+    if (!user?.member) {
+      return NextResponse.json({ error: '회원 정보를 찾을 수 없습니다.' }, { status: 400 })
     }
 
-    // Create like
-    await prisma.reportLike.create({
-      data: {
-        reportId: id,
-        userId: session.user.id
+    const memberId = user.member.id
+
+    // BookReport 존재 확인
+    const report = await prisma.bookReport.findUnique({
+      where: { id: reportId }
+    })
+
+    if (report) {
+      // BookReport에 대한 좋아요 처리
+      const existingLike = await prisma.bookReportLike.findUnique({
+        where: {
+          reportId_memberId: {
+            reportId,
+            memberId
+          }
+        }
+      })
+
+      if (existingLike) {
+        // 좋아요 취소
+        await prisma.bookReportLike.delete({
+          where: { id: existingLike.id }
+        })
+
+        await prisma.bookReport.update({
+          where: { id: reportId },
+          data: { likeCount: { decrement: 1 } }
+        })
+
+        return NextResponse.json({ liked: false, success: true })
+      } else {
+        // 좋아요 추가
+        await prisma.bookReportLike.create({
+          data: {
+            reportId,
+            memberId
+          }
+        })
+
+        await prisma.bookReport.update({
+          where: { id: reportId },
+          data: { likeCount: { increment: 1 } }
+        })
+
+        return NextResponse.json({ liked: true, success: true })
       }
-    })
-
-    // Update count
-    await prisma.programReport.update({
-      where: { id },
-      data: { likeCount: { increment: 1 } }
-    })
-
-    return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('Error liking report:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
-}
-
-// DELETE /api/reports/[id]/like - 좋아요 취소
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 })
     }
 
-    const { id } = await params
+    // ProgramReport 확인 (기존 호환성)
+    const programReport = await prisma.programReport.findUnique({
+      where: { id: reportId }
+    })
 
-    // Delete like
-    await prisma.reportLike.delete({
-      where: {
-        reportId_userId: {
-          reportId: id,
-          userId: session.user.id
+    if (programReport) {
+      const existing = await prisma.reportLike.findUnique({
+        where: {
+          reportId_userId: {
+            reportId,
+            userId: session.user.id
+          }
         }
+      })
+
+      if (existing) {
+        await prisma.reportLike.delete({
+          where: { id: existing.id }
+        })
+
+        await prisma.programReport.update({
+          where: { id: reportId },
+          data: { likeCount: { decrement: 1 } }
+        })
+
+        return NextResponse.json({ liked: false, success: true })
+      } else {
+        await prisma.reportLike.create({
+          data: {
+            reportId,
+            userId: session.user.id
+          }
+        })
+
+        await prisma.programReport.update({
+          where: { id: reportId },
+          data: { likeCount: { increment: 1 } }
+        })
+
+        return NextResponse.json({ liked: true, success: true })
       }
-    })
+    }
 
-    // Update count
-    await prisma.programReport.update({
-      where: { id },
-      data: { likeCount: { decrement: 1 } }
-    })
-
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ error: '독후감을 찾을 수 없습니다.' }, { status: 404 })
   } catch (error) {
-    console.error('Error unliking report:', error)
+    console.error('Error toggling like:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

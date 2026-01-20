@@ -65,7 +65,7 @@ export default async function ReportsPage() {
                     )}
                   </div>
                   <p className="text-gray-500 text-sm mb-2">
-                    {report.book.title} · {report.book.author}
+                    {report.book?.title || report.bookTitle} · {report.book?.author || report.bookAuthor || '작자 미상'}
                   </p>
                   <p className="text-gray-600 text-sm line-clamp-2 mb-2">
                     {report.content}

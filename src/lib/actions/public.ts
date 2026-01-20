@@ -164,7 +164,7 @@ export async function getNoticeById(id: string) {
 // =============================================
 
 export async function getUserProfile(userId: string) {
-  return prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
       registrations: {
@@ -176,13 +176,27 @@ export async function getUserProfile(userId: string) {
         orderBy: { createdAt: 'desc' },
         take: 10
       },
-      bookReports: {
-        include: { book: true },
-        orderBy: { createdAt: 'desc' },
-        take: 10
+      // Member 연결된 경우 독후감도 가져오기
+      member: {
+        include: {
+          bookReports: {
+            include: { book: true },
+            orderBy: { createdAt: 'desc' },
+            take: 10
+          }
+        }
       }
     }
   })
+
+  // bookReports를 상위 레벨로 펼쳐서 기존 코드와 호환성 유지
+  if (user) {
+    return {
+      ...user,
+      bookReports: user.member?.bookReports || []
+    }
+  }
+  return user
 }
 
 export async function getUserPrograms(userId: string) {
@@ -394,8 +408,17 @@ export async function getPointHistory(params?: { limit?: number }) {
 }
 
 // =============================================
-// Book Reports
+// Book Reports (New model: Member-based with authorId)
 // =============================================
+
+// 현재 로그인한 사용자의 Member 찾기
+async function getUserMember(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: { member: true }
+  })
+  return user?.member
+}
 
 export async function getUserBookReports() {
   const session = await getServerSession(authOptions)
@@ -404,31 +427,56 @@ export async function getUserBookReports() {
     return []
   }
 
-  return prisma.bookReport.findMany({
-    where: { userId: session.user.id },
-    include: { book: true },
+  // Member 연결 확인
+  const member = await getUserMember(session.user.id)
+  if (!member) {
+    return []
+  }
+
+  const reports = await prisma.bookReport.findMany({
+    where: { authorId: member.id },
+    include: { book: true, author: true },
     orderBy: { createdAt: 'desc' }
   })
+
+  // 기존 코드와의 호환성을 위해 isPublic 필드 추가
+  return reports.map(r => ({
+    ...r,
+    isPublic: r.visibility === 'PUBLIC'
+  }))
 }
 
 export async function getBookReport(id: string) {
-  return prisma.bookReport.findUnique({
+  const report = await prisma.bookReport.findUnique({
     where: { id },
-    include: { book: true, user: true }
+    include: { book: true, author: true }
   })
+
+  if (!report) return null
+
+  // 기존 코드와의 호환성을 위해 필드 추가
+  return {
+    ...report,
+    isPublic: report.visibility === 'PUBLIC'
+  }
 }
 
 export async function getBooks() {
-  return prisma.book.findMany({
+  // ReadBook 테이블에서 조회 (우리가 읽은 책)
+  return prisma.readBook.findMany({
     orderBy: { title: 'asc' }
   })
 }
 
 export async function createBookReport(data: {
-  bookId: string
+  bookId?: string
+  bookTitle: string
+  bookAuthor?: string
   title: string
   content: string
   isPublic?: boolean
+  programId?: string
+  sessionId?: string
 }) {
   const session = await getServerSession(authOptions)
 
@@ -436,21 +484,59 @@ export async function createBookReport(data: {
     throw new Error('로그인이 필요합니다.')
   }
 
+  // Member 연결 확인 - 없으면 생성
+  let member = await getUserMember(session.user.id)
+  if (!member) {
+    // 자동으로 Member 생성 (웹사이트 회원용)
+    const user = await prisma.user.findUnique({ where: { id: session.user.id } })
+    if (!user) throw new Error('사용자를 찾을 수 없습니다.')
+
+    // generateMemberCode import 필요
+    const { generateMemberCode } = await import('@/lib/services/member-matching')
+    const memberCode = await generateMemberCode(user.birthYear || null, new Date())
+
+    member = await prisma.member.create({
+      data: {
+        memberCode,
+        name: user.name || '익명',
+        email: user.email,
+        phone: user.phone,
+        birthYear: user.birthYear,
+        origin: user.origin,
+        grade: 'NEW',
+        status: 'ACTIVE',
+        userId: user.id,
+      }
+    })
+
+    await prisma.memberStats.create({
+      data: { memberId: member.id }
+    })
+  }
+
   const report = await prisma.bookReport.create({
     data: {
-      userId: session.user.id,
-      bookId: data.bookId,
+      authorId: member.id,
+      bookId: data.bookId || null,
+      bookTitle: data.bookTitle,
+      bookAuthor: data.bookAuthor || null,
       title: data.title,
       content: data.content,
-      isPublic: data.isPublic || false
+      visibility: data.isPublic ? 'PUBLIC' : 'PRIVATE',
+      status: 'DRAFT',
+      programId: data.programId || null,
+      sessionId: data.sessionId || null,
     },
     include: { book: true }
   })
 
   // 포인트 적립 (200P)
-  await addPoints(session.user.id, 200, 'REPORT', `독서 기록 작성 - ${report.book.title}`)
+  await addPoints(session.user.id, 200, 'REPORT', `독서 기록 작성 - ${data.bookTitle}`)
 
-  return report
+  return {
+    ...report,
+    isPublic: report.visibility === 'PUBLIC'
+  }
 }
 
 export async function updateBookReport(
@@ -463,15 +549,28 @@ export async function updateBookReport(
     throw new Error('로그인이 필요합니다.')
   }
 
+  // Member 연결 확인
+  const member = await getUserMember(session.user.id)
+  if (!member) {
+    throw new Error('Member 정보를 찾을 수 없습니다.')
+  }
+
   const report = await prisma.bookReport.findUnique({ where: { id } })
 
-  if (!report || report.userId !== session.user.id) {
+  if (!report || report.authorId !== member.id) {
     throw new Error('수정 권한이 없습니다.')
+  }
+
+  const updateData: any = {}
+  if (data.title) updateData.title = data.title
+  if (data.content) updateData.content = data.content
+  if (data.isPublic !== undefined) {
+    updateData.visibility = data.isPublic ? 'PUBLIC' : 'PRIVATE'
   }
 
   return prisma.bookReport.update({
     where: { id },
-    data
+    data: updateData
   })
 }
 
@@ -482,9 +581,15 @@ export async function deleteBookReport(id: string) {
     throw new Error('로그인이 필요합니다.')
   }
 
+  // Member 연결 확인
+  const member = await getUserMember(session.user.id)
+  if (!member) {
+    throw new Error('Member 정보를 찾을 수 없습니다.')
+  }
+
   const report = await prisma.bookReport.findUnique({ where: { id } })
 
-  if (!report || report.userId !== session.user.id) {
+  if (!report || report.authorId !== member.id) {
     throw new Error('삭제 권한이 없습니다.')
   }
 

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getMember } from '@/lib/actions/admin'
+import { getMember } from '@/lib/actions/members'
 import MemberDetail from './MemberDetail'
 
 interface Props {

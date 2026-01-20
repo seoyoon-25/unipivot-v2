@@ -64,8 +64,18 @@ export default function ReportForm({ books }: Props) {
     setError('')
 
     try {
+      // 선택된 책 정보 찾기
+      const selectedBook = books.find(b => b.id === form.bookId)
+      if (!selectedBook) {
+        setError('도서를 선택해주세요.')
+        setLoading(false)
+        return
+      }
+
       await createBookReport({
         bookId: form.bookId,
+        bookTitle: selectedBook.title,
+        bookAuthor: selectedBook.author || undefined,
         title: form.title,
         content: form.content,
         isPublic: form.isPublic
