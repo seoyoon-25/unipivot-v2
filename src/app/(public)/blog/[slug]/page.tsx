@@ -2,8 +2,9 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowLeft, Calendar, Eye, Tag, User, Share2 } from 'lucide-react'
+import { ArrowLeft, Calendar, Eye, Tag, User } from 'lucide-react'
 import { getBlogPostBySlug, getRelatedBlogPosts } from '@/lib/actions/public'
+import { ShareButton } from '@/components/ShareButton'
 
 interface Props {
   params: { slug: string }
@@ -150,17 +151,7 @@ export default async function BlogDetailPage({ params }: Props) {
             {/* Share */}
             <div className="mt-8 pt-8 border-t border-gray-100 flex items-center justify-between">
               <span className="text-gray-500 text-sm">이 글이 도움이 되셨나요?</span>
-              <button
-                onClick={() => {
-                  if (typeof navigator !== 'undefined' && navigator.share) {
-                    navigator.share({ title: post.title, url: window.location.href })
-                  }
-                }}
-                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
-              >
-                <Share2 className="w-4 h-4" />
-                공유하기
-              </button>
+              <ShareButton title={post.title} />
             </div>
           </article>
 
