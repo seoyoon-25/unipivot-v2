@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { Menu, X, ChevronDown, User, LogOut, Settings, Bell } from 'lucide-react'
+import { Menu, X, ChevronDown, User, LogOut, Settings, Bell, Info, BookOpen, MessageSquare, Heart, FlaskConical, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useSession, signOut } from 'next-auth/react'
@@ -126,8 +126,18 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
 
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center gap-2">
-            {menuItems.map((item) =>
-              item.children ? (
+            {menuItems.map((item) => {
+              // 카테고리별 아이콘 매핑
+              const iconMap: Record<string, React.ReactNode> = {
+                '소개': <Info className="w-4 h-4" />,
+                '프로그램': <BookOpen className="w-4 h-4" />,
+                '소통마당': <MessageSquare className="w-4 h-4" />,
+                '함께하기': <Heart className="w-4 h-4" />,
+                '리서치랩': <FlaskConical className="w-4 h-4" />,
+              }
+              const icon = iconMap[item.label]
+
+              return item.children ? (
                 <div
                   key={item.label}
                   className="dropdown relative"
@@ -140,40 +150,57 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
                     className="gap-1"
                   >
                     {item.label}
-                    <ChevronDown className="w-4 h-4" />
+                    <ChevronDown className={cn(
+                      "w-4 h-4 transition-transform duration-200",
+                      openDropdown === item.label && "rotate-180"
+                    )} />
                   </Button>
                   <div
                     className={cn(
-                      'absolute top-full left-0 pt-2 w-48 transition-all duration-200',
+                      'absolute top-full left-0 pt-3 w-64 transition-all duration-200',
                       openDropdown === item.label
                         ? 'opacity-100 visible translate-y-0'
                         : 'opacity-0 invisible translate-y-2'
                     )}
                   >
-                    <div className="bg-white rounded-xl shadow-xl py-2">
-                      {item.children.map((child) => (
-                        <Link
-                          key={child.href}
-                          href={child.href}
-                          target={child.external ? '_blank' : undefined}
-                          rel={child.external ? 'noopener noreferrer' : undefined}
-                          className="block px-4 py-2.5 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                        >
-                          <span className="font-medium flex items-center gap-1">
-                            {child.label}
-                            {child.external && (
-                              <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                              </svg>
-                            )}
-                          </span>
-                          {child.description && (
-                            <span className="block text-xs text-gray-400 mt-0.5">
-                              {child.description}
-                            </span>
-                          )}
-                        </Link>
-                      ))}
+                    <div className="bg-white rounded-2xl shadow-2xl shadow-black/10 border border-gray-100 overflow-hidden">
+                      {/* 드롭다운 헤더 */}
+                      <div className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-400 text-white">
+                        {icon}
+                        <span className="font-semibold">{item.label}</span>
+                      </div>
+                      {/* 메뉴 아이템 */}
+                      <div className="py-2">
+                        {item.children.map((child, idx) => (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            target={child.external ? '_blank' : undefined}
+                            rel={child.external ? 'noopener noreferrer' : undefined}
+                            className="group flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-orange-50 transition-colors"
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-orange-100 group-hover:bg-orange-200 flex items-center justify-center text-orange-600 transition-colors">
+                              <span className="text-sm font-bold">{idx + 1}</span>
+                            </div>
+                            <div className="flex-1">
+                              <span className="font-medium flex items-center gap-1 group-hover:text-orange-600 transition-colors">
+                                {child.label}
+                                {child.external && (
+                                  <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                  </svg>
+                                )}
+                              </span>
+                              {child.description && (
+                                <span className="block text-xs text-gray-400 mt-0.5">
+                                  {child.description}
+                                </span>
+                              )}
+                            </div>
+                            <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-orange-400 group-hover:translate-x-1 transition-all" />
+                          </Link>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -185,6 +212,7 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
                   rel={item.external ? 'noopener noreferrer' : undefined}
                   className="inline-flex items-center justify-center h-10 px-6 py-3 text-sm font-semibold text-white bg-white/10 border border-white/20 rounded-xl transition-all duration-200 hover:bg-white/20 gap-1"
                 >
+                  {icon}
                   {item.label}
                   {item.external && (
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -193,7 +221,7 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
                   )}
                 </a>
               )
-            )}
+            })}
           </div>
 
           {/* Auth Buttons */}
@@ -286,72 +314,103 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden bg-white rounded-2xl shadow-xl mt-2 p-4 animate-slide-down">
-            {menuItems.map((item) =>
-              item.children ? (
-                <div key={item.label} className="mb-4">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                    {item.label}
-                  </p>
-                  {item.children.map((child) => (
-                    <Link
-                      key={child.href}
-                      href={child.href}
-                      target={child.external ? '_blank' : undefined}
-                      rel={child.external ? 'noopener noreferrer' : undefined}
-                      className="flex items-center gap-1 py-2 text-gray-700 hover:text-orange-600"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      {child.label}
-                      {child.external && (
-                        <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      )}
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <a
-                  key={item.label}
-                  href={item.href!}
-                  target={item.external ? '_blank' : undefined}
-                  rel={item.external ? 'noopener noreferrer' : undefined}
-                  className="flex items-center gap-1 py-2 text-gray-700 hover:text-orange-600 font-medium"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {item.label}
-                  {item.external && (
-                    <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  )}
-                </a>
-              )
-            )}
-            <div className="mt-4 pt-4 border-t border-gray-100">
-              {session ? (
-                <div className="space-y-2">
-                  <Link
-                    href="/my"
-                    className="block py-2 text-gray-700 hover:text-orange-600"
+          <div className="lg:hidden bg-white rounded-2xl shadow-xl mt-2 p-3 animate-slide-down max-h-[80vh] overflow-y-auto">
+            <div className="space-y-2">
+              {menuItems.map((item) => {
+                // 카테고리별 아이콘 매핑
+                const iconMap: Record<string, React.ReactNode> = {
+                  '소개': <Info className="w-5 h-5" />,
+                  '프로그램': <BookOpen className="w-5 h-5" />,
+                  '소통마당': <MessageSquare className="w-5 h-5" />,
+                  '함께하기': <Heart className="w-5 h-5" />,
+                  '리서치랩': <FlaskConical className="w-5 h-5" />,
+                }
+                const icon = iconMap[item.label] || <ChevronRight className="w-5 h-5" />
+
+                return item.children ? (
+                  <div key={item.label} className="bg-gray-50 rounded-xl overflow-hidden">
+                    {/* 카테고리 헤더 */}
+                    <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-400">
+                      <span className="text-white">{icon}</span>
+                      <span className="font-semibold text-white">{item.label}</span>
+                    </div>
+                    {/* 서브 메뉴 */}
+                    <div className="divide-y divide-gray-100">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          target={child.external ? '_blank' : undefined}
+                          rel={child.external ? 'noopener noreferrer' : undefined}
+                          className="flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-orange-50 active:bg-orange-100 transition-colors"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          <div>
+                            <span className="font-medium flex items-center gap-1">
+                              {child.label}
+                              {child.external && (
+                                <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                              )}
+                            </span>
+                            {child.description && (
+                              <span className="block text-xs text-gray-400 mt-0.5">{child.description}</span>
+                            )}
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-gray-300" />
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <a
+                    key={item.label}
+                    href={item.href!}
+                    target={item.external ? '_blank' : undefined}
+                    rel={item.external ? 'noopener noreferrer' : undefined}
+                    className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-400 rounded-xl text-white font-semibold"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    마이페이지
+                    <span>{icon}</span>
+                    <span className="flex-1">{item.label}</span>
+                    {item.external && (
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    )}
+                  </a>
+                )
+              })}
+            </div>
+
+            {/* 로그인/사용자 섹션 */}
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              {session ? (
+                <div className="space-y-1">
+                  <Link
+                    href="/my"
+                    className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <User className="w-5 h-5 text-gray-400" />
+                    <span className="font-medium">마이페이지</span>
                   </Link>
                   <button
                     onClick={() => signOut()}
-                    className="block py-2 text-red-600"
+                    className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
                   >
-                    로그아웃
+                    <LogOut className="w-5 h-5" />
+                    <span className="font-medium">로그아웃</span>
                   </button>
                 </div>
               ) : (
                 <Link
                   href="/login"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block w-full py-3 bg-orange-500 hover:bg-orange-600 text-white text-center rounded-xl font-semibold transition-colors"
+                  className="flex items-center justify-center gap-2 w-full py-3.5 bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500 text-white rounded-xl font-semibold transition-all shadow-lg shadow-orange-500/20"
                 >
+                  <User className="w-5 h-5" />
                   로그인
                 </Link>
               )}

@@ -95,24 +95,25 @@ export default async function ProgramsPage({ searchParams }: PageProps) {
           <p className="text-xl text-white/80 max-w-2xl mx-auto">
             {header.hero.subtitle}
           </p>
-          {/* 관리자 전용 글쓰기 버튼 */}
-          {isAdmin && (
-            <Link
-              href="/programs/write"
-              className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-100 text-primary rounded-xl font-medium transition-colors shadow-lg"
-            >
-              <Plus className="w-5 h-5" />
-              <span className="hidden sm:inline">프로그램 등록</span>
-            </Link>
-          )}
         </div>
       </section>
 
       {/* Content Section */}
       <section className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
-          {/* 필터 */}
-          <ProgramTypeFilters currentType={type} />
+          {/* 필터 + 등록 버튼 */}
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <ProgramTypeFilters currentType={type} />
+            {isAdmin && (
+              <Link
+                href="/programs/write"
+                className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-xl font-medium transition-colors shadow-lg shrink-0"
+              >
+                <Plus className="w-5 h-5" />
+                <span className="hidden sm:inline">프로그램 등록</span>
+              </Link>
+            )}
+          </div>
 
           {/* 모집중 */}
           <ProgramSection
