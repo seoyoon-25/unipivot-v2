@@ -4,6 +4,7 @@ import { redirect, notFound } from 'next/navigation'
 import { getBookReport } from '@/lib/actions/public'
 import { prisma } from '@/lib/db'
 import ReportDetail from './ReportDetail'
+import type { ReportStructureCode } from '@/types/report'
 
 interface Props {
   params: { id: string }
@@ -30,10 +31,19 @@ export default async function ReportDetailPage({ params }: Props) {
     redirect('/my/reports')
   }
 
+  // Fetch structured report data if exists
+  const structuredReport = await prisma.structuredBookReport.findUnique({
+    where: { reportId: params.id }
+  })
+
   // ReportDetail에 전달할 형식으로 변환
   const reportForDetail = {
     ...report,
-    book: report.book || { id: '', title: report.bookTitle, author: report.bookAuthor }
+    book: report.book || { id: '', title: report.bookTitle, author: report.bookAuthor },
+    structuredData: structuredReport ? {
+      structure: structuredReport.structure as ReportStructureCode,
+      sections: JSON.parse(structuredReport.sections)
+    } : null
   }
 
   return (

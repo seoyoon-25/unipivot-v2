@@ -295,6 +295,23 @@ export async function deleteProgram(id: string) {
   revalidatePath('/admin/programs')
 }
 
+export async function updateProgramReportStructure(
+  programId: string,
+  reportStructure: string | null
+) {
+  const program = await prisma.program.update({
+    where: { id: programId },
+    data: {
+      reportStructure: reportStructure === null
+        ? { set: null } as any
+        : reportStructure
+    }
+  })
+  revalidatePath('/admin/programs')
+  revalidatePath(`/admin/programs/${programId}`)
+  return program
+}
+
 // =============================================
 // Registration Management
 // =============================================

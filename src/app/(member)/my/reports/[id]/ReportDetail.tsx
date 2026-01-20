@@ -1,10 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Edit, Trash2, Save, X, Book, Calendar, Globe, Lock } from 'lucide-react'
+import { ArrowLeft, Edit, Trash2, Save, X, Book, Calendar, Globe, Lock, LayoutTemplate } from 'lucide-react'
 import { updateBookReport, deleteBookReport } from '@/lib/actions/public'
+import { StructuredReportViewer } from '@/components/report/StructuredReportViewer'
+import { getReportTemplate } from '@/lib/actions/review'
+import type { ReportStructureCode, ReportTemplateStructure, StructuredReportData, REPORT_STRUCTURES } from '@/types/report'
 
 interface Report {
   id: string
@@ -17,10 +20,43 @@ interface Report {
     title: string
     author: string | null
   }
+  structuredData?: {
+    structure: ReportStructureCode
+    sections: Record<string, unknown>
+  } | null
 }
 
 interface Props {
   report: Report
+}
+
+// Local copy of REPORT_STRUCTURES for display
+const REPORT_STRUCTURES_INFO: Record<ReportStructureCode, { name: string; icon: string; color: string }> = {
+  BONGGAEJEOK: {
+    name: '본깨적',
+    icon: '📖',
+    color: 'bg-blue-50 text-blue-700 border-blue-200',
+  },
+  OREO: {
+    name: 'OREO',
+    icon: '🍪',
+    color: 'bg-orange-50 text-orange-700 border-orange-200',
+  },
+  '4F': {
+    name: '4F',
+    icon: '🎯',
+    color: 'bg-green-50 text-green-700 border-green-200',
+  },
+  PMI: {
+    name: 'PMI',
+    icon: '⚖️',
+    color: 'bg-purple-50 text-purple-700 border-purple-200',
+  },
+  FREE: {
+    name: '자유형식',
+    icon: '✏️',
+    color: 'bg-gray-50 text-gray-700 border-gray-200',
+  },
 }
 
 export default function ReportDetail({ report }: Props) {
@@ -29,18 +65,32 @@ export default function ReportDetail({ report }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [template, setTemplate] = useState<ReportTemplateStructure | null>(null)
   const [form, setForm] = useState({
     title: report.title,
     content: report.content,
     isPublic: report.isPublic
   })
 
+  // Fetch template for structured reports
+  useEffect(() => {
+    const fetchTemplate = async () => {
+      if (report.structuredData?.structure) {
+        const tmpl = await getReportTemplate(report.structuredData.structure)
+        if (tmpl) {
+          setTemplate(tmpl.structure)
+        }
+      }
+    }
+    fetchTemplate()
+  }, [report.structuredData?.structure])
+
   const handleSave = async () => {
     if (!form.title.trim()) {
       setError('제목을 입력해주세요.')
       return
     }
-    if (!form.content.trim()) {
+    if (!form.content.trim() && !report.structuredData) {
       setError('내용을 입력해주세요.')
       return
     }
@@ -84,6 +134,10 @@ export default function ReportDetail({ report }: Props) {
     setIsEditing(false)
     setError('')
   }
+
+  const structureInfo = report.structuredData?.structure
+    ? REPORT_STRUCTURES_INFO[report.structuredData.structure]
+    : null
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm">
@@ -147,6 +201,12 @@ export default function ReportDetail({ report }: Props) {
           <Calendar className="w-4 h-4" />
           {new Date(report.createdAt).toLocaleDateString('ko-KR')}
         </span>
+        {structureInfo && (
+          <span className={`flex items-center gap-1 px-2 py-0.5 rounded border ${structureInfo.color}`}>
+            <span>{structureInfo.icon}</span>
+            <span>{structureInfo.name}</span>
+          </span>
+        )}
         {isEditing ? (
           <label className="flex items-center gap-2 cursor-pointer">
             <input
@@ -178,6 +238,14 @@ export default function ReportDetail({ report }: Props) {
           rows={15}
           className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none mb-6"
         />
+      ) : report.structuredData && template ? (
+        <div className="mb-6">
+          <StructuredReportViewer
+            structure={report.structuredData.structure}
+            template={template}
+            data={{ sections: report.structuredData.sections } as StructuredReportData}
+          />
+        </div>
       ) : (
         <div className="prose max-w-none mb-6">
           <p className="whitespace-pre-wrap text-gray-700">{report.content}</p>

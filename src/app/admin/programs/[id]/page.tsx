@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getProgram, getProgramParticipants, getProgramSessions, getDepositSetting } from '@/lib/actions/admin'
 import ProgramDetailTabs from './ProgramDetailTabs'
+import type { ReportStructureCode } from '@/types/report'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -20,9 +21,15 @@ export default async function ProgramDetailPage({ params }: Props) {
     notFound()
   }
 
+  // Transform program to match expected type
+  const programForTabs = {
+    ...program,
+    reportStructure: program.reportStructure as ReportStructureCode | null,
+  }
+
   return (
     <ProgramDetailTabs
-      program={program}
+      program={programForTabs}
       participants={participants}
       sessions={sessions}
       depositSetting={depositSetting}

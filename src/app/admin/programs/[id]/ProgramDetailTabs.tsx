@@ -17,10 +17,13 @@ import {
   AlertCircle,
   QrCode,
   Edit3,
-  ExternalLink
+  ExternalLink,
+  BookOpen,
+  Save,
 } from 'lucide-react'
-import { updateAttendance, createProgramSession } from '@/lib/actions/admin'
+import { updateAttendance, createProgramSession, updateProgramReportStructure } from '@/lib/actions/admin'
 import { useRouter } from 'next/navigation'
+import type { ReportStructureCode } from '@/types/report'
 
 interface Program {
   id: string
@@ -32,6 +35,7 @@ interface Program {
   fee: number
   startDate: Date | null
   endDate: Date | null
+  reportStructure: ReportStructureCode | null
 }
 
 interface Attendance {
@@ -105,11 +109,23 @@ const attendanceIcons: Record<string, { icon: typeof Check; color: string }> = {
   EXCUSED: { icon: AlertCircle, color: 'text-blue-600 bg-blue-100' },
 }
 
+const reportStructures: { code: ReportStructureCode; name: string; icon: string; description: string }[] = [
+  { code: 'BONGGAEJEOK', name: '본깨적', icon: '📖', description: '본 것, 깨달은 것, 적용할 것' },
+  { code: 'OREO', name: 'OREO', icon: '🍪', description: '의견-이유-예시-의견' },
+  { code: '4F', name: '4F', icon: '🎯', description: 'Facts-Feelings-Findings-Future' },
+  { code: 'PMI', name: 'PMI', icon: '⚖️', description: 'Plus-Minus-Interesting' },
+  { code: 'FREE', name: '자유형식', icon: '✏️', description: '자유롭게 작성' },
+]
+
 export default function ProgramDetailTabs({ program, participants, sessions, depositSetting }: Props) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('overview')
   const [selectedSession, setSelectedSession] = useState<string | null>(null)
   const [showSessionModal, setShowSessionModal] = useState(false)
+  const [selectedReportStructure, setSelectedReportStructure] = useState<ReportStructureCode | null>(
+    program.reportStructure
+  )
+  const [savingStructure, setSavingStructure] = useState(false)
   const [sessionForm, setSessionForm] = useState({
     sessionNo: sessions.length + 1,
     date: '',
@@ -136,6 +152,18 @@ export default function ProgramDetailTabs({ program, participants, sessions, dep
   const handleAttendance = async (sessionId: string, participantId: string, status: string) => {
     await updateAttendance(sessionId, participantId, status as 'PRESENT' | 'ABSENT' | 'LATE' | 'EXCUSED')
     router.refresh()
+  }
+
+  const handleSaveReportStructure = async () => {
+    setSavingStructure(true)
+    try {
+      await updateProgramReportStructure(program.id, selectedReportStructure)
+      router.refresh()
+    } catch (error) {
+      alert('독후감 형식 저장에 실패했습니다')
+    } finally {
+      setSavingStructure(false)
+    }
   }
 
   const handleCreateSession = async () => {
@@ -266,6 +294,54 @@ export default function ProgramDetailTabs({ program, participants, sessions, dep
                   </p>
                 </div>
               )}
+
+              {/* Report Structure Selector */}
+              <div className="col-span-full mt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-primary" />
+                    <h3 className="font-semibold">독후감 형식</h3>
+                  </div>
+                  {selectedReportStructure !== program.reportStructure && (
+                    <button
+                      onClick={handleSaveReportStructure}
+                      disabled={savingStructure}
+                      className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark disabled:opacity-50"
+                    >
+                      <Save className="w-4 h-4" />
+                      {savingStructure ? '저장 중...' : '저장'}
+                    </button>
+                  )}
+                </div>
+                <p className="text-sm text-gray-500 mb-4">
+                  참가자들이 독후감을 작성할 때 기본으로 추천되는 형식을 선택합니다.
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                  {reportStructures.map((structure) => (
+                    <button
+                      key={structure.code}
+                      onClick={() => setSelectedReportStructure(structure.code)}
+                      className={`p-4 rounded-xl border-2 text-left transition-all ${
+                        selectedReportStructure === structure.code
+                          ? 'border-primary bg-primary/5'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <span className="text-2xl block mb-2">{structure.icon}</span>
+                      <p className="font-medium text-gray-900">{structure.name}</p>
+                      <p className="text-xs text-gray-500 mt-1">{structure.description}</p>
+                    </button>
+                  ))}
+                </div>
+                {selectedReportStructure && (
+                  <button
+                    onClick={() => setSelectedReportStructure(null)}
+                    className="text-sm text-gray-500 hover:text-gray-700 mt-3"
+                  >
+                    선택 해제 (자유 선택 허용)
+                  </button>
+                )}
+              </div>
             </div>
           )}
 

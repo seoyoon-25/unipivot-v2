@@ -8,6 +8,11 @@ import {
   validateReview,
   REVIEW_POINTS,
 } from '@/lib/utils/review'
+import type {
+  ReportStructureCode,
+  StructuredReportData,
+  ReportTemplateStructure,
+} from '@/types/report'
 
 interface SubmitBookReportInput {
   programId: string
@@ -99,6 +104,365 @@ export async function submitBookReport(input: SubmitBookReportInput) {
     success: true,
     reportId: report.id,
     isLate: false,
+  }
+}
+
+interface SubmitStructuredReportInput {
+  programId: string
+  sessionId: string
+  title: string
+  structure: ReportStructureCode
+  template: ReportTemplateStructure
+  data: StructuredReportData
+  isPublic?: boolean
+}
+
+/**
+ * 구조화된 독후감 제출
+ */
+export async function submitStructuredReport(input: SubmitStructuredReportInput) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    throw new Error('로그인이 필요합니다')
+  }
+
+  const { programId, sessionId, title, structure, template, data, isPublic = true } = input
+
+  // Validate title
+  if (!title.trim()) {
+    throw new Error('제목을 입력해주세요')
+  }
+
+  // Validate required sections
+  for (const section of template.sections) {
+    if (section.required) {
+      const sectionData = data.sections[section.id]
+      if (!sectionData) {
+        throw new Error(`${section.title} 섹션을 작성해주세요`)
+      }
+
+      // Type-specific validation
+      if (section.type === 'textarea' && typeof sectionData === 'string') {
+        if (!sectionData.trim()) {
+          throw new Error(`${section.title}을(를) 작성해주세요`)
+        }
+      } else if (section.type === 'quote') {
+        const quoteData = sectionData as { quote?: string }
+        if (!quoteData.quote?.trim()) {
+          throw new Error(`${section.title}에 구절을 입력해주세요`)
+        }
+      } else if (section.type === 'list') {
+        const listData = sectionData as { items?: string[] }
+        const validItems = listData.items?.filter(item => item.trim()) || []
+        if (validItems.length === 0) {
+          throw new Error(`${section.title}에 최소 1개 항목을 입력해주세요`)
+        }
+      } else if (section.type === 'emotion') {
+        const emotionData = sectionData as { emotions?: string[] }
+        if (!emotionData.emotions || emotionData.emotions.length === 0) {
+          throw new Error(`${section.title}에서 감정을 선택해주세요`)
+        }
+      } else if (section.type === 'questions') {
+        const questionsData = sectionData as { questions?: string[] }
+        const validQuestions = questionsData.questions?.filter(q => q.trim()) || []
+        if (validQuestions.length === 0) {
+          throw new Error(`${section.title}에 최소 1개 질문을 입력해주세요`)
+        }
+      }
+    }
+  }
+
+  // Get session for book info
+  const programSession = await prisma.programSession.findUnique({
+    where: { id: sessionId },
+  })
+
+  if (!programSession) {
+    throw new Error('세션을 찾을 수 없습니다')
+  }
+
+  // Find member linked to user
+  const member = await prisma.member.findFirst({
+    where: { userId: session.user.id },
+  })
+
+  if (!member) {
+    throw new Error('멤버 정보를 찾을 수 없습니다')
+  }
+
+  // Check if already submitted
+  const existing = await prisma.bookReport.findFirst({
+    where: {
+      programId,
+      sessionId,
+      authorId: member.id,
+    },
+  })
+
+  if (existing) {
+    throw new Error('이미 독후감을 제출했습니다')
+  }
+
+  // Generate content from structured data for backward compatibility
+  const generatedContent = generateContentFromStructuredData(template, data)
+
+  // Create book report with structured data using transaction
+  const report = await prisma.$transaction(async (tx) => {
+    // Create book report
+    const bookReport = await tx.bookReport.create({
+      data: {
+        programId,
+        sessionId,
+        authorId: member.id,
+        title,
+        content: generatedContent,
+        bookTitle: programSession.bookTitle || '책 제목 없음',
+        bookAuthor: programSession.bookAuthor,
+        visibility: isPublic ? 'PUBLIC' : 'PRIVATE',
+        status: 'PUBLISHED',
+        publishedAt: new Date(),
+      },
+    })
+
+    // Create structured book report
+    await tx.structuredBookReport.create({
+      data: {
+        reportId: bookReport.id,
+        structure,
+        sections: JSON.stringify(data.sections),
+      },
+    })
+
+    return bookReport
+  })
+
+  // Award points via PointHistory
+  await prisma.pointHistory.create({
+    data: {
+      userId: session.user.id,
+      amount: REVIEW_POINTS,
+      type: 'EARN',
+      category: 'BOOK_REPORT',
+      description: `독후감 작성: ${title}`,
+      balance: 0,
+    },
+  })
+
+  revalidatePath(`/mypage/programs/${programId}`)
+
+  return {
+    success: true,
+    reportId: report.id,
+    isLate: false,
+  }
+}
+
+/**
+ * 구조화된 데이터에서 텍스트 콘텐츠 생성 (하위 호환성용)
+ */
+function generateContentFromStructuredData(
+  template: ReportTemplateStructure,
+  data: StructuredReportData
+): string {
+  const parts: string[] = []
+
+  for (const section of template.sections) {
+    const sectionData = data.sections[section.id]
+    if (!sectionData) continue
+
+    parts.push(`## ${section.emoji} ${section.title}\n`)
+
+    if (section.type === 'textarea' && typeof sectionData === 'string') {
+      parts.push(sectionData)
+    } else if (section.type === 'quote') {
+      const quoteData = sectionData as { quote?: string; page?: string; reason?: string }
+      if (quoteData.quote) {
+        parts.push(`> "${quoteData.quote}"`)
+        if (quoteData.page) {
+          parts.push(`(${quoteData.page})`)
+        }
+        if (quoteData.reason) {
+          parts.push(`\n선택 이유: ${quoteData.reason}`)
+        }
+      }
+    } else if (section.type === 'list') {
+      const listData = sectionData as { items?: string[] }
+      if (listData.items) {
+        listData.items.forEach((item, i) => {
+          if (item.trim()) {
+            parts.push(`${i + 1}. ${item}`)
+          }
+        })
+      }
+    } else if (section.type === 'emotion') {
+      const emotionData = sectionData as { emotions?: string[]; description?: string }
+      if (emotionData.emotions?.length) {
+        parts.push(`감정: ${emotionData.emotions.join(', ')}`)
+      }
+      if (emotionData.description) {
+        parts.push(emotionData.description)
+      }
+    } else if (section.type === 'questions') {
+      const questionsData = sectionData as { questions?: string[] }
+      if (questionsData.questions) {
+        questionsData.questions.forEach((q, i) => {
+          if (q.trim()) {
+            parts.push(`Q${i + 1}. ${q}`)
+          }
+        })
+      }
+    }
+
+    parts.push('\n')
+  }
+
+  return parts.join('\n')
+}
+
+/**
+ * 구조화된 독후감 수정
+ */
+export async function updateStructuredReport(
+  reportId: string,
+  input: {
+    title?: string
+    structure?: ReportStructureCode
+    template?: ReportTemplateStructure
+    data?: StructuredReportData
+    isPublic?: boolean
+  }
+) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    throw new Error('로그인이 필요합니다')
+  }
+
+  // Find member
+  const member = await prisma.member.findFirst({
+    where: { userId: session.user.id },
+  })
+
+  const report = await prisma.bookReport.findUnique({
+    where: { id: reportId },
+    include: { structuredReport: true },
+  })
+
+  if (!report) {
+    throw new Error('독후감을 찾을 수 없습니다')
+  }
+
+  if (!member || report.authorId !== member.id) {
+    throw new Error('권한이 없습니다')
+  }
+
+  const updateData: Record<string, unknown> = {}
+
+  if (input.title !== undefined) {
+    if (!input.title.trim()) {
+      throw new Error('제목을 입력해주세요')
+    }
+    updateData.title = input.title
+  }
+
+  if (input.isPublic !== undefined) {
+    updateData.visibility = input.isPublic ? 'PUBLIC' : 'PRIVATE'
+  }
+
+  // Update structured content
+  if (input.template && input.data) {
+    updateData.content = generateContentFromStructuredData(input.template, input.data)
+
+    if (report.structuredReport) {
+      // Update existing structured report
+      await prisma.structuredBookReport.update({
+        where: { id: report.structuredReport.id },
+        data: {
+          structure: input.structure || report.structuredReport.structure,
+          sections: JSON.stringify(input.data.sections),
+        },
+      })
+    } else {
+      // Create new structured report
+      await prisma.structuredBookReport.create({
+        data: {
+          reportId: report.id,
+          structure: input.structure || 'FREE',
+          sections: JSON.stringify(input.data.sections),
+        },
+      })
+    }
+  }
+
+  if (Object.keys(updateData).length > 0) {
+    await prisma.bookReport.update({
+      where: { id: reportId },
+      data: updateData,
+    })
+  }
+
+  if (report.programId) {
+    revalidatePath(`/mypage/programs/${report.programId}`)
+  }
+
+  return { success: true }
+}
+
+/**
+ * 구조화된 독후감 상세 조회
+ */
+export async function getStructuredReviewDetail(reportId: string) {
+  const report = await getReviewDetail(reportId)
+  if (!report) return null
+
+  const structuredReport = await prisma.structuredBookReport.findUnique({
+    where: { reportId },
+  })
+
+  return {
+    ...report,
+    structuredData: structuredReport
+      ? {
+          structure: structuredReport.structure as ReportStructureCode,
+          sections: JSON.parse(structuredReport.sections) as Record<string, unknown>,
+        }
+      : null,
+  }
+}
+
+/**
+ * 독후감 템플릿 목록 조회
+ */
+export async function getReportTemplates(category?: string) {
+  const templates = await prisma.reportTemplate.findMany({
+    where: {
+      isActive: true,
+      ...(category && { category }),
+    },
+    orderBy: [
+      { isDefault: 'desc' },
+      { sortOrder: 'asc' },
+    ],
+  })
+
+  return templates.map((t) => ({
+    ...t,
+    structure: JSON.parse(t.structure) as ReportTemplateStructure,
+  }))
+}
+
+/**
+ * 독후감 템플릿 상세 조회
+ */
+export async function getReportTemplate(code: string) {
+  const template = await prisma.reportTemplate.findUnique({
+    where: { code },
+  })
+
+  if (!template) return null
+
+  return {
+    ...template,
+    structure: JSON.parse(template.structure) as ReportTemplateStructure,
   }
 }
 
