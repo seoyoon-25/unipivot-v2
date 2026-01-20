@@ -37,7 +37,7 @@ async function getPageContent() {
     const section = await prisma.siteSection.findUnique({
       where: { sectionKey: 'page.donate' },
     })
-    if (section?.content) {
+    if (section?.content && typeof section.content === 'string') {
       return JSON.parse(section.content) as typeof defaultContent
     }
   } catch (error) {

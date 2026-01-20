@@ -32,7 +32,7 @@ async function getPageContent() {
     const section = await prisma.siteSection.findUnique({
       where: { sectionKey: 'page.history' },
     })
-    if (section?.content) {
+    if (section?.content && typeof section.content === 'string') {
       return { ...defaultContent, ...JSON.parse(section.content) as typeof defaultContent }
     }
   } catch (error) {

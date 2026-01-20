@@ -30,7 +30,7 @@ async function getHeaderContent() {
     const section = await prisma.siteSection.findUnique({
       where: { sectionKey: 'page.blog' },
     })
-    if (section?.content) {
+    if (section?.content && typeof section.content === 'string') {
       return JSON.parse(section.content) as typeof defaultHeader
     }
   } catch (error) {

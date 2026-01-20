@@ -17,6 +17,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { getSouthProvinces, getNorthProvinces, getNorthCities } from '@/lib/data/regions';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 
 const referralOptions = [
   '지인 소개',
@@ -318,58 +319,35 @@ function CompleteProfileForm() {
 
               {/* 남한: 시/도만 선택 */}
               {formData.origin === 'SOUTH' && (
-                <div className="relative">
-                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <select
-                    name="birthRegion"
-                    value={formData.birthRegion}
-                    onChange={handleChange}
-                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none bg-white"
-                  >
-                    <option value="">시/도 선택</option>
-                    {southProvinces.map((province) => (
-                      <option key={province} value={province}>
-                        {province}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <SearchableSelect
+                  options={southProvinces}
+                  value={formData.birthRegion}
+                  onChange={(value) => setFormData((prev) => ({ ...prev, birthRegion: value }))}
+                  placeholder="시/도 선택"
+                  searchPlaceholder="지역 검색..."
+                  icon={<MapPin className="w-5 h-5" />}
+                />
               )}
 
               {/* 북한: 시/도 + 시/군 선택 */}
               {formData.origin === 'NORTH' && (
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="relative">
-                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <select
-                      name="birthRegion"
-                      value={formData.birthRegion}
-                      onChange={handleBirthRegionChange}
-                      className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none bg-white"
-                    >
-                      <option value="">시/도 선택</option>
-                      {northProvinces.map((province) => (
-                        <option key={province} value={province}>
-                          {province}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <select
-                    name="birthCity"
+                  <SearchableSelect
+                    options={northProvinces}
+                    value={formData.birthRegion}
+                    onChange={(value) => setFormData((prev) => ({ ...prev, birthRegion: value, birthCity: '' }))}
+                    placeholder="시/도 선택"
+                    searchPlaceholder="시/도 검색..."
+                    icon={<MapPin className="w-5 h-5" />}
+                  />
+                  <SearchableSelect
+                    options={formData.birthRegion ? getNorthCities(formData.birthRegion) : []}
                     value={formData.birthCity}
-                    onChange={handleChange}
+                    onChange={(value) => setFormData((prev) => ({ ...prev, birthCity: value }))}
+                    placeholder="시/군 선택"
+                    searchPlaceholder="시/군 검색..."
                     disabled={!formData.birthRegion}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none bg-white disabled:bg-gray-100"
-                  >
-                    <option value="">시/군 선택</option>
-                    {formData.birthRegion &&
-                      getNorthCities(formData.birthRegion).map((city) => (
-                        <option key={city} value={city}>
-                          {city}
-                        </option>
-                      ))}
-                  </select>
+                  />
                 </div>
               )}
 
@@ -395,22 +373,14 @@ function CompleteProfileForm() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               현재 거주지 <span className="text-red-500">*</span>
             </label>
-            <div className="relative">
-              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <select
-                name="residenceRegion"
-                value={formData.residenceRegion}
-                onChange={handleChange}
-                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none bg-white"
-              >
-                <option value="">시/도 선택</option>
-                {southProvinces.map((province) => (
-                  <option key={province} value={province}>
-                    {province}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <SearchableSelect
+              options={southProvinces}
+              value={formData.residenceRegion}
+              onChange={(value) => setFormData((prev) => ({ ...prev, residenceRegion: value }))}
+              placeholder="시/도 선택"
+              searchPlaceholder="지역 검색..."
+              icon={<MapPin className="w-5 h-5" />}
+            />
           </div>
 
           {/* 연락처 */}

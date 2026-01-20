@@ -73,3 +73,7 @@ temp/
 # Database backups
 backups/
 logs/
+
+# SQLite journal files
+*.db-shm
+*.db-wal
