@@ -3,9 +3,46 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Search, Download, Plus, MoreVertical, Trash2, Edit, Users, UserPlus } from 'lucide-react'
-import { deleteMember } from '@/lib/actions/members'
+import { Search, Download, Plus, MoreVertical, Trash2, Edit, Users, UserPlus, Loader2 } from 'lucide-react'
+import { deleteMember, getMembersForExport } from '@/lib/actions/members'
 import { MEMBER_GRADES, MEMBER_STATUS } from '@/lib/services/member-matching'
+
+// CSV 변환 유틸
+function convertToCSV(data: Record<string, any>[]) {
+  if (data.length === 0) return ''
+
+  const headers = Object.keys(data[0])
+  const csvRows = [
+    headers.join(','),
+    ...data.map(row =>
+      headers.map(header => {
+        const value = row[header]
+        // 쉼표나 따옴표가 포함된 경우 따옴표로 감싸기
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+          return `"${value.replace(/"/g, '""')}"`
+        }
+        return value ?? ''
+      }).join(',')
+    )
+  ]
+
+  return csvRows.join('\n')
+}
+
+// CSV 다운로드 유틸
+function downloadCSV(csv: string, filename: string) {
+  // UTF-8 BOM 추가 (한글 인코딩 문제 해결)
+  const BOM = '\uFEFF'
+  const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
 
 interface MemberStats {
   attendanceRate: number
@@ -112,6 +149,31 @@ export default function MembersTable({ members, pagination, stats, searchParams 
   const [grade, setGrade] = useState(searchParams.grade || '')
   const [status, setStatus] = useState(searchParams.status || '')
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [exporting, setExporting] = useState(false)
+
+  const handleExport = async () => {
+    setExporting(true)
+    try {
+      const data = await getMembersForExport({
+        grade: searchParams.grade,
+        status: searchParams.status,
+      })
+
+      if (data.length === 0) {
+        alert('내보낼 데이터가 없습니다.')
+        return
+      }
+
+      const csv = convertToCSV(data)
+      const today = new Date().toISOString().split('T')[0]
+      downloadCSV(csv, `회원목록_${today}.csv`)
+    } catch (error) {
+      console.error('내보내기 실패:', error)
+      alert('내보내기 중 오류가 발생했습니다.')
+    } finally {
+      setExporting(false)
+    }
+  }
 
   const handleSearch = () => {
     const params = new URLSearchParams()
@@ -170,9 +232,17 @@ export default function MembersTable({ members, pagination, stats, searchParams 
           </h1>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
-            <Download className="w-4 h-4" />
-            내보내기
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {exporting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Download className="w-4 h-4" />
+            )}
+            {exporting ? '내보내는 중...' : '내보내기'}
           </button>
           <Link
             href="/admin/members/new"

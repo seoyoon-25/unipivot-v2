@@ -538,7 +538,9 @@ export default function ProgramOrderPage() {
       setSaving(true)
 
       const deleteErrors: string[] = []
+      const successfulDeletes: string[] = []
       const deleteIds = Array.from(pendingDeletes)
+
       for (const id of deleteIds) {
         const program = programs.find(p => p.id === id)
         try {
@@ -548,26 +550,39 @@ export default function ProgramOrderPage() {
           if (!response.ok) {
             const data = await response.json()
             deleteErrors.push(`${program?.title || id}: ${data.error}`)
+          } else {
+            successfulDeletes.push(id)
           }
         } catch (error) {
           deleteErrors.push(`${program?.title || id}: 삭제 실패`)
         }
       }
 
+      // 에러 토스트 표시
       if (deleteErrors.length > 0) {
         toast({
-          title: '일부 삭제 실패',
+          title: deleteErrors.length === deleteIds.length ? '삭제 실패' : '일부 삭제 실패',
           description: deleteErrors.join('\n'),
           variant: 'destructive',
         })
       }
 
-      const remainingPrograms = programs.filter(p => !pendingDeletes.has(p.id))
+      // 모든 삭제 실패 시 pendingDeletes 초기화하고 중단
+      if (successfulDeletes.length === 0 && deleteIds.length > 0) {
+        setPendingDeletes(new Set())
+        setSaving(false)
+        return
+      }
+
+      // 성공적으로 삭제된 프로그램만 제외하고 순서 저장
+      const successfulDeleteSet = new Set(successfulDeletes)
+      const remainingPrograms = programs.filter(p => !successfulDeleteSet.has(p.id))
+
       if (remainingPrograms.length > 0) {
         // pendingEdits를 객체로 변환
         const edits: { [id: string]: ProgramEdit } = {}
         pendingEdits.forEach((edit, id) => {
-          if (!pendingDeletes.has(id)) {
+          if (!successfulDeleteSet.has(id)) {
             edits[id] = edit
           }
         })
@@ -587,7 +602,7 @@ export default function ProgramOrderPage() {
 
       toast({
         title: '성공',
-        description: `변경사항이 저장되었습니다.${pendingDeletes.size > 0 ? ` (${pendingDeletes.size - deleteErrors.length}개 삭제됨)` : ''}`,
+        description: `변경사항이 저장되었습니다.${successfulDeletes.length > 0 ? ` (${successfulDeletes.length}개 삭제됨)` : ''}`,
       })
 
       await fetchPrograms()
