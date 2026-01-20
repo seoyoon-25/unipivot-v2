@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { ArrowLeft, Save, Upload, Image, RotateCcw } from 'lucide-react'
 import { createProgram } from '@/lib/actions/admin'
 import { RichTextEditor } from '@/components/editor'
+import { ReportStructureSelector } from '@/components/program/ReportStructureSelector'
+import type { ReportStructureCode } from '@/types/report'
 
 const DRAFT_KEY = 'program-draft-new'
 
@@ -44,6 +46,7 @@ export default function NewProgramPage() {
     recruitEndDate: '',
     startDate: '',
     endDate: '',
+    reportStructure: 'FREE' as ReportStructureCode,
   })
   const [uploading, setUploading] = useState(false)
   const [hasDraft, setHasDraft] = useState(false)
@@ -492,6 +495,28 @@ export default function NewProgramPage() {
               </div>
             </div>
           </div>
+
+          {/* 독후감 설정 - 독서모임일 때만 표시 */}
+          {form.type === 'BOOKCLUB' && (
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">📝 독후감 설정</h2>
+              <p className="text-sm text-gray-600 mb-4">
+                참가자들이 작성할 독후감의 구조를 선택해주세요. 책의 성격에 맞는 구조를 선택하면 더 깊이 있는 독후감을 작성할 수 있습니다.
+              </p>
+
+              <ReportStructureSelector
+                value={form.reportStructure}
+                onChange={(code) => setForm({ ...form, reportStructure: code })}
+                showPreview={true}
+              />
+
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  💡 독후감 구조는 프로그램 시작 후에도 변경할 수 있습니다.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* 설명 */}
           <div className="bg-white rounded-2xl p-6 shadow-sm">

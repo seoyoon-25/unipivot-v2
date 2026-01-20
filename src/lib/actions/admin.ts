@@ -237,6 +237,7 @@ export async function createProgram(data: {
   startDate?: Date
   endDate?: Date
   applicationFormId?: string
+  reportStructure?: string
 }) {
   const slug = data.title
     .toLowerCase()
