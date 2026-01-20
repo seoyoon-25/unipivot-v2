@@ -201,3 +201,125 @@ export function formatAccountNumber(accountNumber: string, masked = false): stri
 
   return cleaned
 }
+
+// ============================================
+// Phase 13: 진행자 인센티브 반영
+// ============================================
+
+interface AttendanceDataWithWaiver extends AttendanceData {
+  waivers: number // 진행자 인센티브로 면제받은 횟수
+}
+
+interface ReviewDataWithWaiver extends ReviewData {
+  waivers: number // 진행자 인센티브로 면제받은 횟수
+}
+
+export interface RefundEligibilityWithIncentive {
+  isEligible: boolean
+  attendanceRate: number
+  attendanceMet: boolean
+  reviewRate: number
+  reviewMet: boolean
+  reason: string
+  facilitatorSessions: number // 진행한 횟수
+  details: {
+    attendance: AttendanceDataWithWaiver
+    reviews: ReviewDataWithWaiver
+  }
+}
+
+/**
+ * 환급 자격 계산 (인센티브 반영)
+ * @param attendance 출석 데이터
+ * @param reviews 독후감 데이터
+ * @param attendanceWaivers 출석 면제 횟수 (진행자 인센티브)
+ * @param reportWaivers 독후감 면제 횟수 (진행자 인센티브)
+ * @param facilitatorSessions 진행한 세션 수
+ * @returns RefundEligibilityWithIncentive 환급 자격 정보 (인센티브 포함)
+ */
+export function calculateRefundEligibilityWithIncentive(
+  attendance: AttendanceData,
+  reviews: ReviewData,
+  attendanceWaivers: number = 0,
+  reportWaivers: number = 0,
+  facilitatorSessions: number = 0
+): RefundEligibilityWithIncentive {
+  // 출석률 계산 (지각도 출석으로 인정 + 인센티브 면제)
+  const effectiveAttendance = attendance.present + attendance.late + attendanceWaivers
+  const attendanceRate = attendance.total > 0
+    ? Math.round((effectiveAttendance / attendance.total) * 100)
+    : 0
+
+  // 독후감 제출률 계산 (인센티브 면제 반영)
+  const effectiveSubmitted = reviews.submitted + reportWaivers
+  const reviewRate = reviews.total > 0
+    ? Math.round((effectiveSubmitted / reviews.total) * 100)
+    : 0
+
+  // 조건 충족 여부
+  const attendanceMet = attendanceRate >= 50
+  const reviewMet = reviewRate >= 50
+
+  // 환급 자격 판정
+  const isEligible = attendanceMet || reviewMet
+
+  // 사유 생성
+  let reason = ''
+  if (isEligible) {
+    const incentiveNote = facilitatorSessions > 0
+      ? ` (진행자 인센티브 ${facilitatorSessions}회 포함)`
+      : ''
+
+    if (attendanceMet && reviewMet) {
+      reason = `출석률 ${attendanceRate}%, 독후감 ${reviewRate}% 달성${incentiveNote}`
+    } else if (attendanceMet) {
+      reason = `출석률 ${attendanceRate}% 달성${incentiveNote}`
+    } else {
+      reason = `독후감 ${reviewRate}% 달성${incentiveNote}`
+    }
+  } else {
+    reason = `출석률 ${attendanceRate}%, 독후감 ${reviewRate}% (50% 미달)`
+  }
+
+  return {
+    isEligible,
+    attendanceRate,
+    attendanceMet,
+    reviewRate,
+    reviewMet,
+    reason,
+    facilitatorSessions,
+    details: {
+      attendance: {
+        ...attendance,
+        waivers: attendanceWaivers,
+      },
+      reviews: {
+        ...reviews,
+        waivers: reportWaivers,
+      },
+    },
+  }
+}
+
+/**
+ * 인센티브 요약 텍스트 생성
+ */
+export function getIncentiveSummary(
+  attendanceWaivers: number,
+  reportWaivers: number
+): string | null {
+  if (attendanceWaivers === 0 && reportWaivers === 0) {
+    return null
+  }
+
+  const parts: string[] = []
+  if (attendanceWaivers > 0) {
+    parts.push(`결석 ${attendanceWaivers}회 면제`)
+  }
+  if (reportWaivers > 0) {
+    parts.push(`독후감 ${reportWaivers}회 면제`)
+  }
+
+  return `진행자 혜택: ${parts.join(', ')}`
+}

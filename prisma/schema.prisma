@@ -9,72 +9,77 @@ datasource db {
 }
 
 model User {
-  id                   String                @id @default(cuid())
-  name                 String?
-  email                String                @unique
-  emailVerified        DateTime?
-  image                String?
-  password             String?
-  phone                String?
-  origin               String?
-  birthYear            Int?
-  occupation           String?
-  bio                  String?
-  points               Int                   @default(0)
-  role                 String                @default("USER")
-  status               String                @default("ACTIVE")
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
-  arrivalYear          Int?
-  originCategory       String?
-  originCountry        String?
-  originDetails        String?
-  grade                Int                   @default(1)
-  gradeUpdatedAt       DateTime?
-  profileCompleted     Boolean               @default(false)
-  birthCity            String?
-  birthRegion          String?
-  displayName          String?
-  gender               String?
-  marketingAgreed      Boolean               @default(false)
-  marketingAgreedAt    DateTime?
-  organization         String?
-  privacyAgreed        Boolean               @default(false)
-  privacyAgreedAt      DateTime?
-  referralSource       String?
-  residenceCity        String?
-  residenceRegion      String?
-  termsAgreed          Boolean               @default(false)
-  termsAgreedAt        DateTime?
-  accounts             Account[]
-  activityLogs         ActivityLog[]
-  bankAccounts         BankAccount[]
-  blogPosts            BlogPost[]
-  bookSuggestions      BookSuggestion[]
-  bookVotes            BookVote[]
-  chatLogs             ChatLog[]
-  deposits             Deposit[]
-  donations            Donation[]
-  interests            Interest[]
-  interestAlerts       InterestAlert[]
-  interestKeywordLikes InterestKeywordLike[]
-  interestLikes        InterestLike[]
-  labProfile           LabProfile?
-  member               Member?
-  gradeHistory         MemberGradeHistory[]
-  notifications        Notification[]
-  pointHistory         PointHistory[]
-  programApplications  ProgramApplication[]
-  programLikes         ProgramLike[]
-  programParticipants  ProgramParticipant[]
-  programReports       ProgramReport[]
-  registrations        Registration[]
-  reportComments       ReportComment[]
-  reportLikes          ReportLike[]
-  rewardClaims         RewardClaim[]
-  sessions             Session[]
-  surveyResponses      SurveyResponse[]
-  talents              Talent[]
+  id                      String                   @id @default(cuid())
+  name                    String?
+  email                   String                   @unique
+  emailVerified           DateTime?
+  image                   String?
+  password                String?
+  phone                   String?
+  origin                  String?
+  birthYear               Int?
+  occupation              String?
+  bio                     String?
+  points                  Int                      @default(0)
+  role                    String                   @default("USER")
+  status                  String                   @default("ACTIVE")
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  arrivalYear             Int?
+  originCategory          String?
+  originCountry           String?
+  originDetails           String?
+  grade                   Int                      @default(1)
+  gradeUpdatedAt          DateTime?
+  profileCompleted        Boolean                  @default(false)
+  birthCity               String?
+  birthRegion             String?
+  displayName             String?
+  gender                  String?
+  marketingAgreed         Boolean                  @default(false)
+  marketingAgreedAt       DateTime?
+  organization            String?
+  privacyAgreed           Boolean                  @default(false)
+  privacyAgreedAt         DateTime?
+  referralSource          String?
+  residenceCity           String?
+  residenceRegion         String?
+  termsAgreed             Boolean                  @default(false)
+  termsAgreedAt           DateTime?
+  accounts                Account[]
+  activityLogs            ActivityLog[]
+  bankAccounts            BankAccount[]
+  blogPosts               BlogPost[]
+  bookSuggestions         BookSuggestion[]
+  bookVotes               BookVote[]
+  chatLogs                ChatLog[]
+  deposits                Deposit[]
+  donations               Donation[]
+  interests               Interest[]
+  interestAlerts          InterestAlert[]
+  interestKeywordLikes    InterestKeywordLike[]
+  interestLikes           InterestLike[]
+  labProfile              LabProfile?
+  member                  Member?
+  gradeHistory            MemberGradeHistory[]
+  notifications           Notification[]
+  pointHistory            PointHistory[]
+  programApplications     ProgramApplication[]
+  programLikes            ProgramLike[]
+  programParticipants     ProgramParticipant[]
+  programReports          ProgramReport[]
+  registrations           Registration[]
+  reportComments          ReportComment[]
+  reportLikes             ReportLike[]
+  rewardClaims            RewardClaim[]
+  sessions                Session[]
+  surveyResponses         SurveyResponse[]
+  talents                 Talent[]
+  // Phase 13: 진행자 지원 + RSVP
+  programMemberships      ProgramMembership[]
+  facilitatorApplications FacilitatorApplication[]
+  sessionFacilitators     SessionFacilitator[]
+  sessionRSVPs            SessionRSVP[]
 }
 
 model Account {
@@ -122,64 +127,71 @@ model PasswordResetToken {
 }
 
 model Program {
-  id                   String               @id @default(cuid())
-  title                String
-  slug                 String               @unique
-  type                 String
-  description          String?
-  content              String?
-  image                String?
-  capacity             Int                  @default(30)
-  fee                  Int                  @default(0)
-  location             String?
-  isOnline             Boolean              @default(false)
-  status               String               @default("DRAFT")
-  startDate            DateTime?
-  endDate              DateTime?
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @updatedAt
-  applicationCount     Int                  @default(0)
-  applicationFormId    String?
-  feeAmount            Int                  @default(0)
-  feeType              String               @default("FREE")
-  likeCount            Int                  @default(0)
-  recruitEndDate       DateTime?
-  recruitStartDate     DateTime?
-  thumbnailSquare      String?
-  currentBookContent   String?
-  scheduleContent      String?
-  isLegacy             Boolean              @default(false)
-  legacyHtml           String?
-  legacyImages         String?              @default("[]")
-  migratedAt           DateTime?
-  originalUrl          String?
-  displayOrder         Int                  @default(0)
-  applicationEndAt     DateTime?
-  applicationOpen      Boolean              @default(false)
-  applicationStartAt   DateTime?
-  autoApproveVIP       Boolean              @default(true)
-  autoApproveVVIP      Boolean              @default(true)
-  autoRejectBlocked    Boolean              @default(false)
-  customQuestions      String?
-  depositAmountSetting Int?
-  maxParticipants      Int?
-  requireMotivation    Boolean              @default(true)
-  requireSelfIntro     Boolean              @default(false)
-  reportStructure      String               @default("FREE")
-  books                BookOnProgram[]
-  bookReports          BookReport[]
-  depositSetting       DepositSetting?
-  memberAttendances    MemberAttendance[]
-  applicationForm      ApplicationForm?     @relation(fields: [applicationFormId], references: [id])
-  applications         ProgramApplication[]
-  gallery              ProgramGallery[]
-  likes                ProgramLike[]
-  participants         ProgramParticipant[]
-  programReports       ProgramReport[]
-  sessions             ProgramSession[]
-  refundHistories      RefundHistory[]
-  registrations        Registration[]
-  surveys              SatisfactionSurvey[]
+  id                      String                        @id @default(cuid())
+  title                   String
+  slug                    String                        @unique
+  type                    String
+  description             String?
+  content                 String?
+  image                   String?
+  capacity                Int                           @default(30)
+  fee                     Int                           @default(0)
+  location                String?
+  isOnline                Boolean                       @default(false)
+  status                  String                        @default("DRAFT")
+  startDate               DateTime?
+  endDate                 DateTime?
+  createdAt               DateTime                      @default(now())
+  updatedAt               DateTime                      @updatedAt
+  applicationCount        Int                           @default(0)
+  applicationFormId       String?
+  feeAmount               Int                           @default(0)
+  feeType                 String                        @default("FREE")
+  likeCount               Int                           @default(0)
+  recruitEndDate          DateTime?
+  recruitStartDate        DateTime?
+  thumbnailSquare         String?
+  currentBookContent      String?
+  scheduleContent         String?
+  isLegacy                Boolean                       @default(false)
+  legacyHtml              String?
+  legacyImages            String?                       @default("[]")
+  migratedAt              DateTime?
+  originalUrl             String?
+  displayOrder            Int                           @default(0)
+  applicationEndAt        DateTime?
+  applicationOpen         Boolean                       @default(false)
+  applicationStartAt      DateTime?
+  autoApproveVIP          Boolean                       @default(true)
+  autoApproveVVIP         Boolean                       @default(true)
+  autoRejectBlocked       Boolean                       @default(false)
+  customQuestions         String?
+  depositAmountSetting    Int?
+  maxParticipants         Int?
+  requireMotivation       Boolean                       @default(true)
+  requireSelfIntro        Boolean                       @default(false)
+  reportStructure         String                        @default("FREE")
+  // Phase 13: 진행자 지원 + RSVP 설정
+  rsvpEnabled             Boolean                       @default(true)
+  rsvpDeadlineHours       Int                           @default(24)
+  facilitatorIncentiveMax Int                           @default(3) // 최대 인센티브 횟수
+  books                   BookOnProgram[]
+  bookReports             BookReport[]
+  depositSetting          DepositSetting?
+  memberAttendances       MemberAttendance[]
+  applicationForm         ApplicationForm?              @relation(fields: [applicationFormId], references: [id])
+  applications            ProgramApplication[]
+  gallery                 ProgramGallery[]
+  likes                   ProgramLike[]
+  participants            ProgramParticipant[]
+  programReports          ProgramReport[]
+  sessions                ProgramSession[]
+  refundHistories         RefundHistory[]
+  registrations           Registration[]
+  surveys                 SatisfactionSurvey[]
+  // Phase 13: 진행자 지원 + RSVP
+  memberships             ProgramMembership[]
+  checklistTemplate       FacilitatorChecklistTemplate?
 }
 
 model Registration {
@@ -892,30 +904,34 @@ model ProgramParticipant {
 }
 
 model ProgramSession {
-  id             String               @id @default(cuid())
-  programId      String
-  title          String?
-  date           DateTime
-  startTime      String?
-  endTime        String?
-  location       String?
-  createdAt      DateTime             @default(now())
-  bookRange      String?
-  bookTitle      String?
-  description    String?
-  qrCode         String?              @unique
-  qrExpiresAt    DateTime?
-  reportDeadline DateTime?
-  sessionNo      Int
-  status         String               @default("SCHEDULED")
-  bookAuthor     String?
-  bookImage      String?
-  qrTokens       AttendanceQR[]
-  bookReports    BookReport[]
-  attendances    ProgramAttendance[]
-  reports        ProgramReport[]
-  surveys        SatisfactionSurvey[]
-  program        Program              @relation(fields: [programId], references: [id], onDelete: Cascade)
+  id                      String                   @id @default(cuid())
+  programId               String
+  title                   String?
+  date                    DateTime
+  startTime               String?
+  endTime                 String?
+  location                String?
+  createdAt               DateTime                 @default(now())
+  bookRange               String?
+  bookTitle               String?
+  description             String?
+  qrCode                  String?                  @unique
+  qrExpiresAt             DateTime?
+  reportDeadline          DateTime?
+  sessionNo               Int
+  status                  String                   @default("SCHEDULED")
+  bookAuthor              String?
+  bookImage               String?
+  qrTokens                AttendanceQR[]
+  bookReports             BookReport[]
+  attendances             ProgramAttendance[]
+  reports                 ProgramReport[]
+  surveys                 SatisfactionSurvey[]
+  program                 Program                  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  // Phase 13: 진행자 지원 + RSVP
+  facilitatorApplications FacilitatorApplication[]
+  facilitators            SessionFacilitator[]
+  rsvps                   SessionRSVP[]
 
   @@unique([programId, sessionNo])
 }
@@ -2594,4 +2610,128 @@ model StructuredBookReport {
   updatedAt DateTime   @updatedAt
 
   @@index([structure])
+}
+
+// ============================================
+// Phase 13: 진행자 지원 + RSVP + 인센티브
+// ============================================
+
+// 프로그램 멤버십 (역할 구분: 운영진/참가자)
+model ProgramMembership {
+  id        String @id @default(cuid())
+  programId String
+  userId    String
+  role      String // "ORGANIZER" (운영진), "PARTICIPANT" (참가자)
+
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([programId, userId])
+  @@index([programId])
+  @@index([userId])
+  @@index([role])
+}
+
+// 진행자 지원 (참가자가 신청)
+model FacilitatorApplication {
+  id        String  @id @default(cuid())
+  sessionId String
+  userId    String
+  status    String  @default("PENDING") // PENDING, APPROVED, REJECTED
+  message   String? // 지원 동기
+
+  reviewedBy String? // 운영진 userId
+  reviewedAt DateTime?
+  reviewNote String?
+
+  session ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sessionId, userId])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([status])
+}
+
+// 세션별 진행자 (최종 배정)
+model SessionFacilitator {
+  id        String @id @default(cuid())
+  sessionId String
+  userId    String
+
+  type       String // "ORGANIZER" (운영진), "VOLUNTEER" (참가자 지원)
+  assignedBy String? // 배정한 운영진 userId
+  note       String?
+
+  // 인센티브 (참가자만)
+  incentiveGranted Boolean @default(false)
+  incentiveType    String? // "ATTENDANCE" | "REPORT"
+  incentiveApplied Boolean @default(false)
+
+  session   ProgramSession        @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  checklist FacilitatorChecklist?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sessionId, userId])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([type])
+}
+
+// 진행자 준비 체크리스트 템플릿
+model FacilitatorChecklistTemplate {
+  id        String @id @default(cuid())
+  programId String @unique
+
+  items      String // JSON: 체크리스트 항목 배열
+  isRequired Boolean @default(false) // 권장사항 or 필수
+
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 진행자별 체크리스트 상태
+model FacilitatorChecklist {
+  id            String @id @default(cuid())
+  facilitatorId String @unique
+
+  completedItems String // JSON: 완료한 항목 ID 배열
+  progress       Int    @default(0) // 완료율 (%)
+
+  facilitator SessionFacilitator @relation(fields: [facilitatorId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+}
+
+// 참석 확인 (RSVP)
+model SessionRSVP {
+  id             String    @id @default(cuid())
+  sessionId      String
+  userId         String
+  status         String    @default("PENDING") // PENDING, ATTENDING, NOT_ATTENDING, MAYBE
+  respondedAt    DateTime?
+  note           String?
+  reminderSentAt DateTime?
+
+  session ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sessionId, userId])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([status])
 }
