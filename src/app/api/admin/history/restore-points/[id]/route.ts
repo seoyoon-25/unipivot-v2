@@ -34,7 +34,7 @@ async function executeFullRestore(snapshot: any, userId: string) {
         data: {
           name: `자동 백업 - ${new Date().toLocaleString()}`,
           description: '복원 실행 전 자동 백업',
-          snapshot: currentSnapshot,
+          snapshot: JSON.stringify(currentSnapshot),
           userId,
           isAutomatic: true
         }
@@ -311,8 +311,11 @@ export async function POST(
     }
 
     // 복원 실행
+    const snapshotData = typeof restorePoint.snapshot === 'string'
+      ? JSON.parse(restorePoint.snapshot)
+      : restorePoint.snapshot
     const affectedEntities = await executeFullRestore(
-      restorePoint.snapshot,
+      snapshotData,
       userId!
     )
 
@@ -322,10 +325,10 @@ export async function POST(
         entityType: 'RestorePoint',
         entityId: params.id,
         action: 'RESTORE',
-        fullSnapshot: {
+        fullSnapshot: JSON.stringify({
           restorePointName: restorePoint.name,
           affectedEntities
-        },
+        }),
         userId: userId!,
         description: `복원 지점 "${restorePoint.name}"로 복원 실행`
       }

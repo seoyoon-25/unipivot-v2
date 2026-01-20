@@ -200,7 +200,7 @@ async function createInitialSnapshot(sessionId: string, userId: string) {
         name: '초기 스냅샷',
         description: '세션 생성 시점의 사이트 상태',
         dataType: 'full',
-        data: fullData,
+        data: JSON.stringify(fullData),
         checksum,
         createdBy: userId
       }

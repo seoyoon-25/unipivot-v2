@@ -745,14 +745,21 @@ export async function createProgramSession(programId: string, data: {
   })
 
   if (participants.length > 0) {
-    await prisma.programAttendance.createMany({
-      data: participants.map(p => ({
-        sessionId: session.id,
-        participantId: p.id,
-        status: 'ABSENT'
-      })),
-      skipDuplicates: true
-    })
+    // SQLite doesn't support skipDuplicates, so we create records individually
+    for (const p of participants) {
+      const existing = await prisma.programAttendance.findFirst({
+        where: { sessionId: session.id, participantId: p.id }
+      })
+      if (!existing) {
+        await prisma.programAttendance.create({
+          data: {
+            sessionId: session.id,
+            participantId: p.id,
+            status: 'ABSENT'
+          }
+        })
+      }
+    }
   }
 
   revalidatePath(`/admin/programs/${programId}`)

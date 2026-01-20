@@ -221,7 +221,10 @@ export async function POST() {
 
       if (!existing) {
         const created = await prisma.siteSection.create({
-          data: sectionData
+          data: {
+            ...sectionData,
+            content: JSON.stringify(sectionData.content)
+          }
         })
         createdSections.push(created)
       }

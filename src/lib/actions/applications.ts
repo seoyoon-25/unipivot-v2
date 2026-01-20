@@ -154,11 +154,11 @@ export async function submitApplication(data: ApplicationData) {
         type: 'ALERT_APPLICATION',
         title: `${matchResult.alertLevel === 'BLOCKED' ? '차단' : '경고'} 회원 신청`,
         message: `${data.name}님이 ${program.title}에 신청했습니다.`,
-        data: {
+        data: JSON.stringify({
           applicationId: application.id,
           alertLevel: matchResult.alertLevel,
           memberCode: matchResult.member?.memberCode,
-        },
+        }),
       },
     })
   }

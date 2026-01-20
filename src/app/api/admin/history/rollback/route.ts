@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
       data: {
         targetHistoryId: validatedData.historyId,
         rollbackType: validatedData.rollbackType,
-        affectedEntities: affectedEntities,
+        affectedEntities: JSON.stringify(affectedEntities),
         userId: userId!,
         reason: validatedData.reason
       }

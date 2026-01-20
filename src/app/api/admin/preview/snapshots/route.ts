@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
         name: validatedData.name,
         description: validatedData.description,
         dataType: validatedData.dataType,
-        data: currentData,
+        data: JSON.stringify(currentData),
         checksum,
         device: validatedData.device,
         theme: validatedData.theme,

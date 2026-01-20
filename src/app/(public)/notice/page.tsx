@@ -32,7 +32,7 @@ async function getHeaderContent() {
       where: { sectionKey: 'page.notice' },
     })
     if (section?.content) {
-      return section.content as typeof defaultHeader
+      return JSON.parse(section.content) as typeof defaultHeader
     }
   } catch (error) {
     console.error('Failed to load notice header:', error)

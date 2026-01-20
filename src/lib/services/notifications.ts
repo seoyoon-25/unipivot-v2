@@ -22,7 +22,7 @@ export async function createAdminNotification(data: {
       type: data.type,
       title: data.title,
       message: data.message,
-      data: data.data || undefined,
+      data: data.data ? JSON.stringify(data.data) : undefined,
     },
   })
 }

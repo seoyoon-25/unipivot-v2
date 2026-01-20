@@ -41,7 +41,7 @@ async function getPageContent() {
       where: { sectionKey: 'page.about-us' },
     })
     if (section?.content) {
-      return { ...defaultContent, ...section.content as typeof defaultContent }
+      return { ...defaultContent, ...JSON.parse(section.content) as typeof defaultContent }
     }
   } catch (error) {
     console.error('Failed to load about-us content:', error)

@@ -38,7 +38,7 @@ async function getPageContent() {
       where: { sectionKey: 'page.donate' },
     })
     if (section?.content) {
-      return section.content as typeof defaultContent
+      return JSON.parse(section.content) as typeof defaultContent
     }
   } catch (error) {
     console.error('Failed to load donate page content:', error)

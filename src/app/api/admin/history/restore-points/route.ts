@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
       data: {
         name: validatedData.name,
         description: validatedData.description,
-        snapshot,
+        snapshot: JSON.stringify(snapshot),
         userId: userId!,
         isAutomatic: validatedData.isAutomatic
       }

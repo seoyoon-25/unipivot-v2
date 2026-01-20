@@ -4,64 +4,63 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id                   String                @id @default(cuid())
-  name                 String?
-  email                String                @unique
-  emailVerified        DateTime?
-  image                String?
-  password             String?
-  phone                String?
-  origin               String?
-  birthYear            Int?
-  occupation           String?
-  bio                  String?
-  points               Int                   @default(0)
-  role                 String                @default("USER")
-  status               String                @default("ACTIVE")
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
-  arrivalYear          Int?
-  originCategory       String?
-  originCountry        String?
-  originDetails        String?
-  grade                Int                   @default(1)
-  gradeUpdatedAt       DateTime?
-  profileCompleted     Boolean               @default(false)
+  id               String    @id @default(cuid())
+  name             String?
+  email            String    @unique
+  emailVerified    DateTime?
+  image            String?
+  password         String?
+  phone            String?
+  origin           String?
+  birthYear        Int?
+  occupation       String?
+  bio              String?
+  points           Int       @default(0)
+  role             String    @default("USER")
+  status           String    @default("ACTIVE")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  arrivalYear      Int?
+  originCategory   String?
+  originCountry    String?
+  originDetails    String?
+  grade            Int       @default(1)
+  gradeUpdatedAt   DateTime?
+  profileCompleted Boolean   @default(false)
 
   // 활동명
-  displayName          String?
+  displayName String?
 
   // 출생지 (상세)
-  birthRegion          String?
-  birthCity            String?
+  birthRegion String?
+  birthCity   String?
 
   // 거주지
-  residenceRegion      String?
-  residenceCity        String?
+  residenceRegion String?
+  residenceCity   String?
 
   // 추가 정보
-  gender               String?
-  organization         String?
-  referralSource       String?
+  gender         String?
+  organization   String?
+  referralSource String?
 
   // 약관 동의
-  termsAgreed          Boolean               @default(false)
-  privacyAgreed        Boolean               @default(false)
-  marketingAgreed      Boolean               @default(false)
-  termsAgreedAt        DateTime?
-  privacyAgreedAt      DateTime?
-  marketingAgreedAt    DateTime?
+  termsAgreed       Boolean   @default(false)
+  privacyAgreed     Boolean   @default(false)
+  marketingAgreed   Boolean   @default(false)
+  termsAgreedAt     DateTime?
+  privacyAgreedAt   DateTime?
+  marketingAgreedAt DateTime?
 
   accounts             Account[]
   activityLogs         ActivityLog[]
   bankAccounts         BankAccount[]
   blogPosts            BlogPost[]
-  bookReports          BookReport[]
   chatLogs             ChatLog[]
   deposits             Deposit[]
   donations            Donation[]
@@ -134,68 +133,70 @@ model PasswordResetToken {
 }
 
 model Program {
-  id                 String               @id @default(cuid())
+  id                 String    @id @default(cuid())
   title              String
-  slug               String               @unique
+  slug               String    @unique
   type               String
   description        String?
   content            String?
   image              String?
-  capacity           Int                  @default(30)
-  fee                Int                  @default(0)
+  capacity           Int       @default(30)
+  fee                Int       @default(0)
   location           String?
-  isOnline           Boolean              @default(false)
-  status             String               @default("DRAFT")
+  isOnline           Boolean   @default(false)
+  status             String    @default("DRAFT")
   startDate          DateTime?
   endDate            DateTime?
-  displayOrder       Int                  @default(0)
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  applicationCount   Int                  @default(0)
+  displayOrder       Int       @default(0)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  applicationCount   Int       @default(0)
   applicationFormId  String?
-  feeAmount          Int                  @default(0)
-  feeType            String               @default("FREE")
-  likeCount          Int                  @default(0)
+  feeAmount          Int       @default(0)
+  feeType            String    @default("FREE")
+  likeCount          Int       @default(0)
   recruitEndDate     DateTime?
   recruitStartDate   DateTime?
   thumbnailSquare    String?
   currentBookContent String?
   scheduleContent    String?
-  isLegacy           Boolean              @default(false)
+  isLegacy           Boolean   @default(false)
   legacyHtml         String?
-  legacyImages       String[]             @default([])
+  legacyImages       String    @default("[]") // JSON array stored as string
   migratedAt         DateTime?
   originalUrl        String?
 
   // 신청 설정
-  applicationOpen     Boolean  @default(false)  // 신청 오픈 여부
-  applicationStartAt  DateTime?                 // 신청 시작일
-  applicationEndAt    DateTime?                 // 신청 마감일
-  maxParticipants     Int?                      // 최대 인원
-  depositAmountSetting Int?                     // 보증금 금액
+  applicationOpen      Boolean   @default(false) // 신청 오픈 여부
+  applicationStartAt   DateTime? // 신청 시작일
+  applicationEndAt     DateTime? // 신청 마감일
+  maxParticipants      Int? // 최대 인원
+  depositAmountSetting Int? // 보증금 금액
 
   // 신청 폼 설정
-  requireMotivation   Boolean  @default(true)   // 신청 동기 필수
-  requireSelfIntro    Boolean  @default(false)  // 자기소개 필수
-  customQuestions     Json?                     // 추가 질문 (JSON)
+  requireMotivation Boolean @default(true) // 신청 동기 필수
+  requireSelfIntro  Boolean @default(false) // 자기소개 필수
+  customQuestions   String? // 추가 질문 (JSON string)
 
   // 자동 처리 설정
-  autoApproveVVIP     Boolean  @default(true)   // VVIP 자동 승인
-  autoApproveVIP      Boolean  @default(true)   // VIP 자동 승인
-  autoRejectBlocked   Boolean  @default(false)  // 차단 회원 자동 거절
+  autoApproveVVIP   Boolean @default(true) // VVIP 자동 승인
+  autoApproveVIP    Boolean @default(true) // VIP 자동 승인
+  autoRejectBlocked Boolean @default(false) // 차단 회원 자동 거절
 
-  books              BookOnProgram[]
-  depositSetting     DepositSetting?
-  applicationForm    ApplicationForm?     @relation(fields: [applicationFormId], references: [id])
-  applications       ProgramApplication[]
-  gallery            ProgramGallery[]
-  likes              ProgramLike[]
-  participants       ProgramParticipant[]
-  programReports     ProgramReport[]
-  sessions           ProgramSession[]
-  registrations      Registration[]
-  surveys            SatisfactionSurvey[]
-  memberAttendances  MemberAttendance[]
+  books             BookOnProgram[]
+  depositSetting    DepositSetting?
+  applicationForm   ApplicationForm?     @relation(fields: [applicationFormId], references: [id])
+  applications      ProgramApplication[]
+  gallery           ProgramGallery[]
+  likes             ProgramLike[]
+  participants      ProgramParticipant[]
+  programReports    ProgramReport[]
+  sessions          ProgramSession[]
+  registrations     Registration[]
+  surveys           SatisfactionSurvey[]
+  memberAttendances MemberAttendance[]
+  refundHistories   RefundHistory[]
+  bookReports       BookReport[]
 }
 
 model Registration {
@@ -234,7 +235,6 @@ model Book {
   summary   String?
   createdAt DateTime        @default(now())
   programs  BookOnProgram[]
-  reports   BookReport[]
 }
 
 model BookOnProgram {
@@ -249,34 +249,23 @@ model BookOnProgram {
   @@unique([bookId, programId])
 }
 
-model BookReport {
-  id        String   @id @default(cuid())
-  userId    String
-  bookId    String
-  title     String
-  content   String
-  isPublic  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
+// BookReport 모델은 아래 Member 기반 BookReport로 대체됨
 
 // 읽고 싶은 책 제안
 model BookSuggestion {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   title       String
   author      String?
   publisher   String?
   isbn        String?
   image       String?
-  description String?  // 추천 이유
+  description String? // 추천 이유
   userId      String
-  voteCount   Int      @default(0)
-  isSelected  Boolean  @default(false) // 독서모임 책으로 선정됨
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  voteCount   Int        @default(0)
+  isSelected  Boolean    @default(false) // 독서모임 책으로 선정됨
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   votes       BookVote[]
 
   @@index([voteCount])
@@ -781,11 +770,11 @@ model Donor {
 }
 
 model ProgramApplication {
-  id                    String           @id @default(cuid())
+  id                    String    @id @default(cuid())
   programId             String
   userId                String?
-  status                String           @default("PENDING")  // PENDING, APPROVED, REJECTED, WAITLIST, CANCELLED
-  appliedAt             DateTime         @default(now())
+  status                String    @default("PENDING") // PENDING, APPROVED, REJECTED, WAITLIST, CANCELLED
+  appliedAt             DateTime  @default(now())
   confirmedAt           DateTime?
   cancelledAt           DateTime?
   cancelReason          String?
@@ -797,14 +786,14 @@ model ProgramApplication {
   depositAmount         Int?
   depositNote           String?
   depositNotifiedAt     DateTime?
-  depositPaid           Boolean          @default(false)
+  depositPaid           Boolean   @default(false)
   depositPaidAt         DateTime?
   ebookProvider         String?
   ebookProviderOther    String?
-  facePrivacy           Boolean          @default(false)
+  facePrivacy           Boolean   @default(false)
   rejectNotifiedAt      DateTime?
   source                String?
-  depositStatus         String           @default("NONE")
+  depositStatus         String    @default("NONE")
   donatedAmount         Int?
   donatedAt             DateTime?
   refundCalculation     String?
@@ -812,58 +801,58 @@ model ProgramApplication {
   refundableAmount      Int?
   refundedAmount        Int?
   refundedAt            DateTime?
-  surveySubmitted       Boolean          @default(false)
+  surveySubmitted       Boolean   @default(false)
   surveySubmittedAt     DateTime?
 
   // 신청자 정보
-  name                  String?
-  email                 String?
-  phone                 String?
-  birthDate             DateTime?
-  birthYear             Int?
-  gender                String?
-  organization          String?           // 소속
-  origin                String?           // 출신 (남한/북한/해외)
-  hometown              String?           // 고향
-  residence             String?           // 거주지
+  name         String?
+  email        String?
+  phone        String?
+  birthDate    DateTime?
+  birthYear    Int?
+  gender       String?
+  organization String? // 소속
+  origin       String? // 출신 (남한/북한/해외)
+  hometown     String? // 고향
+  residence    String? // 거주지
 
   // 신청 내용
-  motivation            String?  @db.Text  // 신청 동기
-  selfIntro             String?  @db.Text  // 자기소개
-  referralSource        String?           // 알게 된 경로
-  referrerName          String?           // 추천인
-  referrer              String?           // Legacy 추천인
+  motivation     String? // 신청 동기
+  selfIntro      String? // 자기소개
+  referralSource String? // 알게 된 경로
+  referrerName   String? // 추천인
+  referrer       String? // Legacy 추천인
 
   // 동의
-  agreedToRules         Boolean  @default(false)  // 십계명 동의
-  agreedToTerms         Boolean  @default(false)  // 이용약관 동의
-  agreedToPrivacy       Boolean  @default(false)  // 개인정보 동의
-  privacyAgreed         Boolean  @default(true)   // Legacy 개인정보 동의
+  agreedToRules   Boolean @default(false) // 십계명 동의
+  agreedToTerms   Boolean @default(false) // 이용약관 동의
+  agreedToPrivacy Boolean @default(false) // 개인정보 동의
+  privacyAgreed   Boolean @default(true) // Legacy 개인정보 동의
 
   // 기존 회원 연동
-  memberId              String?
-  member                Member?  @relation(fields: [memberId], references: [id])
+  memberId String?
+  member   Member? @relation(fields: [memberId], references: [id])
 
   // 자동 감지 결과
-  matchedMemberId       String?           // 매칭된 기존 회원 ID
-  matchedMemberCode     String?           // 매칭된 회원 고유번호
-  memberGrade           String?           // 매칭된 회원 등급 (VVIP, VIP 등)
-  memberStatus          String?           // 매칭된 회원 상태 (WATCH, WARNING, BLOCKED)
-  alertLevel            String?           // NONE, WATCH, WARNING, BLOCKED, VVIP, VIP
-  matchType             String?           // email, phone, name_birth, name_hometown
+  matchedMemberId   String? // 매칭된 기존 회원 ID
+  matchedMemberCode String? // 매칭된 회원 고유번호
+  memberGrade       String? // 매칭된 회원 등급 (VVIP, VIP 등)
+  memberStatus      String? // 매칭된 회원 상태 (WATCH, WARNING, BLOCKED)
+  alertLevel        String? // NONE, WATCH, WARNING, BLOCKED, VVIP, VIP
+  matchType         String? // email, phone, name_birth, name_hometown
 
   // 처리 상태
-  processedBy           String?           // 처리한 운영진
-  processedAt           DateTime?
-  rejectReason          String?           // 거절 사유
-  approvalNote          String?           // 승인 메모 (예외 승인 시 사유)
+  processedBy  String? // 처리한 운영진
+  processedAt  DateTime?
+  rejectReason String? // 거절 사유
+  approvalNote String? // 승인 메모 (예외 승인 시 사유)
 
-  updatedAt             DateTime @default(now()) @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
 
-  program               Program          @relation(fields: [programId], references: [id], onDelete: Cascade)
-  user                  User?            @relation(fields: [userId], references: [id])
-  surveyReminders       SurveyReminder[]
-  surveyResponse        SurveyResponse?
+  program         Program          @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user            User?            @relation(fields: [userId], references: [id])
+  surveyReminders SurveyReminder[]
+  surveyResponse  SurveyResponse?
 
   @@unique([programId, userId])
   @@index([programId])
@@ -959,6 +948,7 @@ model ProgramSession {
   qrTokens       AttendanceQR[]
   attendances    ProgramAttendance[]
   reports        ProgramReport[]
+  bookReports    BookReport[]
   program        Program             @relation(fields: [programId], references: [id], onDelete: Cascade)
 
   @@unique([programId, sessionNo])
@@ -1210,7 +1200,7 @@ model ConsultingRequest {
 model LecturerRequest {
   id              String   @id @default(cuid())
   topic           String
-  schedules       Json
+  schedules       String // JSON string
   method          String
   requirements    String
   fee             String?
@@ -1607,7 +1597,7 @@ model SiteSection {
   id          String   @id @default(cuid())
   sectionKey  String   @unique
   sectionName String
-  content     Json
+  content     String // JSON string
   isVisible   Boolean  @default(true)
   order       Int      @default(0)
   createdAt   DateTime @default(now())
@@ -1617,7 +1607,7 @@ model SiteSection {
 model SiteSettings {
   id          String   @id @default(cuid())
   key         String   @unique
-  value       Json
+  value       String // JSON string
   category    String?
   description String?
   createdAt   DateTime @default(now())
@@ -1861,7 +1851,7 @@ model PreviewSnapshot {
   name          String
   description   String?
   dataType      String
-  data          Json
+  data          String // JSON string
   checksum      String
   device        String         @default("desktop")
   theme         String         @default("light")
@@ -1899,8 +1889,8 @@ model PreviewChange {
   action     String
   targetId   String
   targetType String
-  before     Json?
-  after      Json?
+  before     String? // JSON string
+  after      String? // JSON string
   userId     String
   ipAddress  String?
   userAgent  String?
@@ -2043,14 +2033,14 @@ model ChangeHistory {
   entityId      String
   action        String
   fieldName     String?
-  previousValue Json?
-  newValue      Json?
-  fullSnapshot  Json
+  previousValue String? // JSON string
+  newValue      String? // JSON string
+  fullSnapshot  String // JSON string
   userId        String
   ipAddress     String?
   userAgent     String?
   description   String?
-  changeVersion Int        @default(autoincrement())
+  changeVersion Int        @default(0)
   isAutoSave    Boolean    @default(false)
   createdAt     DateTime   @default(now())
   rollbacks     Rollback[]
@@ -2065,7 +2055,7 @@ model Rollback {
   id               String        @id @default(cuid())
   targetHistoryId  String
   rollbackType     String
-  affectedEntities Json
+  affectedEntities String // JSON string
   userId           String
   reason           String?
   rolledBackAt     DateTime      @default(now())
@@ -2096,7 +2086,7 @@ model RestorePoint {
   id          String   @id @default(cuid())
   name        String
   description String?
-  snapshot    Json
+  snapshot    String // JSON string
   userId      String
   isAutomatic Boolean  @default(false)
   createdAt   DateTime @default(now())
@@ -2203,7 +2193,7 @@ model CustomCode {
   position        String                 @default("head")
   priority        Int                    @default(0)
   conditionalLoad Boolean                @default(false)
-  conditions      Json?
+  conditions      String? // JSON string
   targetPages     String?
   excludePages    String?
   targetDevices   String?
@@ -2283,8 +2273,8 @@ model CodeLibrary {
   type          String
   code          String
   documentation String?
-  configSchema  Json?
-  defaultConfig Json?
+  configSchema  String? // JSON string
+  defaultConfig String? // JSON string
   version       String   @default("1.0.0")
   author        String?
   license       String?
@@ -2313,7 +2303,7 @@ model GlobalScript {
   bodyEndCode     String?
   trackingId      String?
   apiKey          String?
-  configuration   Json?
+  configuration   String? // JSON string
   requiresConsent Boolean  @default(false)
   consentCategory String?
   loadOnPages     String?
@@ -2369,48 +2359,52 @@ model TeamMember {
 
 // 회원 (오프라인 회원 통합 관리)
 model Member {
-  id            String   @id @default(cuid())
+  id String @id @default(cuid())
 
   // 고유번호: 92-1806-01 형식 (출생년도2자리-가입년월-순번)
-  memberCode    String   @unique
+  memberCode String @unique
 
   // 기본 정보
-  name          String
-  birthYear     Int?                    // 출생년도 (1992)
-  birthDate     DateTime?               // 생년월일
-  gender        String?                 // MALE / FEMALE
+  name      String
+  birthYear Int? // 출생년도 (1992)
+  birthDate DateTime? // 생년월일
+  gender    String? // MALE / FEMALE
 
   // 연락처
-  email         String?
-  phone         String?
-  kakaoId       String?
+  email   String?
+  phone   String?
+  kakaoId String?
 
   // 소속/지역
-  organization  String?                 // 소속
-  origin        String?                 // 출신 (SOUTH/NORTH/OVERSEAS)
-  hometown      String?                 // 고향 (출생지)
-  residence     String?                 // 거주지
+  organization String? // 소속
+  origin       String? // 출신 (SOUTH/NORTH/OVERSEAS)
+  hometown     String? // 고향 (출생지)
+  residence    String? // 거주지
 
   // 등급 & 상태
-  grade         String   @default("MEMBER")   // STAFF, VVIP, VIP, MEMBER, NEW
-  status        String   @default("ACTIVE")   // ACTIVE, WATCH, WARNING, BLOCKED
+  grade  String @default("MEMBER") // STAFF, VVIP, VIP, MEMBER, NEW
+  status String @default("ACTIVE") // ACTIVE, WATCH, WARNING, BLOCKED
 
   // 첫 가입일 (고유번호 생성에 사용)
-  joinedAt      DateTime @default(now())
+  joinedAt DateTime @default(now())
 
   // 웹사이트 계정 연동
-  userId        String?  @unique
-  user          User?    @relation(fields: [userId], references: [id])
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id])
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // 관계
-  statusLogs    MemberStatusLog[]
-  notes         MemberNote[]
-  attendances   MemberAttendance[]
-  stats         MemberStats?
-  applications  ProgramApplication[]
+  statusLogs      MemberStatusLog[]
+  notes           MemberNote[]
+  attendances     MemberAttendance[]
+  stats           MemberStats?
+  applications    ProgramApplication[]
+  refundHistories RefundHistory[]
+  bookReports     BookReport[]
+  reportLikes     BookReportLike[]
+  reportComments  BookReportComment[]
 
   @@index([memberCode])
   @@index([email])
@@ -2422,20 +2416,20 @@ model Member {
 
 // 회원 상태/등급 변경 이력
 model MemberStatusLog {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  memberId        String
-  member          Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
-  previousStatus  String?           // 이전 상태
-  previousGrade   String?           // 이전 등급
-  newStatus       String?           // 새 상태
-  newGrade        String?           // 새 등급
+  previousStatus String? // 이전 상태
+  previousGrade  String? // 이전 등급
+  newStatus      String? // 새 상태
+  newGrade       String? // 새 등급
 
-  reason          String   @db.Text  // 변경 사유 (필수)
-  createdBy       String?           // 변경한 운영진
+  reason    String // 변경 사유 (필수)
+  createdBy String? // 변경한 운영진
 
-  createdAt       DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([memberId])
   @@index([createdAt])
@@ -2443,69 +2437,70 @@ model MemberStatusLog {
 
 // 회원 메모 (관리자용)
 model MemberNote {
-  id          String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  memberId    String
-  member      Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
-  content     String   @db.Text
-  createdBy   String?           // 작성자
+  content   String
+  createdBy String? // 작성자
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([memberId])
 }
 
 // 회원 통계 (자동 계산)
 model MemberStats {
-  id                  String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  memberId            String   @unique
-  member              Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId String @unique
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
   // 참여 통계
-  totalPrograms       Int      @default(0)   // 총 참여 프로그램 수
-  totalSessions       Int      @default(0)   // 총 참여 회차 수
-  totalBooks          Int      @default(0)   // 총 읽은 책 수
+  totalPrograms Int @default(0) // 총 참여 프로그램 수
+  totalSessions Int @default(0) // 총 참여 회차 수
+  totalBooks    Int @default(0) // 총 읽은 책 수
 
   // 출석/독후감
-  totalAttended       Int      @default(0)   // 총 출석 횟수
-  totalAbsent         Int      @default(0)   // 총 결석 횟수
-  totalReports        Int      @default(0)   // 총 독후감 제출 횟수
+  totalAttended Int @default(0) // 총 출석 횟수
+  totalAbsent   Int @default(0) // 총 결석 횟수
+  totalReports  Int @default(0) // 총 독후감 제출 횟수
 
   // 비율
-  attendanceRate      Float    @default(0)   // 평균 출석률
-  reportRate          Float    @default(0)   // 평균 독후감 제출률
+  attendanceRate Float @default(0) // 평균 출석률
+  reportRate     Float @default(0) // 평균 독후감 제출률
 
   // 노쇼
-  noShowCount         Int      @default(0)   // 노쇼 횟수
+  noShowCount Int @default(0) // 노쇼 횟수
 
   // 마지막 참여
-  lastParticipatedAt  DateTime?
+  lastParticipatedAt DateTime?
 
-  updatedAt           DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
 // 회원 출석 기록 (오프라인 회원용)
 model MemberAttendance {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  memberId        String
-  member          Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
-  programId       String
-  program         Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  programId String
+  program   Program @relation(fields: [programId], references: [id], onDelete: Cascade)
 
-  sessionNumber   Int               // 회차 (1, 2, 3...)
-  sessionDate     DateTime?         // 날짜
+  sessionNumber Int // 회차 (1, 2, 3...)
+  sessionDate   DateTime? // 날짜
 
-  attended        Boolean  @default(false)  // 출석 여부
-  reportSubmitted Boolean  @default(false)  // 독후감 제출 여부
+  attended        Boolean @default(false) // 출석 여부
+  reportSubmitted Boolean @default(false) // 독후감 제출 여부
+  refundEligible  Boolean @default(false) // 환급 대상 여부
 
-  note            String?           // 비고
+  note String? // 비고
 
-  createdAt       DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@unique([memberId, programId, sessionNumber])
   @@index([memberId])
@@ -2518,14 +2513,167 @@ model MemberAttendance {
 
 model AdminNotification {
   id        String   @id @default(cuid())
-  type      String                       // ALERT_APPLICATION, NEW_APPLICATION, DEPOSIT_RECEIVED
+  type      String // ALERT_APPLICATION, NEW_APPLICATION, DEPOSIT_RECEIVED
   title     String
-  message   String   @db.Text
-  data      Json?                        // 추가 데이터 (applicationId, alertLevel 등)
+  message   String
+  data      String? // JSON string (applicationId, alertLevel 등)
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 
   @@index([type])
   @@index([read])
   @@index([createdAt])
+}
+
+// ============================================
+// 환급 이력 (RefundHistory)
+// ============================================
+
+model RefundHistory {
+  id String @id @default(cuid())
+
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id])
+
+  programId String
+  program   Program @relation(fields: [programId], references: [id])
+
+  amount      Int // 환급 금액
+  method      String? // 환급 방법 (계좌이체 등)
+  accountInfo String? // 계좌 정보
+
+  status      String    @default("PENDING") // PENDING, COMPLETED, FAILED
+  processedBy String? // 처리자
+  processedAt DateTime? // 처리 시간
+  note        String? // 메모
+
+  createdAt DateTime @default(now())
+
+  @@index([memberId])
+  @@index([programId])
+  @@index([status])
+}
+
+// ============================================
+// 우리가 읽은 책 (ReadBook)
+// ============================================
+
+model ReadBook {
+  id String @id @default(cuid())
+
+  title     String // 책 제목
+  author    String? // 저자
+  publisher String? // 출판사
+  pubYear   String? // 출판년도
+  image     String? // 표지 이미지
+
+  season       String // 시즌 (예: "시즌1", "시즌26")
+  sessionCount Int? // 진행 회차 수
+  participants Int? // 참여 인원
+
+  category String? // 분류 (인문, 사회, 과학 등)
+  rating   Int? // 별점 (1-5)
+  status   String  @default("COMPLETED") // COMPLETED, IN_PROGRESS
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookReports BookReport[]
+
+  @@index([season])
+  @@index([category])
+}
+
+// ============================================
+// 독후감 (BookReport) - Member 기반
+// ============================================
+
+model BookReport {
+  id String @id @default(cuid())
+
+  authorId String
+  author   Member @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  programId String?
+  program   Program? @relation(fields: [programId], references: [id])
+
+  sessionId String?
+  session   ProgramSession? @relation(fields: [sessionId], references: [id])
+
+  bookId String?
+  book   ReadBook? @relation(fields: [bookId], references: [id])
+
+  bookTitle  String // 책 제목
+  bookAuthor String? // 책 저자
+
+  title   String // 독후감 제목
+  content String // 독후감 내용
+  rating  Int? // 별점 (1-5)
+
+  visibility String @default("PRIVATE") // PRIVATE, MEMBERS, PUBLIC
+  status     String @default("DRAFT") // DRAFT, PENDING, APPROVED
+
+  approvedBy String?
+  approvedAt DateTime?
+
+  viewCount Int @default(0)
+  likeCount Int @default(0)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+
+  likes    BookReportLike[]
+  comments BookReportComment[]
+
+  @@index([authorId])
+  @@index([programId])
+  @@index([visibility])
+  @@index([status])
+}
+
+// ============================================
+// 독후감 좋아요 (BookReportLike)
+// ============================================
+
+model BookReportLike {
+  id String @id @default(cuid())
+
+  reportId String
+  report   BookReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([reportId, memberId])
+  @@index([reportId])
+  @@index([memberId])
+}
+
+// ============================================
+// 독후감 댓글 (BookReportComment)
+// ============================================
+
+model BookReportComment {
+  id String @id @default(cuid())
+
+  reportId String
+  report   BookReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   Member @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  content String
+
+  parentId String?
+  parent   BookReportComment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  BookReportComment[] @relation("CommentReplies")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([reportId])
+  @@index([authorId])
 }

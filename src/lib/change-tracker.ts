@@ -268,7 +268,7 @@ export async function createAutoBackup(entityType: string, reason: string, userI
         data: {
           name: `자동 백업 - ${now.toLocaleString()}`,
           description: reason,
-          snapshot,
+          snapshot: JSON.stringify(snapshot),
           userId,
           isAutomatic: true
         }

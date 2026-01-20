@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     const lecturerRequest = await prisma.lecturerRequest.create({
       data: {
         topic,
-        schedules,
+        schedules: JSON.stringify(schedules),
         method: method.toUpperCase(),
         requirements,
         fee: fee || null,
