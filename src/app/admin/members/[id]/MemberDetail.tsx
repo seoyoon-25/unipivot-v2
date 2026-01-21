@@ -6,7 +6,7 @@ import Link from 'next/link'
 import {
   ArrowLeft, Save, User, Mail, Phone, Calendar, MapPin, Building,
   BookOpen, Shield, History, ChevronUp, ChevronDown, Plus, Trash2,
-  AlertCircle, CheckCircle, XCircle, FileText
+  AlertCircle, CheckCircle, XCircle, FileText, Layers
 } from 'lucide-react'
 import {
   updateMember, changeMemberGrade, changeMemberStatus, addMemberNote, deleteMemberNote
@@ -87,6 +87,22 @@ interface Member {
     email: string | null
     image: string | null
   } | null
+  applications: Array<{
+    id: string
+    status: string
+    appliedAt: Date
+    depositStatus: string
+    depositAmount: number | null
+    program: {
+      id: string
+      title: string
+      slug: string | null
+      type: string
+      startDate: Date | null
+      endDate: Date | null
+      status: string
+    }
+  }>
 }
 
 interface Props {
@@ -146,7 +162,7 @@ function StatusBadge({ status, size = 'md' }: { status: string; size?: 'sm' | 'm
 
 export default function MemberDetail({ member }: Props) {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState<'info' | 'grade' | 'status' | 'attendance' | 'notes'>('info')
+  const [activeTab, setActiveTab] = useState<'info' | 'programs' | 'grade' | 'status' | 'attendance' | 'notes'>('info')
   const [saving, setSaving] = useState(false)
 
   // 기본 정보 폼
@@ -412,6 +428,7 @@ export default function MemberDetail({ member }: Props) {
             <div className="flex border-b border-gray-100 overflow-x-auto">
               {[
                 { key: 'info', label: '기본 정보', icon: User },
+                { key: 'programs', label: '프로그램', icon: Layers },
                 { key: 'grade', label: '등급 관리', icon: Shield },
                 { key: 'status', label: '상태 관리', icon: AlertCircle },
                 { key: 'attendance', label: '출석 이력', icon: BookOpen },
@@ -538,6 +555,126 @@ export default function MemberDetail({ member }: Props) {
                   {saving ? '저장 중...' : '저장'}
                 </button>
               </div>
+            </div>
+          )}
+
+          {/* Programs Tab */}
+          {activeTab === 'programs' && (
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-gray-900 mb-6">
+                프로그램 참가 이력
+                <span className="ml-2 text-sm font-normal text-gray-500">
+                  (총 {member.applications.length}개)
+                </span>
+              </h3>
+              {member.applications.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">프로그램 참가 이력이 없습니다.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-100">
+                        <th className="px-4 py-3 text-left font-medium text-gray-500">프로그램</th>
+                        <th className="px-4 py-3 text-center font-medium text-gray-500">유형</th>
+                        <th className="px-4 py-3 text-center font-medium text-gray-500">기간</th>
+                        <th className="px-4 py-3 text-center font-medium text-gray-500">신청일</th>
+                        <th className="px-4 py-3 text-center font-medium text-gray-500">상태</th>
+                        <th className="px-4 py-3 text-center font-medium text-gray-500">보증금</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {member.applications.map((app) => {
+                        // 상태 배지 색상
+                        const statusColors: Record<string, string> = {
+                          APPROVED: 'bg-green-100 text-green-700',
+                          PENDING: 'bg-yellow-100 text-yellow-700',
+                          REJECTED: 'bg-red-100 text-red-700',
+                          CANCELLED: 'bg-gray-100 text-gray-600',
+                          WAITLIST: 'bg-blue-100 text-blue-700',
+                        }
+                        const statusLabels: Record<string, string> = {
+                          APPROVED: '승인',
+                          PENDING: '대기',
+                          REJECTED: '반려',
+                          CANCELLED: '취소',
+                          WAITLIST: '대기자',
+                        }
+                        // 보증금 상태
+                        const depositColors: Record<string, string> = {
+                          PAID: 'bg-green-100 text-green-700',
+                          PARTIAL: 'bg-yellow-100 text-yellow-700',
+                          NONE: 'bg-gray-100 text-gray-500',
+                          REFUNDED: 'bg-blue-100 text-blue-700',
+                        }
+                        const depositLabels: Record<string, string> = {
+                          PAID: '완납',
+                          PARTIAL: '일부',
+                          NONE: '-',
+                          REFUNDED: '환불',
+                        }
+                        // 프로그램 유형
+                        const typeLabels: Record<string, string> = {
+                          BOOKCLUB: '독서모임',
+                          SEMINAR: '세미나',
+                          KMOVE: 'K-Move',
+                          DEBATE: '토론회',
+                          OTHER: '기타',
+                        }
+
+                        // 날짜 포맷
+                        const formatDate = (date: Date | null) => {
+                          if (!date) return '-'
+                          return new Date(date).toLocaleDateString('ko-KR', {
+                            year: 'numeric',
+                            month: 'short',
+                          })
+                        }
+                        const formatPeriod = (start: Date | null, end: Date | null) => {
+                          if (!start) return '-'
+                          const startStr = formatDate(start)
+                          if (!end) return startStr
+                          const endStr = formatDate(end)
+                          return `${startStr} ~ ${endStr}`
+                        }
+
+                        return (
+                          <tr key={app.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-3">
+                              <Link
+                                href={`/admin/programs/${app.program.id}`}
+                                className="font-medium text-gray-900 hover:text-primary"
+                              >
+                                {app.program.title}
+                              </Link>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <span className="px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-600">
+                                {typeLabels[app.program.type] || app.program.type}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-center text-gray-500 text-xs">
+                              {formatPeriod(app.program.startDate, app.program.endDate)}
+                            </td>
+                            <td className="px-4 py-3 text-center text-gray-500 text-xs">
+                              {new Date(app.appliedAt).toLocaleDateString('ko-KR')}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${statusColors[app.status] || 'bg-gray-100 text-gray-600'}`}>
+                                {statusLabels[app.status] || app.status}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${depositColors[app.depositStatus] || 'bg-gray-100 text-gray-500'}`}>
+                                {depositLabels[app.depositStatus] || app.depositStatus}
+                              </span>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
 

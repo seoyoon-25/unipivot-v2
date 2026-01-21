@@ -80,9 +80,22 @@ export async function sendRSVPRequests(
         year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'
       })
     : '날짜 미정'
-  const rsvpLink = `/rsvp/${sessionId}`
 
   for (const participant of participants) {
+    // 해당 참가자의 RSVP 조회
+    const rsvp = await prisma.sessionRSVP.findUnique({
+      where: {
+        sessionId_userId: {
+          sessionId,
+          userId: participant.userId,
+        },
+      },
+    })
+
+    if (!rsvp) continue
+
+    const rsvpLink = `/rsvp/${rsvp.id}`
+
     const user = await prisma.user.findUnique({
       where: { id: participant.userId },
       select: { name: true, email: true },
@@ -256,9 +269,10 @@ export async function sendRSVPReminder(
         year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'
       })
     : '날짜 미정'
-  const rsvpLink = `/rsvp/${sessionId}`
 
   for (const rsvp of pendingRSVPs) {
+    const rsvpLink = `/rsvp/${rsvp.id}`
+
     await prisma.sessionRSVP.update({
       where: { id: rsvp.id },
       data: { reminderSentAt: new Date() },
@@ -423,9 +437,22 @@ export async function autoSendRSVPRequests(daysBeforeSession: number = 3) {
           year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'
         })
       : '날짜 미정'
-    const rsvpLink = `/rsvp/${session.id}`
 
     for (const participant of participants) {
+      // 해당 참가자의 RSVP 조회
+      const rsvp = await prisma.sessionRSVP.findUnique({
+        where: {
+          sessionId_userId: {
+            sessionId: session.id,
+            userId: participant.userId,
+          },
+        },
+      })
+
+      if (!rsvp) continue
+
+      const rsvpLink = `/rsvp/${rsvp.id}`
+
       const user = await prisma.user.findUnique({
         where: { id: participant.userId },
         select: { name: true, email: true },
@@ -515,9 +542,10 @@ export async function autoSendRSVPReminders(hoursBeforeDeadline: number = 24) {
             year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'
           })
         : '날짜 미정'
-      const rsvpLink = `/rsvp/${session.id}`
 
       for (const rsvp of session.rsvps) {
+        const rsvpLink = `/rsvp/${rsvp.id}`
+
         await prisma.sessionRSVP.update({
           where: { id: rsvp.id },
           data: { reminderSentAt: new Date() },

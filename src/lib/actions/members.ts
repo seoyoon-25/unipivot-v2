@@ -148,8 +148,62 @@ export async function getMember(id: string) {
           image: true,
         },
       },
+      applications: {
+        orderBy: { appliedAt: 'desc' },
+        include: {
+          program: {
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              type: true,
+              startDate: true,
+              endDate: true,
+              status: true,
+            },
+          },
+        },
+      },
     },
   });
+
+  if (!member) return null;
+
+  // User를 통한 신청 이력도 가져오기 (memberId가 없는 것만)
+  if (member.userId) {
+    const userApplications = await prisma.programApplication.findMany({
+      where: {
+        userId: member.userId,
+        memberId: null, // memberId가 없는 것만 (중복 방지)
+      },
+      orderBy: { appliedAt: 'desc' },
+      include: {
+        program: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            type: true,
+            startDate: true,
+            endDate: true,
+            status: true,
+          },
+        },
+      },
+    });
+
+    // 두 리스트 합치기
+    const allApplications = [...member.applications, ...userApplications];
+    // 날짜순 정렬
+    allApplications.sort((a, b) =>
+      new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime()
+    );
+
+    return {
+      ...member,
+      applications: allApplications,
+    };
+  }
 
   return member;
 }

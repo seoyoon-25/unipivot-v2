@@ -62,7 +62,7 @@ export function HeroSection({ stats }: Props) {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
+    <section className="relative min-h-screen flex items-center overflow-hidden -mt-16 lg:-mt-20 pt-16 lg:pt-20">
       {/* Background */}
       <div className="absolute inset-0">
         {/* 배경 이미지 */}

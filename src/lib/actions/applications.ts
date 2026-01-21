@@ -63,6 +63,33 @@ export async function submitApplication(data: ApplicationData) {
     hometown: data.hometown,
   })
 
+  // 로그인한 User와 연동된 Member 확인 (matchResult에서 못 찾은 경우)
+  let linkedMember = matchResult.member
+  if (!linkedMember && session?.user?.id) {
+    const userLinkedMember = await prisma.member.findFirst({
+      where: { userId: session.user.id },
+      select: {
+        id: true,
+        memberCode: true,
+        name: true,
+        status: true,
+        grade: true,
+        email: true,
+        phone: true,
+        stats: {
+          select: {
+            attendanceRate: true,
+            totalPrograms: true,
+            noShowCount: true,
+          },
+        },
+      },
+    })
+    if (userLinkedMember) {
+      linkedMember = userLinkedMember
+    }
+  }
+
   // Check if blocked and auto-reject is enabled
   if (matchResult.alertLevel === 'BLOCKED' && program.autoRejectBlocked) {
     return { success: false, error: '신청이 제한되었습니다. 문의: unipivot@gmail.com' }
@@ -75,7 +102,7 @@ export async function submitApplication(data: ApplicationData) {
       OR: [
         { email: data.email },
         { phone: normalizedPhone },
-        ...(matchResult.member ? [{ memberId: matchResult.member.id }] : []),
+        ...(linkedMember ? [{ memberId: linkedMember.id }] : []),
         ...(session?.user?.id ? [{ userId: session.user.id }] : []),
       ],
     },
@@ -94,8 +121,8 @@ export async function submitApplication(data: ApplicationData) {
   } else if (matchResult.alertLevel === 'BLOCKED' || matchResult.alertLevel === 'WARNING') {
     status = 'PENDING' // Needs review
   } else if (
-    (program.autoApproveVVIP && matchResult.member?.grade === 'VVIP') ||
-    (program.autoApproveVIP && matchResult.member?.grade === 'VIP')
+    (program.autoApproveVVIP && linkedMember?.grade === 'VVIP') ||
+    (program.autoApproveVIP && linkedMember?.grade === 'VIP')
   ) {
     status = 'APPROVED' // Auto-approve VIP
   }
@@ -127,12 +154,12 @@ export async function submitApplication(data: ApplicationData) {
       facePrivacy: data.facePrivacy || false,
 
       userId: session?.user?.id,
-      memberId: matchResult.member?.id,
+      memberId: linkedMember?.id,
 
-      matchedMemberId: matchResult.member?.id,
-      matchedMemberCode: matchResult.member?.memberCode,
-      memberGrade: matchResult.member?.grade,
-      memberStatus: matchResult.member?.status,
+      matchedMemberId: linkedMember?.id,
+      matchedMemberCode: linkedMember?.memberCode,
+      memberGrade: linkedMember?.grade,
+      memberStatus: linkedMember?.status,
       alertLevel: matchResult.alertLevel,
       matchType: matchResult.matchType,
 
@@ -157,7 +184,7 @@ export async function submitApplication(data: ApplicationData) {
         data: JSON.stringify({
           applicationId: application.id,
           alertLevel: matchResult.alertLevel,
-          memberCode: matchResult.member?.memberCode,
+          memberCode: linkedMember?.memberCode,
         }),
       },
     })

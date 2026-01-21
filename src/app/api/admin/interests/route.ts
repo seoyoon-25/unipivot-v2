@@ -97,11 +97,21 @@ export async function GET(request: NextRequest) {
 
     if (type === 'alerts') {
       // 알림 신청 목록
+      const filter = searchParams.get('filter') || 'all'
+
+      const where: any = {}
+      if (filter === 'active') {
+        where.isActive = true
+        where.notifiedAt = null
+      } else if (filter === 'notified') {
+        where.notifiedAt = { not: null }
+      }
+
       const alerts = await prisma.interestAlert.findMany({
-        where: { isActive: true },
+        where,
         orderBy: { createdAt: 'desc' },
         include: {
-          keyword: true,
+          keyword: { select: { keyword: true } },
           user: { select: { name: true, email: true } },
         },
       })
@@ -176,6 +186,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, message: '월간 통계가 초기화되었습니다' })
     }
 
+    if (action === 'toggleAlert') {
+      // 알림 활성/비활성
+      const { alertId } = body
+      if (!alertId) {
+        return NextResponse.json({ error: '알림 ID가 필요합니다' }, { status: 400 })
+      }
+
+      await prisma.interestAlert.update({
+        where: { id: alertId },
+        data: { isActive: data.isActive },
+      })
+      return NextResponse.json({ success: true })
+    }
+
+    if (action === 'sendNotification') {
+      // 알림 발송 (추후 이메일 발송 로직 추가 가능)
+      const { alertId } = body
+      if (!alertId) {
+        return NextResponse.json({ error: '알림 ID가 필요합니다' }, { status: 400 })
+      }
+
+      await prisma.interestAlert.update({
+        where: { id: alertId },
+        data: { notifiedAt: new Date() },
+      })
+      return NextResponse.json({ success: true })
+    }
+
     return NextResponse.json({ error: '잘못된 요청입니다' }, { status: 400 })
   } catch (error) {
     console.error('Admin interests action error:', error)
@@ -186,7 +224,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// DELETE - 키워드 삭제
+// DELETE - 키워드 또는 알림 삭제
 export async function DELETE(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -196,7 +234,17 @@ export async function DELETE(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const keywordId = searchParams.get('id')
+    const alertId = searchParams.get('alertId')
 
+    // 알림 삭제
+    if (alertId) {
+      await prisma.interestAlert.delete({
+        where: { id: alertId },
+      })
+      return NextResponse.json({ success: true })
+    }
+
+    // 키워드 삭제
     if (!keywordId) {
       return NextResponse.json({ error: '키워드 ID가 필요합니다' }, { status: 400 })
     }

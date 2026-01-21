@@ -102,6 +102,13 @@ model User {
   createdEvaluations       SeasonEvaluation[]        @relation("CreatedEvaluations")
   participationPermissions ParticipationPermission[] @relation("ParticipationPermissions")
   setPermissions           ParticipationPermission[] @relation("SetPermissions")
+  // Phase 22: 결석 신청
+  absenceRequests          AbsenceRequest[]
+  absenceReviews           AbsenceRequest[]          @relation("AbsenceReviewer")
+  // Phase 23: 독후감 승인
+  approvedReports          BookReport[]              @relation("BookReportApprover")
+  // Phase 5-6: 세션 독후감
+  sessionReports           SessionReport[]
 }
 
 model Account {
@@ -926,6 +933,7 @@ model ProgramParticipant {
   program              Program             @relation(fields: [programId], references: [id], onDelete: Cascade)
   user                 User                @relation(fields: [userId], references: [id])
   reports              ProgramReport[]
+  absenceRequests      AbsenceRequest[]
 
   @@unique([programId, userId])
 }
@@ -976,6 +984,10 @@ model ProgramSession {
   highlights              Highlight[]
   // Phase 21: 평가
   participantCards        ParticipantCard[]
+  // Phase 22: 결석 신청
+  absenceRequests         AbsenceRequest[]
+  // Phase 5-6: 세션 독후감
+  sessionReports          SessionReport[]
 
   @@unique([programId, sessionNo])
 }
@@ -2566,6 +2578,7 @@ model BookReport {
   book             ReadBook?             @relation(fields: [bookId], references: [id])
   program          Program?              @relation(fields: [programId], references: [id])
   session          ProgramSession?       @relation(fields: [sessionId], references: [id])
+  approver         User?                 @relation("BookReportApprover", fields: [approvedBy], references: [id])
   comments         BookReportComment[]
   likes            BookReportLike[]
   structuredReport StructuredBookReport?
@@ -2625,22 +2638,49 @@ model SurveyTemplate {
 
 // 독후감 템플릿
 model ReportTemplate {
-  id          String   @id @default(cuid())
-  name        String
-  code        String   @unique
-  description String?
-  category    String
-  icon        String?
-  structure   String
-  isDefault   Boolean  @default(false)
-  isActive    Boolean  @default(true)
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id               String   @id @default(cuid())
+  name             String
+  code             String   @unique
+  description      String?
+  category         String
+  icon             String?
+  structure        String   // 기존 필드 유지
+  fields           String?  // JSON 문자열로 저장 (SQLite 호환)
+  estimatedMinutes Int      @default(20) // 예상 작성 시간
+  isDefault        Boolean  @default(false)
+  isActive         Boolean  @default(true)
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  sessionReports SessionReport[]
 
   @@index([code])
   @@index([category])
   @@index([isDefault])
+}
+
+// 세션별 독후감 (템플릿 기반)
+model SessionReport {
+  id          String          @id @default(cuid())
+  sessionId   String
+  userId      String
+  templateId  String?
+  content     String          // JSON 문자열로 저장 (SQLite 호환)
+  status      String          @default("DRAFT") // DRAFT, SUBMITTED
+  submittedAt DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  session  ProgramSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template ReportTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  @@unique([sessionId, userId])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([status])
 }
 
 // 구조화된 독후감
@@ -3151,4 +3191,36 @@ model ParticipationPermission {
   createdAt DateTime @default(now())
 
   @@index([userId, status])
+}
+
+// ============================================
+// Phase 22: 결석 신청 시스템
+// ============================================
+
+// 결석 신청
+model AbsenceRequest {
+  id            String   @id @default(cuid())
+  sessionId     String
+  participantId String
+  userId        String
+  reason        String   // 결석 사유
+  attachment    String?  // 증빙 자료 URL
+  status        String   @default("PENDING") // PENDING, APPROVED, REJECTED
+
+  reviewedBy    String?
+  reviewedAt    DateTime?
+  reviewNote    String?  // 승인/반려 메모
+
+  session     ProgramSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  participant ProgramParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewer    User?              @relation("AbsenceReviewer", fields: [reviewedBy], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sessionId, participantId])
+  @@index([sessionId])
+  @@index([participantId])
+  @@index([status])
 }

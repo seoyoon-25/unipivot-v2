@@ -832,6 +832,358 @@ export async function addReviewComment(reportId: string, content: string) {
 }
 
 /**
+ * 관리자: 프로그램 독후감 목록 조회
+ */
+export async function getAdminProgramReports(
+  programId: string,
+  options?: {
+    status?: string
+    sessionId?: string
+    page?: number
+    limit?: number
+  }
+) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    throw new Error('로그인이 필요합니다')
+  }
+
+  // Check admin permissions
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+  })
+
+  if (!user || !['ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
+    // Check if user is program organizer
+    const membership = await prisma.programMembership.findFirst({
+      where: {
+        programId,
+        userId: session.user.id,
+        role: 'ORGANIZER',
+      },
+    })
+    if (!membership) {
+      throw new Error('권한이 없습니다')
+    }
+  }
+
+  const page = options?.page || 1
+  const limit = options?.limit || 20
+  const skip = (page - 1) * limit
+
+  const where = {
+    programId,
+    ...(options?.status && { status: options.status }),
+    ...(options?.sessionId && { sessionId: options.sessionId }),
+  }
+
+  const [reports, total] = await Promise.all([
+    prisma.bookReport.findMany({
+      where,
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        session: {
+          select: {
+            id: true,
+            sessionNo: true,
+            title: true,
+          },
+        },
+        approver: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      skip,
+    }),
+    prisma.bookReport.count({ where }),
+  ])
+
+  return {
+    reports,
+    page,
+    totalPages: Math.ceil(total / limit),
+    total,
+  }
+}
+
+/**
+ * 관리자: 독후감 승인
+ */
+export async function approveReport(reportId: string, note?: string) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    throw new Error('로그인이 필요합니다')
+  }
+
+  const report = await prisma.bookReport.findUnique({
+    where: { id: reportId },
+    include: {
+      author: {
+        include: {
+          user: true,
+        },
+      },
+      program: true,
+    },
+  })
+
+  if (!report) {
+    throw new Error('독후감을 찾을 수 없습니다')
+  }
+
+  // Check permissions
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+  })
+
+  if (!user || !['ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
+    if (report.programId) {
+      const membership = await prisma.programMembership.findFirst({
+        where: {
+          programId: report.programId,
+          userId: session.user.id,
+          role: 'ORGANIZER',
+        },
+      })
+      if (!membership) {
+        throw new Error('권한이 없습니다')
+      }
+    } else {
+      throw new Error('권한이 없습니다')
+    }
+  }
+
+  // Update report
+  const updated = await prisma.bookReport.update({
+    where: { id: reportId },
+    data: {
+      status: 'APPROVED',
+      approvedAt: new Date(),
+      approvedBy: session.user.id,
+    },
+  })
+
+  // Send notification to author
+  if (report.author.user) {
+    await prisma.notification.create({
+      data: {
+        userId: report.author.user.id,
+        type: 'REPORT_APPROVED',
+        title: '독후감이 승인되었습니다',
+        content: note || `"${report.title}" 독후감이 승인되었습니다.`,
+        link: `/my/reports/${reportId}`,
+      },
+    })
+  }
+
+  if (report.programId) {
+    revalidatePath(`/admin/programs/${report.programId}/reports`)
+  }
+
+  return updated
+}
+
+/**
+ * 관리자: 독후감 반려
+ */
+export async function rejectReport(reportId: string, reason: string) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    throw new Error('로그인이 필요합니다')
+  }
+
+  if (!reason.trim()) {
+    throw new Error('반려 사유를 입력해주세요')
+  }
+
+  const report = await prisma.bookReport.findUnique({
+    where: { id: reportId },
+    include: {
+      author: {
+        include: {
+          user: true,
+        },
+      },
+      program: true,
+    },
+  })
+
+  if (!report) {
+    throw new Error('독후감을 찾을 수 없습니다')
+  }
+
+  // Check permissions
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+  })
+
+  if (!user || !['ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
+    if (report.programId) {
+      const membership = await prisma.programMembership.findFirst({
+        where: {
+          programId: report.programId,
+          userId: session.user.id,
+          role: 'ORGANIZER',
+        },
+      })
+      if (!membership) {
+        throw new Error('권한이 없습니다')
+      }
+    } else {
+      throw new Error('권한이 없습니다')
+    }
+  }
+
+  // Update report
+  const updated = await prisma.bookReport.update({
+    where: { id: reportId },
+    data: {
+      status: 'REJECTED',
+    },
+  })
+
+  // Send notification to author
+  if (report.author.user) {
+    await prisma.notification.create({
+      data: {
+        userId: report.author.user.id,
+        type: 'REPORT_REJECTED',
+        title: '독후감이 반려되었습니다',
+        content: `"${report.title}" 독후감이 반려되었습니다. 사유: ${reason}`,
+        link: `/my/reports/${reportId}`,
+      },
+    })
+  }
+
+  if (report.programId) {
+    revalidatePath(`/admin/programs/${report.programId}/reports`)
+  }
+
+  return updated
+}
+
+/**
+ * 관리자: 독후감 수정 요청
+ */
+export async function requestReportRevision(reportId: string, feedback: string) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    throw new Error('로그인이 필요합니다')
+  }
+
+  if (!feedback.trim()) {
+    throw new Error('피드백을 입력해주세요')
+  }
+
+  const report = await prisma.bookReport.findUnique({
+    where: { id: reportId },
+    include: {
+      author: {
+        include: {
+          user: true,
+        },
+      },
+      program: true,
+    },
+  })
+
+  if (!report) {
+    throw new Error('독후감을 찾을 수 없습니다')
+  }
+
+  // Check permissions
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+  })
+
+  if (!user || !['ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
+    if (report.programId) {
+      const membership = await prisma.programMembership.findFirst({
+        where: {
+          programId: report.programId,
+          userId: session.user.id,
+          role: 'ORGANIZER',
+        },
+      })
+      if (!membership) {
+        throw new Error('권한이 없습니다')
+      }
+    } else {
+      throw new Error('권한이 없습니다')
+    }
+  }
+
+  // Update report
+  const updated = await prisma.bookReport.update({
+    where: { id: reportId },
+    data: {
+      status: 'REVISION_REQUESTED',
+    },
+  })
+
+  // Send notification to author
+  if (report.author.user) {
+    await prisma.notification.create({
+      data: {
+        userId: report.author.user.id,
+        type: 'REPORT_REVISION_REQUESTED',
+        title: '독후감 수정이 요청되었습니다',
+        content: `"${report.title}" 독후감에 수정이 요청되었습니다. 피드백: ${feedback}`,
+        link: `/my/reports/${reportId}/edit`,
+      },
+    })
+  }
+
+  if (report.programId) {
+    revalidatePath(`/admin/programs/${report.programId}/reports`)
+  }
+
+  return updated
+}
+
+/**
+ * 독후감 상태별 카운트 조회
+ */
+export async function getReportStatusCounts(programId: string) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    throw new Error('로그인이 필요합니다')
+  }
+
+  const counts = await prisma.bookReport.groupBy({
+    by: ['status'],
+    where: { programId },
+    _count: true,
+  })
+
+  const result: Record<string, number> = {
+    DRAFT: 0,
+    PENDING: 0,
+    PUBLISHED: 0,
+    APPROVED: 0,
+    REJECTED: 0,
+    REVISION_REQUESTED: 0,
+  }
+
+  for (const count of counts) {
+    result[count.status] = count._count
+  }
+
+  return result
+}
+
+/**
  * 독후감 제출 현황 조회 (진행자용)
  */
 export async function getReviewSubmissionStatus(programId: string) {

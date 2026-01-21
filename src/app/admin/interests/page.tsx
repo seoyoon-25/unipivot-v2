@@ -360,9 +360,7 @@ export default function InterestAdminPage() {
 
           {/* 알림 관리 */}
           {activeTab === 'alerts' && (
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <p className="text-gray-500">알림 관리 기능은 곧 추가됩니다.</p>
-            </div>
+            <AlertsTab />
           )}
         </>
       )}
@@ -414,6 +412,257 @@ function StatCard({
       </div>
       <div className="text-2xl font-bold text-gray-900">{value}</div>
       <div className="text-sm text-gray-500">{label}</div>
+    </div>
+  )
+}
+
+interface Alert {
+  id: string
+  email: string
+  name: string | null
+  isActive: boolean
+  notifiedAt: string | null
+  createdAt: string
+  keyword: { keyword: string }
+  user: { name: string; email: string } | null
+}
+
+function AlertsTab() {
+  const [alerts, setAlerts] = useState<Alert[]>([])
+  const [loading, setLoading] = useState(true)
+  const [filter, setFilter] = useState<'all' | 'active' | 'notified'>('all')
+  const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    fetchAlerts()
+  }, [filter])
+
+  const fetchAlerts = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/admin/interests?type=alerts&filter=${filter}`)
+      const data = await res.json()
+      setAlerts(data.alerts || [])
+    } catch (error) {
+      console.error('Failed to fetch alerts:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleToggleActive = async (alertId: string, isActive: boolean) => {
+    try {
+      const res = await fetch('/api/admin/interests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'toggleAlert',
+          alertId,
+          data: { isActive: !isActive },
+        }),
+      })
+
+      if (res.ok) {
+        fetchAlerts()
+      }
+    } catch (error) {
+      console.error('Toggle failed:', error)
+    }
+  }
+
+  const handleDeleteAlert = async (alertId: string) => {
+    if (!confirm('이 알림을 삭제하시겠습니까?')) return
+
+    try {
+      const res = await fetch(`/api/admin/interests?alertId=${alertId}`, {
+        method: 'DELETE',
+      })
+
+      if (res.ok) {
+        fetchAlerts()
+      }
+    } catch (error) {
+      console.error('Delete failed:', error)
+    }
+  }
+
+  const handleSendNotification = async (alertId: string) => {
+    if (!confirm('이 사용자에게 알림을 보내시겠습니까?')) return
+
+    try {
+      const res = await fetch('/api/admin/interests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'sendNotification',
+          alertId,
+        }),
+      })
+
+      if (res.ok) {
+        fetchAlerts()
+        alert('알림이 발송되었습니다.')
+      }
+    } catch (error) {
+      console.error('Notification failed:', error)
+    }
+  }
+
+  const filteredAlerts = alerts.filter((alert) => {
+    if (!search) return true
+    const searchLower = search.toLowerCase()
+    return (
+      alert.email.toLowerCase().includes(searchLower) ||
+      alert.name?.toLowerCase().includes(searchLower) ||
+      alert.keyword.keyword.toLowerCase().includes(searchLower)
+    )
+  })
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* 필터 & 검색 */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between">
+        <div className="flex gap-2">
+          {[
+            { key: 'all', label: '전체' },
+            { key: 'active', label: '활성' },
+            { key: 'notified', label: '발송됨' },
+          ].map((item) => (
+            <button
+              key={item.key}
+              onClick={() => setFilter(item.key as any)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                filter === item.key
+                  ? 'bg-primary text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="relative">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="이메일, 이름, 키워드 검색..."
+            className="w-full sm:w-64 px-4 py-2 border rounded-lg"
+          />
+        </div>
+      </div>
+
+      {/* 알림 목록 */}
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        {filteredAlerts.length === 0 ? (
+          <div className="p-12 text-center text-gray-500">
+            <Bell className="w-12 h-12 mx-auto mb-4 opacity-20" />
+            <p>등록된 알림이 없습니다.</p>
+          </div>
+        ) : (
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">키워드</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">이메일</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">이름</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-500">상태</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-500">발송일</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-500">등록일</th>
+                <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">관리</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filteredAlerts.map((alert) => (
+                <tr key={alert.id} className={!alert.isActive ? 'bg-gray-50 opacity-60' : ''}>
+                  <td className="px-4 py-3">
+                    <span className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
+                      #{alert.keyword.keyword}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-sm">{alert.email}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">
+                    {alert.name || alert.user?.name || '-'}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {alert.isActive ? (
+                      <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
+                        활성
+                      </span>
+                    ) : (
+                      <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full text-xs">
+                        비활성
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-center text-sm text-gray-500">
+                    {alert.notifiedAt
+                      ? new Date(alert.notifiedAt).toLocaleDateString('ko-KR')
+                      : '-'}
+                  </td>
+                  <td className="px-4 py-3 text-center text-sm text-gray-500">
+                    {new Date(alert.createdAt).toLocaleDateString('ko-KR')}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => handleSendNotification(alert.id)}
+                        className="p-2 text-gray-400 hover:text-blue-500"
+                        title="알림 발송"
+                      >
+                        <Bell className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleToggleActive(alert.id, alert.isActive)}
+                        className={`p-2 ${alert.isActive ? 'text-green-500 hover:text-gray-400' : 'text-gray-400 hover:text-green-500'}`}
+                        title={alert.isActive ? '비활성화' : '활성화'}
+                      >
+                        {alert.isActive ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteAlert(alert.id)}
+                        className="p-2 text-gray-400 hover:text-red-500"
+                        title="삭제"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* 통계 */}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-white rounded-xl p-4 shadow-sm text-center">
+          <div className="text-2xl font-bold text-gray-900">{alerts.length}</div>
+          <div className="text-sm text-gray-500">전체 알림</div>
+        </div>
+        <div className="bg-white rounded-xl p-4 shadow-sm text-center">
+          <div className="text-2xl font-bold text-green-600">
+            {alerts.filter((a) => a.isActive).length}
+          </div>
+          <div className="text-sm text-gray-500">활성 알림</div>
+        </div>
+        <div className="bg-white rounded-xl p-4 shadow-sm text-center">
+          <div className="text-2xl font-bold text-blue-600">
+            {alerts.filter((a) => a.notifiedAt).length}
+          </div>
+          <div className="text-sm text-gray-500">발송 완료</div>
+        </div>
+      </div>
     </div>
   )
 }
