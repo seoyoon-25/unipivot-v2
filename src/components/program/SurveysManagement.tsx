@@ -62,6 +62,31 @@ export function SurveysManagement({
   isFacilitator = false,
 }: SurveysManagementProps) {
   const router = useRouter()
+  const [sendingReminder, setSendingReminder] = useState<string | null>(null)
+
+  const handleSendReminder = async (surveyId: string) => {
+    if (!confirm('미응답자에게 리마인더를 발송하시겠습니까?')) return
+
+    setSendingReminder(surveyId)
+    try {
+      const response = await fetch(`/api/admin/surveys/${surveyId}/reminders`, {
+        method: 'POST',
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || '리마인더 발송 실패')
+      }
+
+      const result = await response.json()
+      alert(`리마인더 발송 완료: ${result.sent}명 성공`)
+      router.refresh()
+    } catch (error) {
+      alert(error instanceof Error ? error.message : '리마인더 발송 중 오류가 발생했습니다.')
+    } finally {
+      setSendingReminder(null)
+    }
+  }
 
   // Separate surveys by type
   const programSurveys = surveys.filter((s) => s.surveyType === 'program')
@@ -113,6 +138,8 @@ export function SurveysManagement({
               participantCount={participantCount}
               programId={programId}
               isFacilitator={isFacilitator}
+              onSendReminder={handleSendReminder}
+              sendingReminder={sendingReminder}
             />
           ))
         )}
@@ -137,6 +164,8 @@ export function SurveysManagement({
                 participantCount={participantCount}
                 programId={programId}
                 isFacilitator={isFacilitator}
+                onSendReminder={handleSendReminder}
+                sendingReminder={sendingReminder}
               />
             ))}
           </div>
@@ -147,29 +176,32 @@ export function SurveysManagement({
 }
 
 // Individual Survey Card
+interface SurveyCardProps {
+  survey: Survey
+  participantCount: number
+  programId: string
+  isFacilitator: boolean
+  onSendReminder: (surveyId: string) => void
+  sendingReminder: string | null
+}
+
 function SurveyCard({
   survey,
   participantCount,
   programId,
   isFacilitator,
-}: {
-  survey: Survey
-  participantCount: number
-  programId: string
-  isFacilitator: boolean
-}) {
+  onSendReminder,
+  sendingReminder,
+}: SurveyCardProps) {
   const router = useRouter()
   const now = new Date()
   const deadline = new Date(survey.deadline)
   const isExpired = now > deadline && survey.status !== 'CLOSED'
+  const isSending = sendingReminder === survey.id
+  const nonRespondents = participantCount - survey._count.responses
 
   const handleViewResults = () => {
     router.push(`/admin/surveys/${survey.id}/results`)
-  }
-
-  const handleSendReminder = () => {
-    // TODO: Implement reminder sending
-    console.log('Sending reminder for survey:', survey.id)
   }
 
   return (
@@ -233,10 +265,22 @@ function SurveyCard({
                 <BarChart3 className="mr-2 h-4 w-4" />
                 결과 보기
               </DropdownMenuItem>
-              {isFacilitator && survey.status === 'ACTIVE' && (
-                <DropdownMenuItem onClick={handleSendReminder}>
-                  <Send className="mr-2 h-4 w-4" />
-                  리마인더 발송
+              {isFacilitator && survey.status === 'ACTIVE' && nonRespondents > 0 && (
+                <DropdownMenuItem
+                  onClick={() => onSendReminder(survey.id)}
+                  disabled={isSending}
+                >
+                  {isSending ? (
+                    <>
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-primary" />
+                      발송 중...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      리마인더 발송 ({nonRespondents}명)
+                    </>
+                  )}
                 </DropdownMenuItem>
               )}
               {isFacilitator && survey.status === 'DRAFT' && (

@@ -117,25 +117,35 @@ async function getDynamicDisallowPaths(): Promise<string[]> {
       disallowPaths.push(`/programs/${program.slug}`)
     }
 
-    // TODO: 비공개 게시글들 처리 (Post 모델이 구현된 후)
-    // const privatePosts = await prisma.post.findMany({
-    //   where: { isPublished: false },
-    //   select: { slug: true }
-    // }).catch(() => [])
-    //
-    // for (const post of privatePosts) {
-    //   disallowPaths.push(`/posts/${post.slug}`)
-    // }
+    // 비공개 공지사항 차단
+    const privateNotices = await prisma.notice.findMany({
+      where: { isPublic: false },
+      select: { id: true }
+    }).catch(() => [])
 
-    // TODO: 종료된 이벤트들 처리 (Event 모델이 구현된 후)
-    // const endedEvents = await prisma.event.findMany({
-    //   where: { endDate: { lt: new Date() } },
-    //   select: { slug: true }
-    // }).catch(() => [])
-    //
-    // for (const event of endedEvents) {
-    //   disallowPaths.push(`/events/${event.slug}`)
-    // }
+    for (const notice of privateNotices) {
+      disallowPaths.push(`/notice/${notice.id}`)
+    }
+
+    // 미발행 블로그 포스트 차단
+    const unpublishedPosts = await prisma.blogPost.findMany({
+      where: { isPublished: false },
+      select: { slug: true }
+    }).catch(() => [])
+
+    for (const post of unpublishedPosts) {
+      disallowPaths.push(`/blog/${post.slug}`)
+    }
+
+    // 비활성화된 페이지 컨텐츠 차단
+    const inactivePageContents = await prisma.pageContent.findMany({
+      where: { isActive: false },
+      select: { slug: true }
+    }).catch(() => [])
+
+    for (const page of inactivePageContents) {
+      disallowPaths.push(`/p/${page.slug}`)
+    }
 
     // 비활성화된 SEO 설정이 있는 페이지들
     const inactivePages = await prisma.seoSetting.findMany({

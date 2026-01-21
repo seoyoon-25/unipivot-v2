@@ -1,4 +1,5 @@
 import prisma from '@/lib/db'
+import { sendNotification, generateSurveyReminderEmail } from '@/lib/services/notification-sender'
 
 /**
  * 설문 리마인더 유틸리티
@@ -143,15 +144,25 @@ export async function sendSurveyReminders() {
 
   for (const target of targets) {
     try {
-      // Create notification
-      await prisma.notification.create({
-        data: {
-          userId: target.userId,
-          type: 'SURVEY_REMINDER',
-          title: '만족도 조사 리마인더',
-          content: `"${target.surveyTitle}" 설문이 ${target.daysUntilDeadline}일 후 마감됩니다.`,
-          link: `/surveys/${target.surveyId}/respond`,
-        },
+      const surveyLink = `/surveys/${target.surveyId}/respond`
+
+      // 통합 알림 발송 (인앱 + 이메일)
+      await sendNotification({
+        userId: target.userId,
+        type: 'SURVEY_REMINDER',
+        title: '만족도 조사 리마인더',
+        content: `"${target.surveyTitle}" 설문이 ${target.daysUntilDeadline}일 후 마감됩니다.`,
+        link: surveyLink,
+        email: target.userEmail ? {
+          to: target.userEmail,
+          subject: `[유니피벗] 만족도 조사 참여 안내 - ${target.surveyTitle}`,
+          html: await generateSurveyReminderEmail(
+            target.userName,
+            target.surveyTitle,
+            target.daysUntilDeadline,
+            surveyLink
+          ),
+        } : undefined,
       })
 
       // Record reminder sent
@@ -164,10 +175,6 @@ export async function sendSurveyReminders() {
           sentAt: new Date(),
         },
       })
-
-      // TODO: Send email/push notification
-      // await sendEmail(target.userEmail, ...)
-      // await sendPush(target.userId, ...)
 
       results.sent++
     } catch (error) {

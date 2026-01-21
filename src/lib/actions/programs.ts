@@ -98,6 +98,52 @@ export async function getFilteredProgramsByStatus(type?: ProgramType) {
   return { recruiting, ongoing, completed };
 }
 
+// 단일 프로그램 상세 조회
+export async function getProgram(programId: string) {
+  const program = await prisma.program.findUnique({
+    where: { id: programId },
+    include: {
+      sessions: {
+        orderBy: { sessionNo: 'asc' },
+        select: {
+          id: true,
+          sessionNo: true,
+          title: true,
+          date: true,
+          status: true,
+          bookTitle: true,
+          bookRange: true,
+        },
+      },
+      participants: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          attendances: {
+            select: {
+              id: true,
+              status: true,
+            },
+          },
+        },
+      },
+      _count: {
+        select: {
+          sessions: true,
+          participants: true,
+        },
+      },
+    },
+  })
+
+  return program
+}
+
 // 완료된 프로그램 페이지네이션 (더 보기용)
 export async function getCompletedPrograms(
   type?: ProgramType,

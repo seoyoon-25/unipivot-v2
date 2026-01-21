@@ -9,77 +9,99 @@ datasource db {
 }
 
 model User {
-  id                      String                   @id @default(cuid())
-  name                    String?
-  email                   String                   @unique
-  emailVerified           DateTime?
-  image                   String?
-  password                String?
-  phone                   String?
-  origin                  String?
-  birthYear               Int?
-  occupation              String?
-  bio                     String?
-  points                  Int                      @default(0)
-  role                    String                   @default("USER")
-  status                  String                   @default("ACTIVE")
-  createdAt               DateTime                 @default(now())
-  updatedAt               DateTime                 @updatedAt
-  arrivalYear             Int?
-  originCategory          String?
-  originCountry           String?
-  originDetails           String?
-  grade                   Int                      @default(1)
-  gradeUpdatedAt          DateTime?
-  profileCompleted        Boolean                  @default(false)
-  birthCity               String?
-  birthRegion             String?
-  displayName             String?
-  gender                  String?
-  marketingAgreed         Boolean                  @default(false)
-  marketingAgreedAt       DateTime?
-  organization            String?
-  privacyAgreed           Boolean                  @default(false)
-  privacyAgreedAt         DateTime?
-  referralSource          String?
-  residenceCity           String?
-  residenceRegion         String?
-  termsAgreed             Boolean                  @default(false)
-  termsAgreedAt           DateTime?
-  accounts                Account[]
-  activityLogs            ActivityLog[]
-  bankAccounts            BankAccount[]
-  blogPosts               BlogPost[]
-  bookSuggestions         BookSuggestion[]
-  bookVotes               BookVote[]
-  chatLogs                ChatLog[]
-  deposits                Deposit[]
-  donations               Donation[]
-  interests               Interest[]
-  interestAlerts          InterestAlert[]
-  interestKeywordLikes    InterestKeywordLike[]
-  interestLikes           InterestLike[]
-  labProfile              LabProfile?
-  member                  Member?
-  gradeHistory            MemberGradeHistory[]
-  notifications           Notification[]
-  pointHistory            PointHistory[]
-  programApplications     ProgramApplication[]
-  programLikes            ProgramLike[]
-  programParticipants     ProgramParticipant[]
-  programReports          ProgramReport[]
-  registrations           Registration[]
-  reportComments          ReportComment[]
-  reportLikes             ReportLike[]
-  rewardClaims            RewardClaim[]
-  sessions                Session[]
-  surveyResponses         SurveyResponse[]
-  talents                 Talent[]
+  id                       String                    @id @default(cuid())
+  name                     String?
+  email                    String                    @unique
+  emailVerified            DateTime?
+  image                    String?
+  password                 String?
+  phone                    String?
+  origin                   String?
+  birthYear                Int?
+  occupation               String?
+  bio                      String?
+  points                   Int                       @default(0)
+  role                     String                    @default("USER")
+  status                   String                    @default("ACTIVE")
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  arrivalYear              Int?
+  originCategory           String?
+  originCountry            String?
+  originDetails            String?
+  grade                    Int                       @default(1)
+  gradeUpdatedAt           DateTime?
+  profileCompleted         Boolean                   @default(false)
+  birthCity                String?
+  birthRegion              String?
+  displayName              String?
+  gender                   String?
+  marketingAgreed          Boolean                   @default(false)
+  marketingAgreedAt        DateTime?
+  organization             String?
+  privacyAgreed            Boolean                   @default(false)
+  privacyAgreedAt          DateTime?
+  referralSource           String?
+  residenceCity            String?
+  residenceRegion          String?
+  termsAgreed              Boolean                   @default(false)
+  termsAgreedAt            DateTime?
+  accounts                 Account[]
+  activityLogs             ActivityLog[]
+  bankAccounts             BankAccount[]
+  blogPosts                BlogPost[]
+  bookSuggestions          BookSuggestion[]
+  bookVotes                BookVote[]
+  chatLogs                 ChatLog[]
+  deposits                 Deposit[]
+  donations                Donation[]
+  interests                Interest[]
+  interestAlerts           InterestAlert[]
+  interestKeywordLikes     InterestKeywordLike[]
+  interestLikes            InterestLike[]
+  labProfile               LabProfile?
+  member                   Member?
+  gradeHistory             MemberGradeHistory[]
+  notifications            Notification[]
+  pointHistory             PointHistory[]
+  programApplications      ProgramApplication[]
+  programLikes             ProgramLike[]
+  programParticipants      ProgramParticipant[]
+  programReports           ProgramReport[]
+  registrations            Registration[]
+  reportComments           ReportComment[]
+  reportLikes              ReportLike[]
+  rewardClaims             RewardClaim[]
+  sessions                 Session[]
+  surveyResponses          SurveyResponse[]
+  talents                  Talent[]
   // Phase 13: 진행자 지원 + RSVP
-  programMemberships      ProgramMembership[]
-  facilitatorApplications FacilitatorApplication[]
-  sessionFacilitators     SessionFacilitator[]
-  sessionRSVPs            SessionRSVP[]
+  programMemberships       ProgramMembership[]
+  facilitatorApplications  FacilitatorApplication[]
+  sessionFacilitators      SessionFacilitator[]
+  sessionRSVPs             SessionRSVP[]
+  // Phase 14: 발언 타이머
+  speakingTimes            SpeakingTime[]
+  // Phase 15: AI 어시스턴트
+  aiConversations          AIConversation[]
+  // Phase 16: 공지
+  announcementTemplates    AnnouncementTemplate[]
+  notificationSettings     NotificationSettings?
+  // Phase 18: 배지/프로필
+  badges                   UserBadge[]
+  userProfile              UserProfile?
+  // Phase 20: 읽기 도우미
+  readingProgress          ReadingProgress[]
+  highlights               Highlight[]
+  // Phase 21: 평가
+  receivedCards            ParticipantCard[]         @relation("ReceivedCards")
+  issuedCards              ParticipantCard[]         @relation("IssuedCards")
+  receivedNotes            OrganizerNote[]           @relation("ReceivedNotes")
+  createdNotes             OrganizerNote[]           @relation("CreatedNotes")
+  receivedEvaluations      SeasonEvaluation[]        @relation("ReceivedEvaluations")
+  createdEvaluations       SeasonEvaluation[]        @relation("CreatedEvaluations")
+  participationPermissions ParticipationPermission[] @relation("ParticipationPermissions")
+  setPermissions           ParticipationPermission[] @relation("SetPermissions")
 }
 
 model Account {
@@ -127,71 +149,76 @@ model PasswordResetToken {
 }
 
 model Program {
-  id                      String                        @id @default(cuid())
-  title                   String
-  slug                    String                        @unique
-  type                    String
-  description             String?
-  content                 String?
-  image                   String?
-  capacity                Int                           @default(30)
-  fee                     Int                           @default(0)
-  location                String?
-  isOnline                Boolean                       @default(false)
-  status                  String                        @default("DRAFT")
-  startDate               DateTime?
-  endDate                 DateTime?
-  createdAt               DateTime                      @default(now())
-  updatedAt               DateTime                      @updatedAt
-  applicationCount        Int                           @default(0)
-  applicationFormId       String?
-  feeAmount               Int                           @default(0)
-  feeType                 String                        @default("FREE")
-  likeCount               Int                           @default(0)
-  recruitEndDate          DateTime?
-  recruitStartDate        DateTime?
-  thumbnailSquare         String?
-  currentBookContent      String?
-  scheduleContent         String?
-  isLegacy                Boolean                       @default(false)
-  legacyHtml              String?
-  legacyImages            String?                       @default("[]")
-  migratedAt              DateTime?
-  originalUrl             String?
-  displayOrder            Int                           @default(0)
-  applicationEndAt        DateTime?
-  applicationOpen         Boolean                       @default(false)
-  applicationStartAt      DateTime?
-  autoApproveVIP          Boolean                       @default(true)
-  autoApproveVVIP         Boolean                       @default(true)
-  autoRejectBlocked       Boolean                       @default(false)
-  customQuestions         String?
-  depositAmountSetting    Int?
-  maxParticipants         Int?
-  requireMotivation       Boolean                       @default(true)
-  requireSelfIntro        Boolean                       @default(false)
-  reportStructure         String                        @default("FREE")
+  id                       String                        @id @default(cuid())
+  title                    String
+  slug                     String                        @unique
+  type                     String
+  description              String?
+  content                  String?
+  image                    String?
+  capacity                 Int                           @default(30)
+  fee                      Int                           @default(0)
+  location                 String?
+  isOnline                 Boolean                       @default(false)
+  status                   String                        @default("DRAFT")
+  startDate                DateTime?
+  endDate                  DateTime?
+  createdAt                DateTime                      @default(now())
+  updatedAt                DateTime                      @updatedAt
+  applicationCount         Int                           @default(0)
+  applicationFormId        String?
+  feeAmount                Int                           @default(0)
+  feeType                  String                        @default("FREE")
+  likeCount                Int                           @default(0)
+  recruitEndDate           DateTime?
+  recruitStartDate         DateTime?
+  thumbnailSquare          String?
+  currentBookContent       String?
+  scheduleContent          String?
+  isLegacy                 Boolean                       @default(false)
+  legacyHtml               String?
+  legacyImages             String?                       @default("[]")
+  migratedAt               DateTime?
+  originalUrl              String?
+  displayOrder             Int                           @default(0)
+  applicationEndAt         DateTime?
+  applicationOpen          Boolean                       @default(false)
+  applicationStartAt       DateTime?
+  autoApproveVIP           Boolean                       @default(true)
+  autoApproveVVIP          Boolean                       @default(true)
+  autoRejectBlocked        Boolean                       @default(false)
+  customQuestions          String?
+  depositAmountSetting     Int?
+  maxParticipants          Int?
+  requireMotivation        Boolean                       @default(true)
+  requireSelfIntro         Boolean                       @default(false)
+  reportStructure          String                        @default("FREE")
   // Phase 13: 진행자 지원 + RSVP 설정
-  rsvpEnabled             Boolean                       @default(true)
-  rsvpDeadlineHours       Int                           @default(24)
-  facilitatorIncentiveMax Int                           @default(3) // 최대 인센티브 횟수
-  books                   BookOnProgram[]
-  bookReports             BookReport[]
-  depositSetting          DepositSetting?
-  memberAttendances       MemberAttendance[]
-  applicationForm         ApplicationForm?              @relation(fields: [applicationFormId], references: [id])
-  applications            ProgramApplication[]
-  gallery                 ProgramGallery[]
-  likes                   ProgramLike[]
-  participants            ProgramParticipant[]
-  programReports          ProgramReport[]
-  sessions                ProgramSession[]
-  refundHistories         RefundHistory[]
-  registrations           Registration[]
-  surveys                 SatisfactionSurvey[]
+  rsvpEnabled              Boolean                       @default(true)
+  rsvpDeadlineHours        Int                           @default(24)
+  facilitatorIncentiveMax  Int                           @default(3) // 최대 인센티브 횟수
+  books                    BookOnProgram[]
+  bookReports              BookReport[]
+  depositSetting           DepositSetting?
+  memberAttendances        MemberAttendance[]
+  applicationForm          ApplicationForm?              @relation(fields: [applicationFormId], references: [id])
+  applications             ProgramApplication[]
+  gallery                  ProgramGallery[]
+  likes                    ProgramLike[]
+  participants             ProgramParticipant[]
+  programReports           ProgramReport[]
+  sessions                 ProgramSession[]
+  refundHistories          RefundHistory[]
+  registrations            Registration[]
+  surveys                  SatisfactionSurvey[]
   // Phase 13: 진행자 지원 + RSVP
-  memberships             ProgramMembership[]
-  checklistTemplate       FacilitatorChecklistTemplate?
+  memberships              ProgramMembership[]
+  checklistTemplate        FacilitatorChecklistTemplate?
+  // Phase 21: 평가
+  participantCards         ParticipantCard[]
+  organizerNotes           OrganizerNote[]
+  seasonEvaluations        SeasonEvaluation[]
+  participationPermissions ParticipationPermission[]
 }
 
 model Registration {
@@ -932,6 +959,23 @@ model ProgramSession {
   facilitatorApplications FacilitatorApplication[]
   facilitators            SessionFacilitator[]
   rsvps                   SessionRSVP[]
+  // Phase 14: 발언 타이머
+  speakingTimes           SpeakingTime[]
+  speakingStats           SessionSpeakingStats?
+  // Phase 15: AI 어시스턴트
+  aiConversations         AIConversation[]
+  aiGeneratedQuestions    AIGeneratedQuestion[]
+  // Phase 16: 공지
+  announcements           SessionAnnouncement[]
+  // Phase 17: 녹음/블로그
+  recordings              SessionRecording[]
+  // Phase 19: 아카이브
+  archive                 SessionArchive?
+  // Phase 20: 읽기 도우미
+  readingProgress         ReadingProgress[]
+  highlights              Highlight[]
+  // Phase 21: 평가
+  participantCards        ParticipantCard[]
 
   @@unique([programId, sessionNo])
 }
@@ -2734,4 +2778,377 @@ model SessionRSVP {
   @@index([sessionId])
   @@index([userId])
   @@index([status])
+}
+
+// ============================================
+// Phase 14: 발언자별 타이머 + 통계
+// ============================================
+
+// 참가자별 발언 시간 기록
+model SpeakingTime {
+  id        String  @id @default(cuid())
+  sessionId String
+  userId    String
+  duration  Int     @default(0) // 초 단위
+  isActive  Boolean @default(false) // 현재 발언 중
+
+  session ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([sessionId, userId])
+  @@index([sessionId])
+}
+
+// 세션별 발언 통계 요약
+model SessionSpeakingStats {
+  id                  String  @id @default(cuid())
+  sessionId           String  @unique
+  totalSpeakingTime   Int     @default(0) // 총 발언 시간 (초)
+  averageSpeakingTime Int     @default(0) // 평균 발언 시간 (초)
+  participantCount    Int     @default(0) // 발언한 참가자 수
+  balanceScore        Int     @default(0) // 발언 균형도 점수 (0-100)
+  topSpeakers         String? // JSON: 상위 발언자 [{userId, duration, percentage}]
+  silentParticipants  String? // JSON: 발언하지 않은 참가자 userId 배열
+
+  session ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================
+// Phase 15: AI 모임 준비 어시스턴트
+// ============================================
+
+// AI 대화 기록
+model AIConversation {
+  id        String  @id @default(cuid())
+  sessionId String
+  userId    String // 진행자
+  messages  String // JSON: 대화 메시지 배열
+  context   String? // JSON: 분석 컨텍스트
+
+  session ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sessionId, userId])
+  @@index([sessionId])
+  @@index([userId])
+}
+
+// AI 생성 토론 질문
+model AIGeneratedQuestion {
+  id        String    @id @default(cuid())
+  sessionId String
+  question  String
+  category  String // "INTRO", "DEEP", "APPLICATION"
+  reasoning String? // AI가 이 질문을 제안한 이유
+  basedOn   String? // JSON: 기반이 된 독후감/데이터
+  isUsed    Boolean   @default(false)
+  usedAt    DateTime?
+
+  session ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+}
+
+// ============================================
+// Phase 16: 공지/알림 시스템
+// ============================================
+
+// 세션 공지
+model SessionAnnouncement {
+  id            String    @id @default(cuid())
+  sessionId     String
+  type          String // "TWO_WEEKS", "ONE_WEEK", "ONE_DAY"
+  title         String?
+  content       String // 공지 내용
+  isAIGenerated Boolean   @default(false)
+  aiStyle       String? // JSON: {tone, emoji, length}
+  isSent        Boolean   @default(false)
+  sentAt        DateTime?
+  sentBy        String?
+
+  session ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([sessionId, type])
+}
+
+// 공지 템플릿
+model AnnouncementTemplate {
+  id       String  @id @default(cuid())
+  userId   String
+  name     String
+  content  String // 템플릿 (변수 포함)
+  style    String? // JSON
+  isPublic Boolean @default(false)
+  useCount Int     @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+// 알림 설정
+model NotificationSettings {
+  id                 String  @id @default(cuid())
+  userId             String  @unique
+  oneWeekEnabled     Boolean @default(true)
+  facilitatorEnabled Boolean @default(true)
+  rsvpEnabled        Boolean @default(true)
+  reportEnabled      Boolean @default(true)
+  quietHoursStart    Int     @default(22) // 22:00
+  quietHoursEnd      Int     @default(8) // 08:00
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// Phase 17: 클로바노트 녹음 → 블로그
+// ============================================
+
+// 세션 녹음
+model SessionRecording {
+  id               String  @id @default(cuid())
+  sessionId        String
+  originalFileName String
+  originalFileUrl  String
+  uploadedBy       String
+  transcriptRaw    String?
+  transcriptClean  String?
+  removedContent   String? // JSON: 제거된 내용
+
+  session  ProgramSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  blogPost SessionBlogPost?
+
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+}
+
+// 블로그 포스트
+model SessionBlogPost {
+  id          String    @id @default(cuid())
+  recordingId String    @unique
+  title       String
+  content     String // 마크다운
+  excerpt     String?
+  status      String    @default("DRAFT")
+  publishedAt DateTime?
+  keywords    String? // JSON
+  categories  String? // JSON
+  shareUrl    String?
+
+  recording SessionRecording @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+// ============================================
+// Phase 18: 배지 시스템 + 개인 프로필
+// ============================================
+
+// 배지 정의
+model Badge {
+  id          String @id @default(cuid())
+  code        String @unique
+  name        String
+  description String
+  icon        String
+  category    String // "ATTENDANCE", "REPORT", "FACILITATOR", "SPEAKING"
+  condition   String // JSON: 획득 조건
+
+  userBadges UserBadge[]
+
+  createdAt DateTime @default(now())
+}
+
+// 사용자 획득 배지
+model UserBadge {
+  id        String  @id @default(cuid())
+  userId    String
+  badgeId   String
+  programId String? // 어느 프로그램에서 획득
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  earnedAt DateTime @default(now())
+
+  @@unique([userId, badgeId])
+}
+
+// 사용자 프로필 (통계)
+model UserProfile {
+  id                  String  @id @default(cuid())
+  userId              String  @unique
+  level               Int     @default(1)
+  xp                  Int     @default(0)
+  totalPrograms       Int     @default(0)
+  totalBooks          Int     @default(0)
+  totalFacilitated    Int     @default(0)
+  attendanceRate      Int     @default(0)
+  reportRate          Int     @default(0)
+  averageSpeakingTime Int     @default(0)
+  favoriteGenres      String? // JSON
+  topKeywords         String? // JSON
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================
+// Phase 19: 모임 기록 아카이브
+// ============================================
+
+// 세션 아카이브
+model SessionArchive {
+  id                 String  @id @default(cuid())
+  sessionId          String  @unique
+  summary            String? // 모임 요약
+  highlights         String? // JSON: 토론 하이라이트
+  photos             String? // JSON: 사진 URL 배열
+  topKeywords        String? // JSON
+  nextSessionPreview String? // 다음 회차 예고
+
+  session ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+// ============================================
+// Phase 20: 책 읽기 도우미
+// ============================================
+
+// 읽기 진도
+model ReadingProgress {
+  id          String @id @default(cuid())
+  userId      String
+  sessionId   String
+  currentPage Int    @default(0)
+  totalPages  Int
+  percentage  Int    @default(0)
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  lastReadAt DateTime @default(now())
+
+  @@unique([userId, sessionId])
+}
+
+// 하이라이트
+model Highlight {
+  id             String  @id @default(cuid())
+  userId         String
+  sessionId      String
+  text           String
+  page           Int
+  note           String?
+  photoUrl       String? // OCR 원본 사진
+  isUsedInReport Boolean @default(false)
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+// ============================================
+// Phase 21: 참가자 평가 시스템 (운영진)
+// ============================================
+
+// 참가자 경고/칭찬 기록
+model ParticipantCard {
+  id          String  @id @default(cuid())
+  programId   String
+  userId      String
+  type        String // "WARNING", "PRAISE"
+  category    String // "ATTENDANCE", "REPORT", "ATTITUDE", "CONTRIBUTION"
+  title       String
+  description String?
+  sessionId   String? // 특정 세션 관련
+  issuedBy    String // 운영진 ID
+
+  program Program         @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user    User            @relation("ReceivedCards", fields: [userId], references: [id])
+  issuer  User            @relation("IssuedCards", fields: [issuedBy], references: [id])
+  session ProgramSession? @relation(fields: [sessionId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([programId, userId])
+  @@index([type])
+}
+
+// 운영진 메모
+model OrganizerNote {
+  id        String  @id @default(cuid())
+  programId String
+  userId    String // 대상 참가자
+  content   String
+  isPrivate Boolean @default(true) // 항상 비공개
+  createdBy String
+
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user    User    @relation("ReceivedNotes", fields: [userId], references: [id])
+  creator User    @relation("CreatedNotes", fields: [createdBy], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([programId, userId])
+}
+
+// 시즌 종료 종합 평가
+model SeasonEvaluation {
+  id                 String  @id @default(cuid())
+  programId          String
+  userId             String
+  overallRating      Int // 1-5
+  participationScore Int // 1-5
+  preparationScore   Int // 1-5
+  cooperationScore   Int // 1-5
+  contributionScore  Int // 1-5
+  strengths          String? // 강점
+  improvements       String? // 개선 필요
+  recommendation     String // "PRIORITY", "WELCOME", "HOLD", "RESTRICT"
+  evaluatedBy        String
+
+  program   Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user      User    @relation("ReceivedEvaluations", fields: [userId], references: [id])
+  evaluator User    @relation("CreatedEvaluations", fields: [evaluatedBy], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([programId, userId])
+  @@index([recommendation])
+}
+
+// 다음 시즌 참여 권한
+model ParticipationPermission {
+  id        String    @id @default(cuid())
+  userId    String
+  programId String? // null = 전체, 특정 ID = 해당 프로그램만
+  status    String // "ALLOWED", "RESTRICTED", "BANNED"
+  reason    String?
+  expiresAt DateTime?
+  setBy     String
+
+  user    User     @relation("ParticipationPermissions", fields: [userId], references: [id])
+  program Program? @relation(fields: [programId], references: [id])
+  admin   User     @relation("SetPermissions", fields: [setBy], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, status])
 }

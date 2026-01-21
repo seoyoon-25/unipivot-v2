@@ -4,6 +4,9 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { z } from 'zod'
 import crypto from 'crypto'
+import puppeteer from 'puppeteer'
+import fs from 'fs/promises'
+import path from 'path'
 
 // 스냅샷 생성 스키마
 const createSnapshotSchema = z.object({
@@ -147,10 +150,9 @@ export async function POST(request: NextRequest) {
       .update(JSON.stringify(currentData))
       .digest('hex')
 
-    // 스크린샷 URL 생성 (구현 예정)
+    // 스크린샷 생성
     let screenshotUrl = null
     if (validatedData.includeScreenshot) {
-      // TODO: 스크린샷 생성 로직 구현
       screenshotUrl = await generateScreenshot(validatedData.sessionId, validatedData.device)
     }
 
@@ -250,17 +252,91 @@ async function collectCurrentData(dataType: string) {
   }
 }
 
-// 스크린샷 생성 함수 (향후 구현)
+// 디바이스별 뷰포트 설정
+const DEVICE_VIEWPORTS = {
+  mobile: { width: 375, height: 812, deviceScaleFactor: 2, isMobile: true },
+  tablet: { width: 768, height: 1024, deviceScaleFactor: 2, isMobile: true },
+  desktop: { width: 1920, height: 1080, deviceScaleFactor: 1, isMobile: false },
+}
+
+// 스크린샷 생성 함수
 async function generateScreenshot(sessionId: string, device: string): Promise<string | null> {
+  let browser = null
+
   try {
-    // TODO: Puppeteer나 Playwright를 사용한 스크린샷 생성
-    // 1. 미리보기 URL 생성
-    // 2. 디바이스별 뷰포트 설정
-    // 3. 스크린샷 촬영
-    // 4. 이미지 저장 및 URL 반환
-    return null
+    // 미리보기 세션 정보 조회
+    const previewSession = await prisma.previewSession.findUnique({
+      where: { id: sessionId },
+      select: { sessionKey: true }
+    })
+
+    if (!previewSession) {
+      console.error('Preview session not found:', sessionId)
+      return null
+    }
+
+    // 미리보기 URL 생성
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    const previewUrl = `${baseUrl}/preview/${previewSession.sessionKey}`
+
+    // Puppeteer 브라우저 시작
+    browser = await puppeteer.launch({
+      headless: true,
+      executablePath: process.env.CHROME_PATH || '/usr/bin/google-chrome',
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor',
+      ],
+    })
+
+    const page = await browser.newPage()
+
+    // 뷰포트 설정
+    const viewport = DEVICE_VIEWPORTS[device as keyof typeof DEVICE_VIEWPORTS] || DEVICE_VIEWPORTS.desktop
+    await page.setViewport({
+      width: viewport.width,
+      height: viewport.height,
+      deviceScaleFactor: viewport.deviceScaleFactor,
+      isMobile: viewport.isMobile,
+    })
+
+    // 페이지 로드
+    await page.goto(previewUrl, {
+      waitUntil: 'networkidle0',
+      timeout: 30000,
+    })
+
+    // 페이지 완전 로드 대기 (추가 렌더링 시간)
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    // 스크린샷 촬영
+    const screenshotBuffer = await page.screenshot({
+      fullPage: true,
+      type: 'png',
+    })
+
+    // 스크린샷 저장
+    const screenshotsDir = path.join(process.cwd(), 'public', 'screenshots')
+    await fs.mkdir(screenshotsDir, { recursive: true })
+
+    const timestamp = Date.now()
+    const fileName = `snapshot_${sessionId}_${device}_${timestamp}.png`
+    const filePath = path.join(screenshotsDir, fileName)
+
+    await fs.writeFile(filePath, screenshotBuffer)
+
+    // 공개 URL 반환
+    return `/screenshots/${fileName}`
   } catch (error) {
     console.error('Error generating screenshot:', error)
     return null
+  } finally {
+    if (browser) {
+      await browser.close()
+    }
   }
 }

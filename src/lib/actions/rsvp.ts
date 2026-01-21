@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import prisma from '@/lib/db'
 import type { RSVPStatus, RSVPStats } from '@/types/facilitator'
+import { sendNotification, generateRsvpEmail } from '@/lib/services/notification-sender'
 
 /**
  * 1. RSVP 요청 발송 (세션에 대해)
@@ -72,7 +73,36 @@ export async function sendRSVPRequests(
     }
   }
 
-  // TODO: 참가자들에게 알림 발송
+  // 참가자들에게 알림 발송
+  const sessionTitle = session.title || `${session.sessionNo}회차`
+  const sessionDate = session.date
+    ? new Date(session.date).toLocaleDateString('ko-KR', {
+        year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'
+      })
+    : '날짜 미정'
+  const rsvpLink = `/rsvp/${sessionId}`
+
+  for (const participant of participants) {
+    const user = await prisma.user.findUnique({
+      where: { id: participant.userId },
+      select: { name: true, email: true },
+    })
+
+    if (user) {
+      await sendNotification({
+        userId: participant.userId,
+        type: 'RSVP_REQUEST',
+        title: '참석 여부 확인 요청',
+        content: `${session.program.title} - ${sessionTitle} 참석 여부를 알려주세요.`,
+        link: rsvpLink,
+        email: user.email ? {
+          to: user.email,
+          subject: `[유니피벗] 참석 여부 확인 - ${session.program.title}`,
+          html: await generateRsvpEmail(user.name, sessionTitle, sessionDate, rsvpLink),
+        } : undefined,
+      })
+    }
+  }
 
   revalidatePath(`/mypage/programs/${session.programId}`)
   revalidatePath(`/mypage/programs/${session.programId}/sessions/${sessionId}`)
@@ -219,14 +249,36 @@ export async function sendRSVPReminder(
     },
   })
 
-  // 리마인더 발송 기록 업데이트
+  // 리마인더 발송 기록 업데이트 및 알림 발송
+  const sessionTitle = session.title || `${session.sessionNo}회차`
+  const sessionDate = session.date
+    ? new Date(session.date).toLocaleDateString('ko-KR', {
+        year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'
+      })
+    : '날짜 미정'
+  const rsvpLink = `/rsvp/${sessionId}`
+
   for (const rsvp of pendingRSVPs) {
     await prisma.sessionRSVP.update({
       where: { id: rsvp.id },
       data: { reminderSentAt: new Date() },
     })
 
-    // TODO: 실제 알림 발송 (이메일, 푸시 등)
+    // 실제 알림 발송 (인앱 + 이메일)
+    if (rsvp.user) {
+      await sendNotification({
+        userId: rsvp.userId,
+        type: 'RSVP_REMINDER',
+        title: '참석 여부 리마인더',
+        content: `${session.program.title} - ${sessionTitle} 참석 여부를 아직 알려주지 않으셨어요.`,
+        link: rsvpLink,
+        email: rsvp.user.email ? {
+          to: rsvp.user.email,
+          subject: `[유니피벗] 참석 여부 리마인더 - ${session.program.title}`,
+          html: await generateRsvpEmail(rsvp.user.name, sessionTitle, sessionDate, rsvpLink),
+        } : undefined,
+      })
+    }
   }
 
   revalidatePath(`/mypage/programs/${session.programId}`)
@@ -364,7 +416,36 @@ export async function autoSendRSVPRequests(daysBeforeSession: number = 3) {
       }
     }
 
-    // TODO: 참가자들에게 알림 발송
+    // 참가자들에게 알림 발송
+    const sessionTitle = session.title || `${session.sessionNo}회차`
+    const sessionDate = session.date
+      ? new Date(session.date).toLocaleDateString('ko-KR', {
+          year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'
+        })
+      : '날짜 미정'
+    const rsvpLink = `/rsvp/${session.id}`
+
+    for (const participant of participants) {
+      const user = await prisma.user.findUnique({
+        where: { id: participant.userId },
+        select: { name: true, email: true },
+      })
+
+      if (user) {
+        await sendNotification({
+          userId: participant.userId,
+          type: 'RSVP_REQUEST',
+          title: '참석 여부 확인 요청',
+          content: `${session.program.title} - ${sessionTitle} 참석 여부를 알려주세요.`,
+          link: rsvpLink,
+          email: user.email ? {
+            to: user.email,
+            subject: `[유니피벗] 참석 여부 확인 - ${session.program.title}`,
+            html: await generateRsvpEmail(user.name, sessionTitle, sessionDate, rsvpLink),
+          } : undefined,
+        })
+      }
+    }
   }
 
   return {
@@ -428,13 +509,35 @@ export async function autoSendRSVPReminders(hoursBeforeDeadline: number = 24) {
     const hoursUntilDeadline = (deadline.getTime() - now.getTime()) / (1000 * 60 * 60)
 
     if (hoursUntilDeadline <= hoursBeforeDeadline && hoursUntilDeadline > 0) {
+      const sessionTitle = session.title || `${session.sessionNo}회차`
+      const sessionDate = session.date
+        ? new Date(session.date).toLocaleDateString('ko-KR', {
+            year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'
+          })
+        : '날짜 미정'
+      const rsvpLink = `/rsvp/${session.id}`
+
       for (const rsvp of session.rsvps) {
         await prisma.sessionRSVP.update({
           where: { id: rsvp.id },
           data: { reminderSentAt: new Date() },
         })
 
-        // TODO: 실제 알림 발송
+        // 실제 알림 발송
+        if (rsvp.user) {
+          await sendNotification({
+            userId: rsvp.userId,
+            type: 'RSVP_REMINDER',
+            title: '참석 여부 리마인더',
+            content: `${session.program.title} - ${sessionTitle} 참석 여부를 아직 알려주지 않으셨어요.`,
+            link: rsvpLink,
+            email: rsvp.user.email ? {
+              to: rsvp.user.email,
+              subject: `[유니피벗] 참석 여부 리마인더 - ${session.program.title}`,
+              html: await generateRsvpEmail(rsvp.user.name, sessionTitle, sessionDate, rsvpLink),
+            } : undefined,
+          })
+        }
         totalSent++
       }
     }

@@ -1,4 +1,7 @@
 import prisma from '@/lib/db'
+import { generateDonationReceiptPDF, generateReceiptNumber } from '@/lib/utils/donation-receipt'
+import * as fs from 'fs/promises'
+import path from 'path'
 
 interface ConvertDepositInput {
   applicationId: string
@@ -132,6 +135,14 @@ export async function getDonationsByProgram(programId: string) {
 export async function issueReceipt(donationId: string) {
   const donation = await prisma.donation.findUnique({
     where: { id: donationId },
+    include: {
+      user: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+    },
   })
 
   if (!donation) {
@@ -142,6 +153,34 @@ export async function issueReceipt(donationId: string) {
     throw new Error('이미 영수증이 발급되었습니다.')
   }
 
+  // 영수증 번호 생성
+  const receiptNumber = generateReceiptNumber(donationId)
+
+  // PDF 영수증 생성
+  const pdfBytes = await generateDonationReceiptPDF({
+    donationId,
+    receiptNumber,
+    donorName: donation.donorName || donation.user?.name || '익명',
+    donorEmail: donation.user?.email || undefined,
+    amount: donation.amount,
+    donationType: donation.type === 'MONTHLY' ? '정기 후원' :
+                  donation.type === 'DEPOSIT_CONVERT' ? '보증금 전환 후원' : '일시 후원',
+    donationDate: donation.createdAt,
+    organizationName: process.env.ORGANIZATION_NAME || 'UniPivot',
+    organizationAddress: process.env.ORGANIZATION_ADDRESS || '서울특별시',
+    organizationContact: process.env.ORGANIZATION_CONTACT || 'contact@unipivot.org',
+    organizationRegistrationNumber: process.env.ORGANIZATION_REG_NUMBER || '000-00-00000',
+  })
+
+  // PDF 파일 저장
+  const receiptsDir = path.join(process.cwd(), 'public', 'receipts')
+  await fs.mkdir(receiptsDir, { recursive: true })
+
+  const fileName = `receipt_${donationId}_${receiptNumber.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`
+  const filePath = path.join(receiptsDir, fileName)
+  await fs.writeFile(filePath, pdfBytes)
+
+  // 데이터베이스 업데이트
   const updated = await prisma.donation.update({
     where: { id: donationId },
     data: {
@@ -150,9 +189,60 @@ export async function issueReceipt(donationId: string) {
     },
   })
 
-  // TODO: 실제 기부금 영수증 발급 로직 (국세청 연동 등)
+  return {
+    ...updated,
+    receiptNumber,
+    receiptUrl: `/receipts/${fileName}`,
+  }
+}
 
-  return updated
+/**
+ * 기부금 영수증 다운로드
+ */
+export async function getReceiptPDF(donationId: string) {
+  const donation = await prisma.donation.findUnique({
+    where: { id: donationId },
+    include: {
+      user: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+    },
+  })
+
+  if (!donation) {
+    throw new Error('후원 정보를 찾을 수 없습니다.')
+  }
+
+  if (!donation.receiptIssued) {
+    throw new Error('영수증이 발급되지 않았습니다.')
+  }
+
+  // 영수증 번호 생성 (동일한 방식으로 재생성)
+  const receiptNumber = generateReceiptNumber(donationId)
+
+  // PDF 생성
+  const pdfBytes = await generateDonationReceiptPDF({
+    donationId,
+    receiptNumber,
+    donorName: donation.donorName || donation.user?.name || '익명',
+    donorEmail: donation.user?.email || undefined,
+    amount: donation.amount,
+    donationType: donation.type === 'MONTHLY' ? '정기 후원' :
+                  donation.type === 'DEPOSIT_CONVERT' ? '보증금 전환 후원' : '일시 후원',
+    donationDate: donation.createdAt,
+    organizationName: process.env.ORGANIZATION_NAME || 'UniPivot',
+    organizationAddress: process.env.ORGANIZATION_ADDRESS || '서울특별시',
+    organizationContact: process.env.ORGANIZATION_CONTACT || 'contact@unipivot.org',
+    organizationRegistrationNumber: process.env.ORGANIZATION_REG_NUMBER || '000-00-00000',
+  })
+
+  return {
+    pdfBytes,
+    fileName: `donation_receipt_${donationId}.pdf`,
+  }
 }
 
 /**

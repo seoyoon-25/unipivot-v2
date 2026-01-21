@@ -94,35 +94,50 @@ async function addDynamicPages(
       })
     }
 
-    // TODO: 블로그/뉴스 페이지들 추가 (Post 모델이 구현된 후)
-    // const posts = await prisma.post.findMany({
-    //   where: { isPublished: true },
-    //   select: { slug: true, updatedAt: true, category: true }
-    // }).catch(() => [])
-    //
-    // for (const post of posts) {
-    //   sitemapUrls.push({
-    //     loc: `${baseUrl}/posts/${post.slug}`,
-    //     lastmod: post.updatedAt.toISOString().split('T')[0],
-    //     changefreq: 'weekly' as const,
-    //     priority: 0.6
-    //   })
-    // }
+    // 공지사항 페이지들 추가
+    const notices = await prisma.notice.findMany({
+      where: { isPublic: true },
+      select: { id: true, updatedAt: true }
+    }).catch(() => [])
 
-    // TODO: 이벤트 페이지들 추가 (Event 모델이 구현된 후)
-    // const events = await prisma.event.findMany({
-    //   where: { isPublished: true, endDate: { gte: new Date() } },
-    //   select: { slug: true, updatedAt: true }
-    // }).catch(() => [])
-    //
-    // for (const event of events) {
-    //   sitemapUrls.push({
-    //     loc: `${baseUrl}/events/${event.slug}`,
-    //     lastmod: event.updatedAt.toISOString().split('T')[0],
-    //     changefreq: 'daily' as const,
-    //     priority: 0.7
-    //   })
-    // }
+    for (const notice of notices) {
+      sitemapUrls.push({
+        loc: `${baseUrl}/notice/${notice.id}`,
+        lastmod: notice.updatedAt.toISOString().split('T')[0],
+        changefreq: 'monthly' as const,
+        priority: 0.5
+      })
+    }
+
+    // 블로그 포스트 페이지들 추가
+    const blogPosts = await prisma.blogPost.findMany({
+      where: { isPublished: true },
+      select: { slug: true, updatedAt: true }
+    }).catch(() => [])
+
+    for (const post of blogPosts) {
+      sitemapUrls.push({
+        loc: `${baseUrl}/blog/${post.slug}`,
+        lastmod: post.updatedAt.toISOString().split('T')[0],
+        changefreq: 'weekly' as const,
+        priority: 0.6
+      })
+    }
+
+    // 페이지 컨텐츠 추가
+    const pageContents = await prisma.pageContent.findMany({
+      where: { isActive: true },
+      select: { slug: true, updatedAt: true }
+    }).catch(() => [])
+
+    for (const page of pageContents) {
+      sitemapUrls.push({
+        loc: `${baseUrl}/p/${page.slug}`,
+        lastmod: page.updatedAt.toISOString().split('T')[0],
+        changefreq: 'monthly' as const,
+        priority: 0.5
+      })
+    }
 
     // 기본 정적 페이지들 추가 (SEO 설정이 없는 경우)
     const staticPages = [

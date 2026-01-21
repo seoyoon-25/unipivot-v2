@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { headers } from 'next/headers'
+import { sendAdminNotification } from '@/lib/services/notification-sender'
 
 // 에러 메시지 (모호하게 - 부정 탐지 힌트를 주지 않음)
 const GENERIC_ERROR = '요청을 처리할 수 없습니다. 고객센터로 문의해주세요.'
@@ -218,10 +219,23 @@ export async function POST(
       },
     })
 
-    // 플래그된 경우 관리자에게 알림 (선택사항)
+    // 플래그된 경우 관리자에게 알림
     if (shouldFlag) {
       console.log(`[RewardClaim] FLAGGED: id=${rewardClaim.id}, riskScore=${riskScore}, reasons=${flagReasons.join('; ')}`)
-      // TODO: 관리자 알림 발송 (이메일, 슬랙 등)
+      // 관리자 알림 발송
+      await sendAdminNotification({
+        type: 'REWARD_CLAIM_FLAGGED',
+        title: '⚠️ 의심스러운 사례비 신청',
+        message: `연구 "${survey.title}" 사례비 신청에서 부정 의심 항목이 감지되었습니다.\n\n위험 점수: ${riskScore}\n사유: ${flagReasons.join(', ')}\n\n신청자: ${realName} (${normalizedPhone})`,
+        data: {
+          claimId: rewardClaim.id,
+          surveyId,
+          surveyTitle: survey.title,
+          userId,
+          riskScore,
+          flagReasons,
+        },
+      })
     }
 
     return NextResponse.json({

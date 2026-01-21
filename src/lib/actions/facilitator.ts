@@ -7,6 +7,7 @@ import type {
   ApplicationStatus,
   IncentiveType,
 } from '@/types/facilitator'
+import { sendNotification, sendBulkNotifications, generateFacilitatorEmail } from '@/lib/services/notification-sender'
 
 /**
  * 1. 참가자가 진행자 지원
@@ -68,7 +69,31 @@ export async function applyForFacilitator(
     },
   })
 
-  // TODO: 운영진들에게 알림 발송
+  // 운영진들에게 알림 발송
+  const organizers = await prisma.programMembership.findMany({
+    where: {
+      programId: session.programId,
+      role: 'ORGANIZER',
+    },
+    select: { userId: true },
+  })
+
+  const applicant = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { name: true },
+  })
+
+  const sessionTitle = session.title || `${session.sessionNo}회차`
+  const organizerUserIds = organizers.map(o => o.userId)
+
+  if (organizerUserIds.length > 0) {
+    await sendBulkNotifications(organizerUserIds, {
+      type: 'FACILITATOR_APPLICATION',
+      title: '진행자 지원 알림',
+      content: `${applicant?.name || '회원'}님이 ${session.program.title} - ${sessionTitle} 진행자로 지원했습니다.`,
+      link: `/mypage/programs/${session.programId}/sessions/${sessionId}`,
+    })
+  }
 
   revalidatePath(`/mypage/programs/${session.programId}`)
   revalidatePath(`/mypage/programs/${session.programId}/sessions/${sessionId}`)
@@ -203,7 +228,31 @@ export async function approveFacilitatorApplication(
     return facilitator
   })
 
-  // TODO: 지원자에게 알림 발송
+  // 지원자에게 승인 알림 발송
+  const applicantUser = await prisma.user.findUnique({
+    where: { id: application.userId },
+    select: { name: true, email: true },
+  })
+
+  const sessionTitle = application.session.title || `${application.session.sessionNo}회차`
+
+  await sendNotification({
+    userId: application.userId,
+    type: 'FACILITATOR_APPROVED',
+    title: '진행자 지원 승인',
+    content: `${application.session.program.title} - ${sessionTitle} 진행자로 선정되셨습니다!`,
+    link: `/mypage/programs/${application.session.programId}/sessions/${application.sessionId}`,
+    email: applicantUser?.email ? {
+      to: applicantUser.email,
+      subject: `[유니피벗] 진행자 지원 승인 - ${application.session.program.title}`,
+      html: await generateFacilitatorEmail(
+        applicantUser.name,
+        '진행자로 선정되었습니다',
+        `축하합니다! ${application.session.program.title} - ${sessionTitle} 진행자로 선정되셨습니다.\n\n체크리스트를 확인하고 모임을 준비해주세요.`,
+        `/mypage/programs/${application.session.programId}/sessions/${application.sessionId}`
+      ),
+    } : undefined,
+  })
 
   revalidatePath(`/mypage/programs/${application.session.programId}`)
   revalidatePath(`/mypage/programs/${application.session.programId}/sessions/${application.sessionId}`)
@@ -258,7 +307,20 @@ export async function rejectFacilitatorApplication(
     },
   })
 
-  // TODO: 지원자에게 알림 발송
+  // 지원자에게 거절 알림 발송
+  const sessionTitle = application.session.title || `${application.session.sessionNo}회차`
+  const program = await prisma.program.findUnique({
+    where: { id: application.session.programId },
+    select: { title: true },
+  })
+
+  await sendNotification({
+    userId: application.userId,
+    type: 'FACILITATOR_REJECTED',
+    title: '진행자 지원 결과',
+    content: `${program?.title || '프로그램'} - ${sessionTitle} 진행자 지원이 선정되지 않았습니다.`,
+    link: `/mypage/programs/${application.session.programId}`,
+  })
 
   revalidatePath(`/mypage/programs/${application.session.programId}`)
 
@@ -356,7 +418,31 @@ export async function assignFacilitatorByOrganizer(
     return facilitator
   })
 
-  // TODO: 진행자에게 알림 발송
+  // 진행자에게 알림 발송
+  const facilitatorUser = await prisma.user.findUnique({
+    where: { id: facilitatorUserId },
+    select: { name: true, email: true },
+  })
+
+  const sessionTitle = session.title || `${session.sessionNo}회차`
+
+  await sendNotification({
+    userId: facilitatorUserId,
+    type: 'FACILITATOR_ASSIGNED',
+    title: '진행자 배정 알림',
+    content: `${session.program.title} - ${sessionTitle} 진행자로 배정되셨습니다.`,
+    link: `/mypage/programs/${session.programId}/sessions/${sessionId}`,
+    email: facilitatorUser?.email ? {
+      to: facilitatorUser.email,
+      subject: `[유니피벗] 진행자 배정 알림 - ${session.program.title}`,
+      html: await generateFacilitatorEmail(
+        facilitatorUser.name,
+        '진행자로 배정되었습니다',
+        `${session.program.title} - ${sessionTitle} 진행자로 배정되셨습니다.\n\n체크리스트를 확인하고 모임을 준비해주세요.`,
+        `/mypage/programs/${session.programId}/sessions/${sessionId}`
+      ),
+    } : undefined,
+  })
 
   revalidatePath(`/mypage/programs/${session.programId}`)
   revalidatePath(`/mypage/programs/${session.programId}/sessions/${sessionId}`)

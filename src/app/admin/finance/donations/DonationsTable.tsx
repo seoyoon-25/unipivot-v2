@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Heart, TrendingUp, Check, X } from 'lucide-react'
+import { Heart, TrendingUp, Check, X, FileText, Download, Loader2 } from 'lucide-react'
 import { updateDonationStatus } from '@/lib/actions/admin'
 
 interface Donation {
@@ -14,6 +14,9 @@ interface Donation {
   anonymous: boolean
   status: string
   createdAt: Date
+  receiptRequested: boolean
+  receiptIssued: boolean
+  receiptIssuedAt: Date | null
   user: { name: string | null; email: string } | null
 }
 
@@ -33,6 +36,7 @@ function formatCurrency(amount: number) {
 export default function DonationsTable({ donations, total, pages, currentPage, summary, searchParams }: Props) {
   const router = useRouter()
   const [status, setStatus] = useState(searchParams.status || '')
+  const [issuingReceipt, setIssuingReceipt] = useState<string | null>(null)
 
   const handleFilter = (newStatus: string) => {
     setStatus(newStatus)
@@ -48,6 +52,33 @@ export default function DonationsTable({ donations, total, pages, currentPage, s
     } catch (error) {
       alert('상태 변경 중 오류가 발생했습니다.')
     }
+  }
+
+  const handleIssueReceipt = async (id: string) => {
+    if (!confirm('영수증을 발급하시겠습니까?')) return
+
+    setIssuingReceipt(id)
+    try {
+      const response = await fetch(`/api/donations/${id}/receipt`, {
+        method: 'POST',
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || '영수증 발급 중 오류가 발생했습니다.')
+      }
+
+      alert('영수증이 발급되었습니다.')
+      router.refresh()
+    } catch (error) {
+      alert(error instanceof Error ? error.message : '영수증 발급 중 오류가 발생했습니다.')
+    } finally {
+      setIssuingReceipt(null)
+    }
+  }
+
+  const handleDownloadReceipt = (id: string) => {
+    window.open(`/api/donations/${id}/receipt`, '_blank')
   }
 
   return (
@@ -115,6 +146,7 @@ export default function DonationsTable({ donations, total, pages, currentPage, s
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">금액</th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">유형</th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">상태</th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">영수증</th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">날짜</th>
                 <th className="px-6 py-4 text-right text-sm font-medium text-gray-500">관리</th>
               </tr>
@@ -149,6 +181,42 @@ export default function DonationsTable({ donations, total, pages, currentPage, s
                       {donation.status === 'COMPLETED' ? '완료' :
                        donation.status === 'PENDING' ? '대기' : '취소'}
                     </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    {donation.receiptIssued ? (
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-600">
+                          발급됨
+                        </span>
+                        <button
+                          onClick={() => handleDownloadReceipt(donation.id)}
+                          className="p-1 text-blue-500 hover:bg-blue-50 rounded"
+                          title="영수증 다운로드"
+                        >
+                          <Download className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : donation.receiptRequested ? (
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-600">
+                          요청됨
+                        </span>
+                        <button
+                          onClick={() => handleIssueReceipt(donation.id)}
+                          disabled={issuingReceipt === donation.id || donation.status !== 'COMPLETED'}
+                          className="p-1 text-green-500 hover:bg-green-50 rounded disabled:opacity-50"
+                          title="영수증 발급"
+                        >
+                          {issuingReceipt === donation.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <FileText className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 text-xs">미요청</span>
+                    )}
                   </td>
                   <td className="px-6 py-4 text-gray-500">
                     {new Date(donation.createdAt).toLocaleDateString('ko-KR')}

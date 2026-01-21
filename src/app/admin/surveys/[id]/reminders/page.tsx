@@ -13,6 +13,8 @@ import {
   Settings,
   RefreshCw,
   MessageSquare,
+  Send,
+  Loader2,
 } from 'lucide-react'
 
 interface ReminderStats {
@@ -66,6 +68,8 @@ export default function SurveyRemindersPage({
   const [reminders, setReminders] = useState<Reminder[]>([])
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [sendResult, setSendResult] = useState<{ sent: number; failed: number } | null>(null)
 
   // 리마인더 설정 폼
   const [reminderEnabled, setReminderEnabled] = useState(true)
@@ -123,6 +127,35 @@ export default function SurveyRemindersPage({
       setReminderDays(reminderDays.filter((d) => d !== day))
     } else {
       setReminderDays([...reminderDays, day].sort((a, b) => b - a))
+    }
+  }
+
+  const handleSendReminders = async () => {
+    if (!survey) return
+    if (!confirm('미응답자에게 리마인더를 즉시 발송하시겠습니까?')) return
+
+    setSending(true)
+    setSendResult(null)
+
+    try {
+      const res = await fetch(`/api/admin/surveys/${id}/reminders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        setSendResult({ sent: data.sent, failed: data.failed })
+        fetchData() // 목록 새로고침
+      } else {
+        const error = await res.json()
+        alert(error.message || '리마인더 발송에 실패했습니다.')
+      }
+    } catch (error) {
+      console.error('Failed to send reminders:', error)
+      alert('리마인더 발송 중 오류가 발생했습니다.')
+    } finally {
+      setSending(false)
     }
   }
 
@@ -294,6 +327,32 @@ export default function SurveyRemindersPage({
               {updating && <RefreshCw className="w-4 h-4 animate-spin" />}
               설정 저장
             </button>
+
+            <div className="pt-4 border-t">
+              <p className="text-sm text-gray-600 mb-3">미응답자에게 즉시 리마인더 발송</p>
+              <button
+                onClick={handleSendReminders}
+                disabled={sending || daysLeft <= 0 || (survey.targetCount - survey.responseCount) === 0}
+                className="w-full py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {sending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    발송 중...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    리마인더 즉시 발송 ({survey.targetCount - survey.responseCount}명)
+                  </>
+                )}
+              </button>
+              {sendResult && (
+                <div className="mt-2 p-2 bg-green-50 text-green-700 rounded-lg text-sm text-center">
+                  발송 완료: 성공 {sendResult.sent}건, 실패 {sendResult.failed}건
+                </div>
+              )}
+            </div>
           </div>
 
           {survey.lastReminderAt && (
