@@ -132,11 +132,10 @@ export async function getMember(id: string) {
         take: 10,
       },
       attendances: {
-        orderBy: { sessionDate: 'desc' },
-        take: 50,
+        orderBy: [{ programId: 'asc' }, { sessionNumber: 'asc' }],
         include: {
           program: {
-            select: { id: true, title: true, slug: true },
+            select: { id: true, title: true, slug: true, type: true },
           },
         },
       },
@@ -168,6 +167,72 @@ export async function getMember(id: string) {
   });
 
   if (!member) return null;
+
+  // 프로그램별 역할 조회 (member.userId가 있는 경우)
+  let membershipRoles: Record<string, string> = {};
+  if (member.userId) {
+    const memberships = await prisma.programMembership.findMany({
+      where: { userId: member.userId },
+      select: { programId: true, role: true },
+    });
+    membershipRoles = memberships.reduce((acc, m) => {
+      acc[m.programId] = m.role;
+      return acc;
+    }, {} as Record<string, string>);
+  }
+
+  // 출석 데이터를 프로그램별로 그룹핑하여 통계 계산
+  const programMap = new Map<string, {
+    programId: string;
+    programTitle: string;
+    programType: string;
+    role: string | null;
+    totalSessions: number;
+    attendedSessions: number;
+    reportSubmitted: number;
+    sessions: Array<{
+      sessionNumber: number;
+      sessionDate: Date | null;
+      attended: boolean;
+      reportSubmitted: boolean;
+    }>;
+  }>();
+
+  for (const att of member.attendances) {
+    const existing = programMap.get(att.programId);
+    const sessionData = {
+      sessionNumber: att.sessionNumber,
+      sessionDate: att.sessionDate,
+      attended: att.attended,
+      reportSubmitted: att.reportSubmitted,
+    };
+
+    if (existing) {
+      existing.totalSessions++;
+      if (att.attended) existing.attendedSessions++;
+      if (att.reportSubmitted) existing.reportSubmitted++;
+      existing.sessions.push(sessionData);
+    } else {
+      programMap.set(att.programId, {
+        programId: att.programId,
+        programTitle: att.program.title,
+        programType: att.program.type,
+        role: membershipRoles[att.programId] || null,
+        totalSessions: 1,
+        attendedSessions: att.attended ? 1 : 0,
+        reportSubmitted: att.reportSubmitted ? 1 : 0,
+        sessions: [sessionData],
+      });
+    }
+  }
+
+  // 통계 계산 및 배열 변환
+  const programParticipations = Array.from(programMap.values()).map(p => ({
+    ...p,
+    attendanceRate: p.totalSessions > 0 ? Math.round((p.attendedSessions / p.totalSessions) * 100) : 0,
+    reportRate: p.totalSessions > 0 ? Math.round((p.reportSubmitted / p.totalSessions) * 100) : 0,
+    sessions: p.sessions.sort((a, b) => a.sessionNumber - b.sessionNumber),
+  }));
 
   // User를 통한 신청 이력도 가져오기 (memberId가 없는 것만)
   if (member.userId) {
@@ -202,10 +267,14 @@ export async function getMember(id: string) {
     return {
       ...member,
       applications: allApplications,
+      programParticipations,
     };
   }
 
-  return member;
+  return {
+    ...member,
+    programParticipations,
+  };
 }
 
 /**
