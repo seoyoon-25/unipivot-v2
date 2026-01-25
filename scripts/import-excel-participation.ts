@@ -6,12 +6,14 @@ const prisma = new PrismaClient()
 
 // 프로그램 매핑 (Excel 파일명 → DB Program ID)
 const PROGRAM_MAPPING: Record<string, string> = {
-  '[출석부] 시즌24 마음힐링 독서모임.xlsx': 'cmkcrsynh0002n1qxtb2y8zsc',
-  '[출석부] 시즌25 진실과 거짓.xlsx': 'cmkcrsxjv0000n1qx5d3a3jtr',
-  '[출석부] 시즌26 Ai와 생존하기 독서모임.xlsx': 'cmkcrsxjv0000n1qx5d3a3jtr',
-  '[온라인시즌12] 출석부.xlsx': 'cmkcrtbca000qn1qxabqlhrck',
-  '[온라인시즌13] 출석부.xlsx': 'cmkcrtas9000pn1qx6gjk84ap',
-  '온라인시즌13_출석부.xlsx': 'cmkcrtas9000pn1qx6gjk84ap',
+  // 오프라인 독서모임
+  '[출석부] 시즌24 마음힐링 독서모임.xlsx': 'cmkcrsynh0002n1qxtb2y8zsc', // [시즌24] 화요일 마음힐링 독서모임
+  '[출석부] 시즌25 진실과 거짓.xlsx': 'cmkcrsy380001n1qxo9e6ciqv',       // [오프라인 시즌25] 진실과 거짓
+  '[출석부] 시즌26 Ai와 생존하기 독서모임.xlsx': 'cmkcrsxjv0000n1qx5d3a3jtr', // [오프라인 시즌26] AI와 함께 사는 삶
+  // 온라인 독서모임
+  '[온라인시즌12] 출석부.xlsx': 'cmkcrtbca000qn1qxabqlhrck',            // [온라인 시즌12] 우리들은 자란다
+  '[온라인시즌13] 출석부.xlsx': 'cmkcrtas9000pn1qx6gjk84ap',            // [온라인 시즌13] 응답하라 1950~1990
+  '온라인시즌13_출석부.xlsx': 'cmkcrtas9000pn1qx6gjk84ap',              // 동일 (파일명 중복)
 }
 
 // Excel 파일 경로

@@ -1,17 +1,33 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft, Save, User, Mail, Phone, Calendar, MapPin, Building,
   BookOpen, Shield, History, ChevronUp, ChevronDown, ChevronRight, Plus, Trash2,
-  AlertCircle, CheckCircle, XCircle, FileText, Layers, Target
+  AlertCircle, CheckCircle, XCircle, FileText, Target
 } from 'lucide-react'
 import {
   updateMember, changeMemberGrade, changeMemberStatus, addMemberNote, deleteMemberNote
 } from '@/lib/actions/members'
 import { MEMBER_GRADES, MEMBER_STATUS } from '@/lib/services/member-matching'
+
+// 프로그램 유형 라벨
+const programTypeLabels: Record<string, string> = {
+  BOOKCLUB: '독서모임',
+  SEMINAR: '세미나',
+  KMOVE: 'K-Move',
+  DEBATE: '토론회',
+  WORKSHOP: '워크숍',
+  OTHER: '기타',
+}
+
+// 역할 라벨
+const roleLabels: Record<string, { label: string; className: string; icon: string }> = {
+  ORGANIZER: { label: '운영진', className: 'bg-purple-100 text-purple-700', icon: '👑' },
+  PARTICIPANT: { label: '일반', className: 'bg-blue-100 text-blue-700', icon: '👤' },
+}
 
 // Member 타입 (getMember 반환값 기반)
 interface Member {
@@ -179,7 +195,7 @@ function StatusBadge({ status, size = 'md' }: { status: string; size?: 'sm' | 'm
 
 export default function MemberDetail({ member }: Props) {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState<'info' | 'programs' | 'grade' | 'status' | 'attendance' | 'notes'>('info')
+  const [activeTab, setActiveTab] = useState<'info' | 'participation' | 'status' | 'grade' | 'notes'>('info')
   const [saving, setSaving] = useState(false)
 
   // 기본 정보 폼
@@ -228,6 +244,35 @@ export default function MemberDetail({ member }: Props) {
       return next
     })
   }
+
+  // 참여 통계 계산
+  const participationStats = useMemo(() => {
+    const programs = member.programParticipations || []
+
+    // 프로그램 유형별 통계
+    const typeStats: Record<string, number> = {
+      BOOKCLUB: 0, SEMINAR: 0, KMOVE: 0, DEBATE: 0, WORKSHOP: 0, OTHER: 0
+    }
+
+    // 역할별 통계
+    const roleStats = { ORGANIZER: 0, PARTICIPANT: 0 }
+
+    programs.forEach(prog => {
+      // 유형별 카운트
+      const type = prog.programType || 'OTHER'
+      typeStats[type] = (typeStats[type] || 0) + 1
+
+      // 역할별 카운트
+      const role = prog.role || 'PARTICIPANT'
+      if (role === 'ORGANIZER') {
+        roleStats.ORGANIZER++
+      } else {
+        roleStats.PARTICIPANT++
+      }
+    })
+
+    return { typeStats, roleStats, total: programs.length }
+  }, [member.programParticipations])
 
   // 기본 정보 저장
   const handleSave = async () => {
@@ -460,10 +505,9 @@ export default function MemberDetail({ member }: Props) {
             <div className="flex border-b border-gray-100 overflow-x-auto">
               {[
                 { key: 'info', label: '기본 정보', icon: User },
-                { key: 'programs', label: '프로그램', icon: Layers },
-                { key: 'grade', label: '등급 관리', icon: Shield },
+                { key: 'participation', label: '참여 이력', icon: History },
                 { key: 'status', label: '상태 관리', icon: AlertCircle },
-                { key: 'attendance', label: '출석 이력', icon: BookOpen },
+                { key: 'grade', label: '등급 관리', icon: Shield },
                 { key: 'notes', label: '메모', icon: FileText },
               ].map((tab) => (
                 <button
@@ -587,126 +631,6 @@ export default function MemberDetail({ member }: Props) {
                   {saving ? '저장 중...' : '저장'}
                 </button>
               </div>
-            </div>
-          )}
-
-          {/* Programs Tab */}
-          {activeTab === 'programs' && (
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-gray-900 mb-6">
-                프로그램 참가 이력
-                <span className="ml-2 text-sm font-normal text-gray-500">
-                  (총 {member.applications.length}개)
-                </span>
-              </h3>
-              {member.applications.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">프로그램 참가 이력이 없습니다.</p>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-gray-100">
-                        <th className="px-4 py-3 text-left font-medium text-gray-500">프로그램</th>
-                        <th className="px-4 py-3 text-center font-medium text-gray-500">유형</th>
-                        <th className="px-4 py-3 text-center font-medium text-gray-500">기간</th>
-                        <th className="px-4 py-3 text-center font-medium text-gray-500">신청일</th>
-                        <th className="px-4 py-3 text-center font-medium text-gray-500">상태</th>
-                        <th className="px-4 py-3 text-center font-medium text-gray-500">보증금</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-50">
-                      {member.applications.map((app) => {
-                        // 상태 배지 색상
-                        const statusColors: Record<string, string> = {
-                          APPROVED: 'bg-green-100 text-green-700',
-                          PENDING: 'bg-yellow-100 text-yellow-700',
-                          REJECTED: 'bg-red-100 text-red-700',
-                          CANCELLED: 'bg-gray-100 text-gray-600',
-                          WAITLIST: 'bg-blue-100 text-blue-700',
-                        }
-                        const statusLabels: Record<string, string> = {
-                          APPROVED: '승인',
-                          PENDING: '대기',
-                          REJECTED: '반려',
-                          CANCELLED: '취소',
-                          WAITLIST: '대기자',
-                        }
-                        // 보증금 상태
-                        const depositColors: Record<string, string> = {
-                          PAID: 'bg-green-100 text-green-700',
-                          PARTIAL: 'bg-yellow-100 text-yellow-700',
-                          NONE: 'bg-gray-100 text-gray-500',
-                          REFUNDED: 'bg-blue-100 text-blue-700',
-                        }
-                        const depositLabels: Record<string, string> = {
-                          PAID: '완납',
-                          PARTIAL: '일부',
-                          NONE: '-',
-                          REFUNDED: '환불',
-                        }
-                        // 프로그램 유형
-                        const typeLabels: Record<string, string> = {
-                          BOOKCLUB: '독서모임',
-                          SEMINAR: '세미나',
-                          KMOVE: 'K-Move',
-                          DEBATE: '토론회',
-                          OTHER: '기타',
-                        }
-
-                        // 날짜 포맷
-                        const formatDate = (date: Date | null) => {
-                          if (!date) return '-'
-                          return new Date(date).toLocaleDateString('ko-KR', {
-                            year: 'numeric',
-                            month: 'short',
-                          })
-                        }
-                        const formatPeriod = (start: Date | null, end: Date | null) => {
-                          if (!start) return '-'
-                          const startStr = formatDate(start)
-                          if (!end) return startStr
-                          const endStr = formatDate(end)
-                          return `${startStr} ~ ${endStr}`
-                        }
-
-                        return (
-                          <tr key={app.id} className="hover:bg-gray-50">
-                            <td className="px-4 py-3">
-                              <Link
-                                href={`/admin/programs/${app.program.id}`}
-                                className="font-medium text-gray-900 hover:text-primary"
-                              >
-                                {app.program.title}
-                              </Link>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-600">
-                                {typeLabels[app.program.type] || app.program.type}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-center text-gray-500 text-xs">
-                              {formatPeriod(app.program.startDate, app.program.endDate)}
-                            </td>
-                            <td className="px-4 py-3 text-center text-gray-500 text-xs">
-                              {new Date(app.appliedAt).toLocaleDateString('ko-KR')}
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className={`px-2 py-1 rounded text-xs font-medium ${statusColors[app.status] || 'bg-gray-100 text-gray-600'}`}>
-                                {statusLabels[app.status] || app.status}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className={`px-2 py-1 rounded text-xs font-medium ${depositColors[app.depositStatus] || 'bg-gray-100 text-gray-500'}`}>
-                                {depositLabels[app.depositStatus] || app.depositStatus}
-                              </span>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
             </div>
           )}
 
@@ -926,157 +850,118 @@ export default function MemberDetail({ member }: Props) {
             </div>
           )}
 
-          {/* Attendance Tab */}
-          {activeTab === 'attendance' && (
-            <div className="space-y-4">
-              {/* 요약 통계 */}
+          {/* Participation Tab */}
+          {activeTab === 'participation' && (
+            <div className="space-y-6">
+              {/* 1. 프로그램 유형별 현황 */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">참여 프로그램 현황</h3>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-gray-50 rounded-xl">
-                    <p className="text-2xl font-bold text-primary">{member.programParticipations?.length || 0}</p>
-                    <p className="text-sm text-gray-500">참여 프로그램</p>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">프로그램 유형별 참여 현황</h3>
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+                  {Object.entries(programTypeLabels).map(([type, label]) => (
+                    <div key={type} className="text-center p-3 bg-gray-50 rounded-xl">
+                      <p className="text-2xl font-bold text-primary">
+                        {participationStats.typeStats[type] || 0}
+                      </p>
+                      <p className="text-xs text-gray-500">{label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 2. 역할별 현황 */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">역할별 참여 현황</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-xl">
+                    <span className="text-2xl">👑</span>
+                    <div>
+                      <p className="text-2xl font-bold text-purple-700">
+                        {participationStats.roleStats.ORGANIZER}회
+                      </p>
+                      <p className="text-sm text-purple-600">운영진 참여</p>
+                    </div>
                   </div>
-                  <div className="text-center p-4 bg-gray-50 rounded-xl">
-                    <p className="text-2xl font-bold text-primary">
-                      {member.stats?.attendanceRate ? `${Math.round(member.stats.attendanceRate)}%` : '-'}
-                    </p>
-                    <p className="text-sm text-gray-500">전체 출석률</p>
-                  </div>
-                  <div className="text-center p-4 bg-gray-50 rounded-xl">
-                    <p className="text-2xl font-bold text-primary">
-                      {member.stats?.reportRate ? `${Math.round(member.stats.reportRate)}%` : '-'}
-                    </p>
-                    <p className="text-sm text-gray-500">전체 독후감 제출률</p>
+                  <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-xl">
+                    <span className="text-2xl">👤</span>
+                    <div>
+                      <p className="text-2xl font-bold text-blue-700">
+                        {participationStats.roleStats.PARTICIPANT}회
+                      </p>
+                      <p className="text-sm text-blue-600">일반 참가</p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* 프로그램별 상세 */}
-              {!member.programParticipations || member.programParticipations.length === 0 ? (
-                <div className="bg-white rounded-2xl p-6 shadow-sm">
+              {/* 3. 프로그램 목록 테이블 */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">
+                  참여 프로그램 목록
+                  <span className="ml-2 text-sm font-normal text-gray-500">
+                    (총 {member.programParticipations?.length || 0}개)
+                  </span>
+                </h3>
+
+                {!member.programParticipations || member.programParticipations.length === 0 ? (
                   <p className="text-gray-500 text-center py-8">참여한 프로그램이 없습니다.</p>
-                </div>
-              ) : (
-                member.programParticipations.map((prog) => {
-                  const isExpanded = expandedPrograms.has(prog.programId)
-                  const typeLabels: Record<string, string> = {
-                    BOOKCLUB: '독서모임',
-                    SEMINAR: '세미나',
-                    KMOVE: 'K-Move',
-                    DEBATE: '토론회',
-                    OTHER: '기타',
-                  }
-
-                  return (
-                    <div key={prog.programId} className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                      {/* 프로그램 헤더 */}
-                      <div
-                        className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
-                        onClick={() => toggleProgram(prog.programId)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <button className="p-1 rounded hover:bg-gray-100 transition-colors">
-                            {isExpanded ? (
-                              <ChevronDown className="w-5 h-5 text-gray-500" />
-                            ) : (
-                              <ChevronRight className="w-5 h-5 text-gray-500" />
-                            )}
-                          </button>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <Link
-                                href={`/admin/programs/${prog.programId}`}
-                                onClick={(e) => e.stopPropagation()}
-                                className="font-medium text-gray-900 hover:text-primary"
-                              >
-                                {prog.programTitle}
-                              </Link>
-                              <span className="px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-600">
-                                {typeLabels[prog.programType] || prog.programType}
-                              </span>
-                              {prog.role && (
-                                <span className={`px-2 py-0.5 text-xs rounded flex items-center gap-1 ${
-                                  prog.role === 'ORGANIZER'
-                                    ? 'bg-purple-100 text-purple-700'
-                                    : 'bg-blue-100 text-blue-700'
-                                }`}>
-                                  {prog.role === 'ORGANIZER' ? (
-                                    <><Target className="w-3 h-3" /> 운영진</>
-                                  ) : (
-                                    <><User className="w-3 h-3" /> 참가자</>
-                                  )}
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-100">
+                          <th className="px-4 py-3 text-left font-medium text-gray-500">구분</th>
+                          <th className="px-4 py-3 text-left font-medium text-gray-500">프로그램명</th>
+                          <th className="px-4 py-3 text-center font-medium text-gray-500">출석현황</th>
+                          <th className="px-4 py-3 text-center font-medium text-gray-500">독후감현황</th>
+                          <th className="px-4 py-3 text-center font-medium text-gray-500">역할</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {member.programParticipations.map((prog) => {
+                          const roleInfo = roleLabels[prog.role || 'PARTICIPANT'] || roleLabels.PARTICIPANT
+                          return (
+                            <tr key={prog.programId} className="hover:bg-gray-50">
+                              <td className="px-4 py-3">
+                                <span className="px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-600">
+                                  {programTypeLabels[prog.programType] || prog.programType}
                                 </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-6 text-sm">
-                          <div className="text-center">
-                            <span className={`font-bold ${
-                              prog.attendanceRate >= 80 ? 'text-green-600' :
-                              prog.attendanceRate >= 50 ? 'text-yellow-600' : 'text-red-500'
-                            }`}>
-                              {prog.attendedSessions}/{prog.totalSessions}회
-                            </span>
-                            <span className="text-gray-400 ml-1">({prog.attendanceRate}%)</span>
-                            <p className="text-xs text-gray-500">출석</p>
-                          </div>
-                          <div className="text-center">
-                            <span className="font-bold text-primary">
-                              {prog.reportSubmitted}/{prog.totalSessions}회
-                            </span>
-                            <span className="text-gray-400 ml-1">({prog.reportRate}%)</span>
-                            <p className="text-xs text-gray-500">독후감</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 세션별 상세 (펼침) */}
-                      {isExpanded && (
-                        <div className="border-t border-gray-100 bg-gray-50 p-4">
-                          <table className="w-full text-sm">
-                            <thead>
-                              <tr className="text-gray-500">
-                                <th className="px-3 py-2 text-left font-medium">회차</th>
-                                <th className="px-3 py-2 text-center font-medium">날짜</th>
-                                <th className="px-3 py-2 text-center font-medium">출석</th>
-                                <th className="px-3 py-2 text-center font-medium">독후감</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                              {prog.sessions.map((session) => (
-                                <tr key={session.sessionNumber} className="bg-white">
-                                  <td className="px-3 py-2 text-gray-700">{session.sessionNumber}회차</td>
-                                  <td className="px-3 py-2 text-center text-gray-500">
-                                    {session.sessionDate
-                                      ? new Date(session.sessionDate).toLocaleDateString('ko-KR')
-                                      : '-'}
-                                  </td>
-                                  <td className="px-3 py-2 text-center">
-                                    {session.attended ? (
-                                      <CheckCircle className="w-5 h-5 text-green-500 mx-auto" />
-                                    ) : (
-                                      <XCircle className="w-5 h-5 text-red-400 mx-auto" />
-                                    )}
-                                  </td>
-                                  <td className="px-3 py-2 text-center">
-                                    {session.reportSubmitted ? (
-                                      <CheckCircle className="w-5 h-5 text-green-500 mx-auto" />
-                                    ) : (
-                                      <XCircle className="w-5 h-5 text-gray-300 mx-auto" />
-                                    )}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })
-              )}
+                              </td>
+                              <td className="px-4 py-3">
+                                <Link
+                                  href={`/admin/programs/${prog.programId}`}
+                                  className="font-medium text-gray-900 hover:text-primary"
+                                >
+                                  {prog.programTitle}
+                                </Link>
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <span className={`font-bold ${
+                                  prog.attendanceRate >= 80 ? 'text-green-600' :
+                                  prog.attendanceRate >= 50 ? 'text-yellow-600' : 'text-red-500'
+                                }`}>
+                                  {prog.attendedSessions}/{prog.totalSessions}
+                                </span>
+                                <span className="text-gray-400 ml-1">({prog.attendanceRate}%)</span>
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <span className="font-bold text-primary">
+                                  {prog.reportSubmitted}/{prog.totalSessions}
+                                </span>
+                                <span className="text-gray-400 ml-1">({prog.reportRate}%)</span>
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${roleInfo.className}`}>
+                                  {roleInfo.icon} {roleInfo.label}
+                                </span>
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

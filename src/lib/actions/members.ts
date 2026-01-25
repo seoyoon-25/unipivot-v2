@@ -61,9 +61,9 @@ export async function getMembers(options: GetMembersOptions = {}) {
 
   if (search) {
     where.OR = [
-      { name: { contains: search, mode: 'insensitive' } },
-      { memberCode: { contains: search, mode: 'insensitive' } },
-      { email: { contains: search, mode: 'insensitive' } },
+      { name: { contains: search } },
+      { memberCode: { contains: search } },
+      { email: { contains: search } },
       { phone: { contains: search } },
     ];
   }
