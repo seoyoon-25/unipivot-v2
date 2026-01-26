@@ -102,12 +102,43 @@
     @apply px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200;
   }
 
+  /* Krafton-style underline animation */
+  .nav-link-animated {
+    position: relative;
+  }
+
+  .nav-link-animated::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #FF6B35;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .nav-link-animated:hover::after {
+    width: 100%;
+  }
+
   .btn-primary {
     @apply px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-primary/20 hover:shadow-primary/30;
   }
 
   .btn-secondary {
     @apply px-6 py-3 bg-white/10 border border-white/20 text-white hover:bg-white/20 rounded-xl font-medium transition-all duration-200;
+  }
+
+  /* Orange accent button */
+  .btn-orange {
+    @apply px-6 py-3 bg-[#FF6B35] hover:bg-[#E55A2B] text-white rounded-xl font-semibold transition-all duration-200;
+    box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+  }
+
+  .btn-orange:hover {
+    box-shadow: 0 6px 30px rgba(255, 107, 53, 0.4);
+    transform: translateY(-2px);
   }
 
   .card {
@@ -124,6 +155,57 @@
 
   .gradient-text {
     @apply bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent;
+  }
+
+  /* Orange gradient text */
+  .gradient-text-orange {
+    background: linear-gradient(135deg, #FF6B35, #E55A2B);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* Custom Cursor Styles (Baunfire style) */
+@media (min-width: 1025px) {
+  .cursor-enabled * {
+    cursor: none !important;
+  }
+}
+
+.custom-cursor {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #FF6B35;
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transition: all 0.15s ease-out;
+  transform: translate(-50%, -50%);
+}
+
+.custom-cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: #FF6B35;
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%);
+}
+
+.custom-cursor.hover {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 107, 53, 0.2);
+}
+
+@media (max-width: 1024px) {
+  .custom-cursor,
+  .custom-cursor-dot {
+    display: none !important;
   }
 }
 

@@ -2,6 +2,7 @@ import { Providers } from '@/components/Providers'
 import { NavbarWrapper } from '@/components/public/NavbarWrapper'
 import { Footer } from '@/components/public/Footer'
 import { ChatbotButton } from '@/components/public/ChatbotButton'
+import { CustomCursor } from '@/components/public/CustomCursor'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { NoSSR } from '@/components/NoSSR'
 import { TopBanners, BottomBanners } from '@/components/banners/BannerDisplay'
@@ -54,6 +55,7 @@ export default function PublicLayout({
               <PopupDisplay />
               <FloatingButtonDisplay />
               <ChatbotButton />
+              <CustomCursor />
             </NoSSR>
           </ErrorBoundary>
         </div>
