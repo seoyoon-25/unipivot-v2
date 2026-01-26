@@ -1,14 +1,20 @@
+'use client'
+
 import Link from 'next/link'
-import { BookOpen, Mic, MapPin, MessageSquare } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
+import { gsap, ScrollTrigger } from '@/hooks/useGSAP'
+import { BookOpen, Mic, MapPin, MessageSquare, ArrowUpRight } from 'lucide-react'
 
 const programs = [
   {
     title: '남Book북한걸음',
     description: '책을 통해 남북을 이해하는 독서모임. 매 시즌 8주간 진행되며, 남북 청년들이 함께 책을 읽고 토론합니다.',
     href: '/programs?type=BOOKCLUB',
-    badge: '격주 1회 총 8회',
+    badge: '격주 1회',
     icon: BookOpen,
-    gradient: 'from-blue-500 to-indigo-600',
+    color: '#3B82F6',
+    bgColor: 'bg-blue-50',
   },
   {
     title: '강연 및 세미나',
@@ -16,7 +22,8 @@ const programs = [
     href: '/programs?type=SEMINAR',
     badge: '월 1회',
     icon: Mic,
-    gradient: 'from-purple-500 to-pink-600',
+    color: '#8B5CF6',
+    bgColor: 'bg-purple-50',
   },
   {
     title: 'K-Move',
@@ -24,7 +31,8 @@ const programs = [
     href: '/programs?type=KMOVE',
     badge: '분기 1회',
     icon: MapPin,
-    gradient: 'from-orange-500 to-red-600',
+    color: '#F97316',
+    bgColor: 'bg-orange-50',
   },
   {
     title: '토론회',
@@ -32,57 +40,115 @@ const programs = [
     href: '/programs?type=DEBATE',
     badge: '월 1회',
     icon: MessageSquare,
-    gradient: 'from-green-500 to-teal-600',
+    color: '#10B981',
+    bgColor: 'bg-green-50',
   },
 ]
 
 export function KeyProgramsSection() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const cardsRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!sectionRef.current || !cardsRef.current) return
+
+    const ctx = gsap.context(() => {
+      // Stagger animation for cards
+      gsap.from(cardsRef.current!.querySelectorAll('.program-card'), {
+        y: 60,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: cardsRef.current,
+          start: 'top 80%',
+          toggleActions: 'play none none reverse',
+        },
+      })
+    }, sectionRef)
+
+    return () => ctx.revert()
+  }, [])
+
   return (
-    <section id="programs" className="py-24 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-16">
-          <span className="text-primary text-sm font-semibold tracking-wider uppercase">Programs</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2 mb-4">
+    <section
+      ref={sectionRef}
+      id="programs"
+      className="section-padding bg-light"
+    >
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Section Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary text-sm font-semibold rounded-full mb-4">
+            Programs
+          </span>
+          <h2 className="text-headline text-dark mb-6">
             핵심 프로그램
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            남북청년이 함께 성장하고 소통하는 다양한 프로그램을 운영합니다
+          <p className="text-body-lg max-w-2xl mx-auto">
+            남북청년이 함께 성장하고 소통하는
+            <br className="hidden md:block" />
+            다양한 프로그램을 운영합니다
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {programs.map((program) => {
+        {/* Program Cards */}
+        <div
+          ref={cardsRef}
+          className="grid md:grid-cols-2 gap-6"
+        >
+          {programs.map((program, index) => {
             const Icon = program.icon
             return (
               <Link
                 key={program.href}
                 href={program.href}
-                className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300"
+                className="program-card group"
               >
-                <div className={`relative h-48 overflow-hidden bg-gradient-to-br ${program.gradient}`}>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Icon className="w-20 h-20 text-white/30" strokeWidth={1} />
+                <div className="relative bg-white rounded-3xl p-8 h-full transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 overflow-hidden">
+                  {/* Background decoration */}
+                  <div
+                    className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-30 transition-opacity duration-500 group-hover:opacity-50"
+                    style={{ backgroundColor: program.color }}
+                  />
+
+                  {/* Icon */}
+                  <div
+                    className={`w-14 h-14 ${program.bgColor} rounded-2xl flex items-center justify-center mb-6 transition-transform duration-500 group-hover:scale-110`}
+                  >
+                    <Icon className="w-7 h-7" style={{ color: program.color }} />
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                  {program.badge && (
-                    <span className="absolute bottom-4 left-4 px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full">
+
+                  {/* Content */}
+                  <div className="relative">
+                    <div className="flex items-start justify-between mb-3">
+                      <h3 className="text-2xl font-bold text-dark group-hover:text-primary transition-colors">
+                        {program.title}
+                      </h3>
+                      <ArrowUpRight className="w-6 h-6 text-gray-300 group-hover:text-primary transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    </div>
+
+                    <span
+                      className="inline-block px-3 py-1 text-xs font-medium rounded-full mb-4"
+                      style={{
+                        backgroundColor: `${program.color}15`,
+                        color: program.color,
+                      }}
+                    >
                       {program.badge}
                     </span>
-                  )}
-                </div>
-                <div className="p-5">
-                  <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors mb-2">
-                    {program.title}
-                  </h3>
-                  <p className="text-gray-500 text-sm mb-4 line-clamp-2">
-                    {program.description}
-                  </p>
-                  <span className="text-primary font-semibold text-sm flex items-center gap-2 group-hover:gap-3 transition-all">
-                    자세히 보기
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </span>
+
+                    <p className="text-gray-600 leading-relaxed">
+                      {program.description}
+                    </p>
+                  </div>
                 </div>
               </Link>
             )

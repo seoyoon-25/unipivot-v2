@@ -15,19 +15,47 @@
   --font-size-h2: 1.953em;
   --font-size-h3: 1.563em;
   --font-size-h4: 1.25em;
+
+  /* New Design System Colors */
+  --color-primary: #FF5E10;
+  --color-primary-dark: #E55A2B;
+  --color-primary-light: #FFF4EE;
+  --color-dark: #1A1A1A;
+  --color-dark-secondary: #2D2D2D;
+  --color-light: #F2F2F2;
+  --color-light-secondary: #FAFAFA;
 }
 
 @layer base {
   html {
-    scroll-behavior: smooth;
     font-size: var(--font-size-base);
+  }
+
+  html.lenis, html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  .lenis.lenis-smooth iframe {
+    pointer-events: none;
   }
 
   body {
     @apply text-gray-900 antialiased;
     font-family: var(--font-primary);
-    color: #111827; /* Ensure dark text */
-    background-color: #ffffff; /* Ensure white background */
+    color: #111827;
+    background-color: #ffffff;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -42,6 +70,7 @@
   ::selection {
     @apply bg-primary/20 text-primary-dark;
   }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
@@ -69,6 +98,7 @@
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -125,6 +155,79 @@
   .gradient-text {
     @apply bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent;
   }
+
+  /* Modern Section Styles */
+  .section-full {
+    @apply min-h-screen flex items-center justify-center;
+  }
+
+  .section-padding {
+    @apply py-24 md:py-32 lg:py-40;
+  }
+
+  /* Modern Typography */
+  .text-display {
+    @apply text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight;
+  }
+
+  .text-headline {
+    @apply text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight;
+  }
+
+  .text-title {
+    @apply text-3xl md:text-4xl font-bold;
+  }
+
+  .text-body-lg {
+    @apply text-lg md:text-xl text-gray-600 leading-relaxed;
+  }
+
+  /* Glassmorphism */
+  .glass {
+    @apply bg-white/80 backdrop-blur-lg border border-white/20;
+  }
+
+  .glass-dark {
+    @apply bg-black/20 backdrop-blur-lg border border-white/10;
+  }
+
+  /* Modern Card Styles */
+  .card-modern {
+    @apply bg-white rounded-3xl shadow-sm hover:shadow-2xl transition-all duration-500;
+  }
+
+  .card-hover-lift {
+    @apply hover:-translate-y-2 transition-transform duration-500;
+  }
+
+  /* Modern Button Styles */
+  .btn-modern {
+    @apply px-8 py-4 rounded-full font-semibold transition-all duration-300;
+  }
+
+  .btn-modern-primary {
+    @apply btn-modern bg-dark text-white hover:bg-dark-secondary;
+  }
+
+  .btn-modern-outline {
+    @apply btn-modern bg-transparent border-2 border-dark text-dark hover:bg-dark hover:text-white;
+  }
+
+  /* Scroll Animation Classes */
+  .reveal {
+    @apply opacity-0 translate-y-8;
+  }
+
+  .reveal.active {
+    @apply opacity-100 translate-y-0 transition-all duration-700 ease-out;
+  }
+
+  /* Stagger Animation Delays */
+  .stagger-1 { transition-delay: 0.1s; }
+  .stagger-2 { transition-delay: 0.2s; }
+  .stagger-3 { transition-delay: 0.3s; }
+  .stagger-4 { transition-delay: 0.4s; }
+  .stagger-5 { transition-delay: 0.5s; }
 }
 
 @layer utilities {
@@ -156,6 +259,83 @@
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  /* Modern Gradient Backgrounds */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #FF5E10 0%, #E55A2B 100%);
+  }
+
+  .bg-gradient-dark {
+    background: linear-gradient(180deg, #1A1A1A 0%, #2D2D2D 100%);
+  }
+
+  .bg-gradient-light {
+    background: linear-gradient(180deg, #FAFAFA 0%, #F2F2F2 100%);
+  }
+
+  /* Text Gradient */
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-[#FF5E10] to-[#FF8A4C] bg-clip-text text-transparent;
+  }
+
+  /* Clip path utilities */
+  .clip-diagonal {
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+  }
+
+  .clip-diagonal-reverse {
+    clip-path: polygon(0 15%, 100% 0, 100% 100%, 0 100%);
+  }
+
+  /* Split text animation helper */
+  .split-char {
+    @apply inline-block;
+    will-change: transform, opacity;
+  }
+
+  /* Parallax helper */
+  .parallax-container {
+    perspective: 1px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .parallax-layer {
+    transform-style: preserve-3d;
+  }
+
+  /* Smooth image loading */
+  .img-loading {
+    @apply bg-gray-100 animate-pulse;
+  }
+
+  .img-loaded {
+    @apply bg-transparent animate-none;
+  }
+
+  /* Modern hover effects */
+  .hover-underline {
+    @apply relative;
+  }
+
+  .hover-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-current transition-all duration-300;
+  }
+
+  .hover-underline:hover::after {
+    @apply w-full;
+  }
+
+  /* Hide scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -195,12 +375,8 @@ input:focus, textarea:focus, select:focus {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   레거시 콘텐츠 스타일 (아임웹 복제본용)
-   ═══════════════════════════════════════════════════════════ */
-
+/* Legacy content styles */
 .legacy-content {
-  /* 기본 스타일 */
   line-height: 1.8;
   color: #333;
 }
@@ -281,20 +457,17 @@ input:focus, textarea:focus, select:focus {
   margin: 2rem 0;
 }
 
-/* 아임웹 특정 클래스 호환 */
 .legacy-content .text-center { text-align: center; }
 .legacy-content .text-left { text-align: left; }
 .legacy-content .text-right { text-align: right; }
 .legacy-content .font-bold { font-weight: 700; }
 .legacy-content .font-normal { font-weight: 400; }
 
-/* 이미지 정렬 */
 .legacy-content .img-center {
   display: block;
   margin: 1rem auto;
 }
 
-/* 반응형 iframe (유튜브 등) */
 .legacy-content iframe {
   max-width: 100%;
   border-radius: 8px;
