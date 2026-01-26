@@ -179,28 +179,51 @@ export async function getPrograms(params: {
   search?: string
   type?: string
   status?: string
+  sortBy?: 'newest' | 'oldest' | 'name' | 'startDate' | 'participants'
 }) {
-  const { page = 1, limit = 10, search, type, status } = params
+  const { page = 1, limit = 10, search, type, status, sortBy = 'newest' } = params
 
   const where: any = {}
   if (search) where.title = { contains: search }
   if (type) where.type = type
   if (status) where.status = status
 
+  // 정렬 옵션 처리
+  let orderBy: any = { createdAt: 'desc' }
+  switch (sortBy) {
+    case 'oldest': orderBy = { createdAt: 'asc' }; break
+    case 'name': orderBy = { title: 'asc' }; break
+    case 'startDate': orderBy = { startDate: 'desc' }; break
+    case 'participants': orderBy = { applicationCount: 'desc' }; break
+    default: orderBy = { createdAt: 'desc' }
+  }
+
   const [programs, total] = await Promise.all([
     prisma.program.findMany({
       where,
       skip: (page - 1) * limit,
       take: limit,
-      orderBy: { createdAt: 'desc' },
+      orderBy,
       include: {
-        _count: { select: { registrations: true } }
+        _count: { select: { registrations: true, sessions: true } }
       }
     }),
     prisma.program.count({ where })
   ])
 
   return { programs, total, pages: Math.ceil(total / limit) }
+}
+
+// 프로그램 상태별 통계
+export async function getProgramStats() {
+  const stats = await prisma.program.groupBy({
+    by: ['status'],
+    _count: true
+  })
+
+  const total = await prisma.program.count()
+
+  return { stats, total }
 }
 
 export async function getProgram(id: string) {
