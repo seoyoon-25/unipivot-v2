@@ -202,7 +202,7 @@ export default function ProgramsGrid({ programs, total, pages, currentPage, sear
                     <ExternalLink className="w-4 h-4" />
                   </Link>
                   <Link
-                    href={`/programs/${program.slug}/edit`}
+                    href={`/admin/programs/${program.id}/edit`}
                     className="p-2 text-gray-400 hover:text-primary"
                     title="수정"
                   >

@@ -228,7 +228,7 @@ export default function ProgramDetailTabs({ program, participants, sessions, dep
             보기
           </Link>
           <Link
-            href={`/programs/${program.slug}/edit`}
+            href={`/admin/programs/${program.id}/edit`}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             <Edit3 className="w-4 h-4" />
