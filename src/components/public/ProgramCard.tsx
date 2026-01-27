@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Heart } from 'lucide-react'
+import { Heart, Pencil } from 'lucide-react'
 import { useState, useTransition } from 'react'
 import { useSession } from 'next-auth/react'
 import {
@@ -81,6 +81,7 @@ export function ProgramCard({
 
   const isRecruiting = programStatus === 'RECRUITING'
   const canApply = isRecruiting && !hasApplied
+  const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN'
 
   const handleLikeClick = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -144,19 +145,31 @@ export function ProgramCard({
             {statusLabel}
           </span>
           {/* Heart Button - Top Right */}
-          <button
-            onClick={handleLikeClick}
-            disabled={isPending}
-            className={`absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm transition-all ${
-              isPending ? 'opacity-50' : 'hover:bg-white hover:scale-110'
-            }`}
-          >
-            <Heart
-              className={`w-5 h-5 transition-colors ${
-                liked ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-500'
+          <div className="absolute top-3 right-3 flex gap-1">
+            {isAdmin && (
+              <Link
+                href={`/admin/programs/${id}/edit`}
+                onClick={(e) => e.stopPropagation()}
+                className="p-2 rounded-full bg-white/80 backdrop-blur-sm transition-all hover:bg-white hover:scale-110"
+                title="프로그램 수정"
+              >
+                <Pencil className="w-5 h-5 text-gray-500 hover:text-primary" />
+              </Link>
+            )}
+            <button
+              onClick={handleLikeClick}
+              disabled={isPending}
+              className={`p-2 rounded-full bg-white/80 backdrop-blur-sm transition-all ${
+                isPending ? 'opacity-50' : 'hover:bg-white hover:scale-110'
               }`}
-            />
-          </button>
+            >
+              <Heart
+                className={`w-5 h-5 transition-colors ${
+                  liked ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-500'
+                }`}
+              />
+            </button>
+          </div>
         </div>
       </Link>
 

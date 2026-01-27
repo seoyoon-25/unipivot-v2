@@ -106,7 +106,7 @@ export default async function ProgramsPage({ searchParams }: PageProps) {
             <ProgramTypeFilters currentType={type} />
             {isAdmin && (
               <Link
-                href="/programs/write"
+                href="/admin/programs/new"
                 className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-xl font-medium transition-colors shadow-lg shrink-0"
               >
                 <Plus className="w-5 h-5" />
