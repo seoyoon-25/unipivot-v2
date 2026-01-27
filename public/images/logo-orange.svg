@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" width="200" height="48">
+  <!-- Orange circle with white U -->
+  <circle cx="24" cy="24" r="20" fill="#FF6B35"/>
+  <text x="24" y="32" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle">U</text>
+
+  <!-- UniPivot text in orange -->
+  <text x="54" y="32" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#FF6B35">UniPivot</text>
+</svg>

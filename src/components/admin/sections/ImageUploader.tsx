@@ -7,7 +7,6 @@ import { FormField } from './FormField'
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from '@/hooks/use-toast'
-import Image from 'next/image'
 
 interface ImageUploaderProps {
   label: string
@@ -17,6 +16,7 @@ interface ImageUploaderProps {
   className?: string
   aspectRatio?: 'square' | 'video' | 'auto'
   maxSizeMB?: number
+  skipOptimize?: boolean
 }
 
 export function ImageUploader({
@@ -26,7 +26,8 @@ export function ImageUploader({
   onChange,
   className,
   aspectRatio = 'auto',
-  maxSizeMB = 10
+  maxSizeMB = 10,
+  skipOptimize = false
 }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
@@ -57,6 +58,9 @@ export function ImageUploader({
       const formData = new FormData()
       formData.append('file', file)
       formData.append('generateThumbnail', 'true')
+      if (skipOptimize) {
+        formData.append('skipOptimize', 'true')
+      }
 
       const response = await fetch('/api/upload/image', {
         method: 'POST',
@@ -146,12 +150,12 @@ export function ImageUploader({
           <CardContent className="p-0">
             {value ? (
               /* Image Preview */
-              <div className="relative w-full h-full min-h-[200px]">
-                <Image
+              <div className="relative w-full h-full min-h-[200px] flex items-center justify-center bg-gray-50 rounded-lg">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={value}
                   alt="Preview"
-                  fill
-                  className="object-cover rounded-lg"
+                  className="max-w-full max-h-[200px] object-contain rounded-lg"
                 />
                 <Button
                   variant="destructive"

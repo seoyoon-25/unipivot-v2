@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   LayoutDashboard, Users, BookOpen, Briefcase, Wallet,
   FileText, Bot, Palette, Settings, Home,
@@ -11,6 +12,18 @@ import {
 import AdminMobileNav from './AdminMobileNav'
 import AdminHeader from './AdminHeader'
 import AdminMobileHeader from './AdminMobileHeader'
+import { prisma } from '@/lib/db'
+
+async function getLogoUrl() {
+  try {
+    const setting = await prisma.siteSetting.findUnique({
+      where: { key: 'theme.logo' }
+    })
+    return setting?.value || ''
+  } catch {
+    return ''
+  }
+}
 
 const sidebarItems = [
   { label: '대시보드', href: '/admin', icon: LayoutDashboard },
@@ -121,19 +134,33 @@ export default async function AdminLayout({
     redirect('/login')
   }
 
+  const logoUrl = await getLogoUrl()
+
   return (
     <div className="min-h-screen bg-gray-100 flex">
       {/* Sidebar - Desktop */}
       <aside className="hidden lg:flex w-64 bg-gray-900 flex-col fixed h-full z-50">
         <div className="p-6 border-b border-gray-800">
           <Link href="/admin" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
-              <span className="text-white font-bold text-lg">U</span>
-            </div>
-            <div>
-              <span className="font-bold text-white">UniPivot</span>
-              <span className="block text-xs text-gray-400">Admin Panel</span>
-            </div>
+            {logoUrl ? (
+              <Image
+                src={logoUrl}
+                alt="UniPivot"
+                width={140}
+                height={40}
+                className="h-10 w-auto object-contain"
+              />
+            ) : (
+              <>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">U</span>
+                </div>
+                <div>
+                  <span className="font-bold text-white">UniPivot</span>
+                  <span className="block text-xs text-gray-400">Admin Panel</span>
+                </div>
+              </>
+            )}
           </Link>
         </div>
 

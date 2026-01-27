@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils'
 import { Menu, User, LogOut, Settings, Info, BookOpen, MessageSquare, Heart, FlaskConical, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { Avatar } from '@/components/ui'
@@ -101,9 +102,12 @@ const defaultMenuItems: MenuItem[] = [
 
 interface NavbarProps {
   menuItems?: MenuItem[]
+  logoUrl?: string
 }
 
-export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
+const DEFAULT_LOGO = '/images/logo.png'
+
+export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { data: session } = useSession()
@@ -120,17 +124,21 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
   return (
     <nav
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black border-b border-white/10',
-        isScrolled && 'shadow-lg shadow-black/20'
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white border-b border-gray-200',
+        isScrolled && 'shadow-lg shadow-gray-200/50'
       )}
     >
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Logo - Orange UniPivot */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <span className="font-bold text-2xl text-[#FF6B35] transition-opacity group-hover:opacity-80">
-              UniPivot
-            </span>
+          {/* Logo */}
+          <Link href="/" className="flex items-center group">
+            <Image
+              src={logoUrl || DEFAULT_LOGO}
+              alt="UniPivot"
+              width={160}
+              height={48}
+              className="h-10 w-auto transition-opacity group-hover:opacity-80"
+            />
           </Link>
 
           {/* Desktop Menu - Krafton style with underline animation */}
@@ -139,29 +147,29 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
               item.children ? (
                 <DropdownMenu key={item.label}>
                   <DropdownMenuTrigger asChild>
-                    <button className="nav-link-animated text-white hover:text-[#FF6B35] font-medium transition-colors py-2">
+                    <button className="nav-link-animated text-gray-600 hover:text-[#FF6B35] font-medium transition-colors py-2 text-lg">
                       {item.label}
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56 bg-[#1A1A1A] border-white/10">
-                    <DropdownMenuLabel className="text-gray-400 text-xs uppercase tracking-wider">
+                  <DropdownMenuContent align="start" className="w-56 bg-white border-gray-200">
+                    <DropdownMenuLabel className="text-gray-500 text-xs uppercase tracking-wider">
                       {item.label}
                     </DropdownMenuLabel>
-                    <DropdownMenuSeparator className="bg-white/10" />
+                    <DropdownMenuSeparator className="bg-gray-200" />
                     {item.children.map((child) => (
-                      <DropdownMenuItem key={child.href} asChild className="focus:bg-[#FF6B35]/10 focus:text-white">
+                      <DropdownMenuItem key={child.href} asChild className="focus:bg-[#FF6B35]/10 focus:text-gray-900">
                         <Link
                           href={child.href}
                           target={child.external ? '_blank' : undefined}
                           rel={child.external ? 'noopener noreferrer' : undefined}
-                          className="flex flex-col items-start gap-0.5 text-gray-300 hover:text-white"
+                          className="flex flex-col items-start gap-0.5 text-gray-600 hover:text-gray-900"
                         >
                           <span className="font-medium flex items-center gap-1">
                             {child.label}
                             {child.external && <ExternalLink className="w-3 h-3" />}
                           </span>
                           {child.description && (
-                            <span className="text-xs text-gray-500">{child.description}</span>
+                            <span className="text-xs text-gray-400">{child.description}</span>
                           )}
                         </Link>
                       </DropdownMenuItem>
@@ -174,7 +182,7 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
                   href={item.href!}
                   target={item.external ? '_blank' : undefined}
                   rel={item.external ? 'noopener noreferrer' : undefined}
-                  className="nav-link-animated text-white hover:text-[#FF6B35] font-medium transition-colors py-2 flex items-center gap-1"
+                  className="nav-link-animated text-gray-600 hover:text-[#FF6B35] font-medium transition-colors py-2 text-lg flex items-center gap-1"
                 >
                   {item.label}
                   {item.external && <ExternalLink className="w-3 h-3" />}
@@ -203,30 +211,30 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
                       />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-[#1A1A1A] border-white/10">
+                  <DropdownMenuContent align="end" className="w-56 bg-white border-gray-200">
                     <DropdownMenuLabel>
                       <div className="flex flex-col">
-                        <span className="font-medium text-white">{session.user?.name}</span>
-                        <span className="text-xs text-gray-400 font-normal">{session.user?.email}</span>
+                        <span className="font-medium text-gray-900">{session.user?.name}</span>
+                        <span className="text-xs text-gray-500 font-normal">{session.user?.email}</span>
                       </div>
                     </DropdownMenuLabel>
-                    <DropdownMenuSeparator className="bg-white/10" />
-                    <DropdownMenuItem asChild className="text-gray-300 focus:bg-[#FF6B35]/10 focus:text-white">
+                    <DropdownMenuSeparator className="bg-gray-200" />
+                    <DropdownMenuItem asChild className="text-gray-600 focus:bg-[#FF6B35]/10 focus:text-gray-900">
                       <Link href="/my" className="flex items-center gap-2">
                         <User className="w-4 h-4" />
                         마이페이지
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="text-gray-300 focus:bg-[#FF6B35]/10 focus:text-white">
+                    <DropdownMenuItem asChild className="text-gray-600 focus:bg-[#FF6B35]/10 focus:text-gray-900">
                       <Link href="/my/settings" className="flex items-center gap-2">
                         <Settings className="w-4 h-4" />
                         설정
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-white/10" />
+                    <DropdownMenuSeparator className="bg-gray-200" />
                     <DropdownMenuItem
                       onClick={() => signOut()}
-                      className="text-red-400 focus:text-red-300 focus:bg-red-500/10"
+                      className="text-red-500 focus:text-red-600 focus:bg-red-500/10"
                     >
                       <LogOut className="w-4 h-4 mr-2" />
                       로그아웃
@@ -247,12 +255,12 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
           {/* Mobile Menu Button */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
-              <button className="lg:hidden p-2 text-white hover:text-[#FF6B35] transition-colors">
+              <button className="lg:hidden p-2 text-gray-600 hover:text-[#FF6B35] transition-colors">
                 <Menu className="w-6 h-6" />
               </button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[350px] p-0 bg-[#1A1A1A] border-l border-white/10">
-              <SheetHeader className="p-4 border-b border-white/10">
+            <SheetContent side="right" className="w-[300px] sm:w-[350px] p-0 bg-white border-l border-gray-200">
+              <SheetHeader className="p-4 border-b border-gray-200">
                 <SheetTitle className="flex items-center gap-2 text-[#FF6B35]">
                   UniPivot
                 </SheetTitle>
@@ -263,8 +271,8 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
                 <Accordion type="multiple" className="w-full">
                   {menuItems.map((item, index) =>
                     item.children ? (
-                      <AccordionItem key={item.label} value={`item-${index}`} className="border-b border-white/10">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-white/5 text-white">
+                      <AccordionItem key={item.label} value={`item-${index}`} className="border-b border-gray-200">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-gray-50 text-gray-700">
                           <span className="flex items-center gap-3">
                             <span className="w-8 h-8 rounded-lg bg-[#FF6B35]/20 flex items-center justify-center text-[#FF6B35]">
                               {ICON_MAP[item.label]}
@@ -273,7 +281,7 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
                           </span>
                         </AccordionTrigger>
                         <AccordionContent className="pb-0">
-                          <div className="bg-black/30">
+                          <div className="bg-gray-50">
                             {item.children.map((child) => (
                               <Link
                                 key={child.href}
@@ -281,7 +289,7 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
                                 target={child.external ? '_blank' : undefined}
                                 rel={child.external ? 'noopener noreferrer' : undefined}
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="flex items-center gap-3 px-4 py-3 pl-16 text-gray-300 hover:text-[#FF6B35] hover:bg-white/5 transition-colors border-t border-white/5 first:border-t-0"
+                                className="flex items-center gap-3 px-4 py-3 pl-16 text-gray-600 hover:text-[#FF6B35] hover:bg-gray-100 transition-colors border-t border-gray-100 first:border-t-0"
                               >
                                 <div className="flex-1">
                                   <span className="font-medium flex items-center gap-1">
@@ -289,7 +297,7 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
                                     {child.external && <ExternalLink className="w-3 h-3" />}
                                   </span>
                                   {child.description && (
-                                    <span className="block text-xs text-gray-500 mt-0.5">{child.description}</span>
+                                    <span className="block text-xs text-gray-400 mt-0.5">{child.description}</span>
                                   )}
                                 </div>
                               </Link>
@@ -298,13 +306,13 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
                         </AccordionContent>
                       </AccordionItem>
                     ) : (
-                      <div key={item.label} className="border-b border-white/10">
+                      <div key={item.label} className="border-b border-gray-200">
                         <a
                           href={item.href!}
                           target={item.external ? '_blank' : undefined}
                           rel={item.external ? 'noopener noreferrer' : undefined}
                           onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3 text-white hover:text-[#FF6B35] hover:bg-white/5 transition-colors"
+                          className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-[#FF6B35] hover:bg-gray-50 transition-colors"
                         >
                           <span className="w-8 h-8 rounded-lg bg-[#FF6B35]/20 flex items-center justify-center text-[#FF6B35]">
                             {ICON_MAP[item.label]}
@@ -319,7 +327,7 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
               </div>
 
               {/* Mobile Auth Section */}
-              <div className="p-4 border-t border-white/10 mt-auto">
+              <div className="p-4 border-t border-gray-200 mt-auto">
                 {session ? (
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 px-2 py-2">
@@ -329,22 +337,22 @@ export function Navbar({ menuItems = defaultMenuItems }: NavbarProps) {
                         size="sm"
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-white truncate">{session.user?.name}</p>
-                        <p className="text-xs text-gray-400 truncate">{session.user?.email}</p>
+                        <p className="font-medium text-gray-900 truncate">{session.user?.name}</p>
+                        <p className="text-xs text-gray-500 truncate">{session.user?.email}</p>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <Link
                         href="/my"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
+                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                       >
                         <User className="w-4 h-4" />
                         마이페이지
                       </Link>
                       <button
                         onClick={() => signOut()}
-                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors"
                       >
                         <LogOut className="w-4 h-4" />
                         로그아웃
