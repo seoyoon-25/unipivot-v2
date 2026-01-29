@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Download, X } from 'lucide-react'
 
 interface QuoteImageGeneratorProps {
@@ -88,13 +88,13 @@ export default function QuoteImageGenerator({ quote, onClose }: QuoteImageGenera
   }
 
   // Draw canvas on mount and bg change
-  useState(() => {
-    setTimeout(drawCanvas, 100)
-  })
+  useEffect(() => {
+    const timer = setTimeout(drawCanvas, 100)
+    return () => clearTimeout(timer)
+  }, [bgIndex])
 
   const handleBgChange = (index: number) => {
     setBgIndex(index)
-    setTimeout(drawCanvas, 50)
   }
 
   const handleDownload = () => {
