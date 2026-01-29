@@ -6,7 +6,7 @@ export function StorySection() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Image */}
-          <div className="relative">
+          <div className="relative scale-in">
             <div className="aspect-[4/3] bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl overflow-hidden">
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
@@ -33,7 +33,7 @@ export function StorySection() {
           </div>
 
           {/* Content */}
-          <div>
+          <div className="animate-on-scroll">
             <span className="text-primary text-sm font-semibold tracking-wider uppercase">Our Story</span>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2 mb-6">
               왜 유니피벗인가요?

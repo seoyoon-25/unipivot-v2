@@ -93,8 +93,7 @@ const sidebarItems = [
     children: [
       { label: '공지사항', href: '/admin/contents/notices' },
       { label: '블로그', href: '/admin/contents/blog' },
-      { label: '페이지 관리', href: '/admin/pages' },
-      { label: '함께하는 사람들', href: '/admin/team-members' },
+      { label: '페이지 관리', href: '/admin/design/pages' },
     ],
   },
   {

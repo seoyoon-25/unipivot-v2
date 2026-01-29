@@ -54,10 +54,10 @@ async function getTrends(searchParams: {
 
   if (searchParams.search) {
     where.OR = [
-      { title: { contains: searchParams.search, mode: 'insensitive' } },
-      { authors: { contains: searchParams.search, mode: 'insensitive' } },
-      { keywords: { contains: searchParams.search, mode: 'insensitive' } },
-      { abstract: { contains: searchParams.search, mode: 'insensitive' } },
+      { title: { contains: searchParams.search, mode: 'insensitive' as const } },
+      { authors: { contains: searchParams.search, mode: 'insensitive' as const } },
+      { keywords: { contains: searchParams.search, mode: 'insensitive' as const } },
+      { abstract: { contains: searchParams.search, mode: 'insensitive' as const } },
     ]
   }
 

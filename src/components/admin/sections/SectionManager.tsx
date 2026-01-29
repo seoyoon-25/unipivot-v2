@@ -44,18 +44,18 @@ interface SectionManagerProps {
 }
 
 export const SectionManager = React.memo(function SectionManager({
-  sections,
+  sections = [],
   onReorder,
   onToggleVisibility,
   className
 }: SectionManagerProps) {
-  const [localSections, setLocalSections] = useState(sections)
+  const [localSections, setLocalSections] = useState(sections || [])
   const [reordering, setReordering] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
   // Update local state when props change
   React.useEffect(() => {
-    setLocalSections(sections)
+    setLocalSections(sections || [])
     setHasChanges(false)
   }, [sections])
 
@@ -119,7 +119,7 @@ export const SectionManager = React.memo(function SectionManager({
   const toggleAllVisibility = async (visible: boolean) => {
     try {
       await Promise.all(
-        sections.map(section =>
+        (sections || []).map(section =>
           onToggleVisibility(section.sectionKey, visible)
         )
       )

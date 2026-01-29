@@ -24,6 +24,7 @@ interface ProgramCardProps {
   description?: string | null
   image?: string | null
   thumbnailSquare?: string | null
+  imagePosition?: number
   isOnline: boolean
   feeType: string
   feeAmount: number
@@ -46,6 +47,7 @@ export function ProgramCard({
   description,
   image,
   thumbnailSquare,
+  imagePosition = 0,
   isOnline,
   feeType,
   feeAmount,
@@ -137,6 +139,7 @@ export function ProgramCard({
             alt={title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
+            style={{ objectPosition: `center ${imagePosition}%` }}
           />
           {/* Status Badge - Top Left */}
           <span

@@ -25,10 +25,10 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { authors: { contains: search, mode: 'insensitive' } },
-        { keywords: { contains: search, mode: 'insensitive' } },
-        { abstract: { contains: search, mode: 'insensitive' } },
+        { title: { contains: search, mode: 'insensitive' as const } },
+        { authors: { contains: search, mode: 'insensitive' as const } },
+        { keywords: { contains: search, mode: 'insensitive' as const } },
+        { abstract: { contains: search, mode: 'insensitive' as const } },
       ]
     }
 

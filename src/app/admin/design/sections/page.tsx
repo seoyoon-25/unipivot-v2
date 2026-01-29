@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Save, Eye, RotateCcw, ExternalLink } from 'lucide-react'
+import { Loader2, Save, Eye, RotateCcw, ExternalLink, PanelRightClose, PanelRight } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import { SectionPreview } from '@/components/admin/sections/SectionPreview'
 import { HeroEditor } from '@/components/admin/sections/HeroEditor'
@@ -109,7 +109,8 @@ export default function SectionsPage() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('hero')
   const [saving, setSaving] = useState<string | null>(null)
-  const [previewSection, setPreviewSection] = useState<string | null>(null)
+  const [previewSection, setPreviewSection] = useState<string | null>('hero') // 미리보기 기본 활성화
+  const [showPreview, setShowPreview] = useState(true) // 미리보기 패널 표시 상태
 
   // Redirect if not admin
   useEffect(() => {
@@ -124,6 +125,13 @@ export default function SectionsPage() {
     fetchSections()
   }, [])
 
+  // activeTab 변경 시 previewSection도 동기화
+  useEffect(() => {
+    if (showPreview) {
+      setPreviewSection(activeTab)
+    }
+  }, [activeTab, showPreview])
+
   const fetchSections = async () => {
     try {
       setLoading(true)
@@ -134,12 +142,12 @@ export default function SectionsPage() {
       const data = await response.json()
 
       // If no sections exist, create default ones
-      if (data.sections.length === 0) {
+      if (!data.sections || data.sections.length === 0) {
         await createDefaultSections()
         return
       }
 
-      setSections(data.sections)
+      setSections(data.sections || [])
     } catch (error) {
       console.error('Error fetching sections:', error)
       toast({
@@ -336,38 +344,60 @@ export default function SectionsPage() {
     )
   }
 
+  // 섹션이 없으면 빈 화면 표시
+  if (!sections || sections.length === 0) {
+    return (
+      <div className="container mx-auto py-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold">섹션별 편집</h1>
+          <p className="text-muted-foreground">
+            메인 페이지의 각 섹션을 개별적으로 편집하고 관리합니다.
+          </p>
+        </div>
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-muted-foreground mb-4">등록된 섹션이 없습니다.</p>
+            <Button onClick={createDefaultSections}>
+              기본 섹션 생성
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
-    <div className="container mx-auto py-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">섹션별 편집</h1>
-        <p className="text-muted-foreground">
-          메인 페이지의 각 섹션을 개별적으로 편집하고 관리합니다.
+    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold">섹션별 편집</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
+          각 섹션을 개별적으로 편집하고 관리합니다.
         </p>
       </div>
 
       {/* Section Management */}
       <SectionManager
-        sections={sections}
+        sections={sections || []}
         onReorder={handleReorder}
         onToggleVisibility={handleVisibilityToggle}
-        className="mb-6"
+        className="mb-4 sm:mb-6"
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         {/* Homepage Sections */}
-        <div className="mb-6">
-          <h3 className="text-sm font-medium text-muted-foreground mb-2">홈페이지 섹션</h3>
-          <TabsList className="flex flex-wrap gap-1 h-auto">
-            {sections.filter(s => !s.sectionKey.startsWith('page.')).map((section) => (
+        <div className="mb-4 sm:mb-6">
+          <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">홈페이지 섹션</h3>
+          <TabsList className="flex flex-wrap gap-1 h-auto p-1">
+            {(sections || []).filter(s => !s.sectionKey.startsWith('page.')).map((section) => (
               <TabsTrigger
                 key={section.sectionKey}
                 value={section.sectionKey}
-                className="relative"
+                className="relative text-xs sm:text-sm px-2 sm:px-3 py-1.5"
               >
-                <span className="mr-2">{section.sectionName}</span>
+                <span className="mr-1 sm:mr-2">{section.sectionName}</span>
                 <div className="flex items-center gap-1">
                   {!section.isVisible && (
-                    <Badge variant="secondary" className="text-xs px-1 py-0">
+                    <Badge variant="secondary" className="text-[10px] sm:text-xs px-1 py-0">
                       숨김
                     </Badge>
                   )}
@@ -381,20 +411,20 @@ export default function SectionsPage() {
         </div>
 
         {/* Page Sections */}
-        {sections.filter(s => s.sectionKey.startsWith('page.')).length > 0 && (
-          <div className="mb-6">
-            <h3 className="text-sm font-medium text-muted-foreground mb-2">페이지별 콘텐츠</h3>
-            <TabsList className="flex flex-wrap gap-1 h-auto">
-              {sections.filter(s => s.sectionKey.startsWith('page.')).map((section) => (
+        {(sections || []).filter(s => s.sectionKey.startsWith('page.')).length > 0 && (
+          <div className="mb-4 sm:mb-6">
+            <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">페이지별 콘텐츠</h3>
+            <TabsList className="flex flex-wrap gap-1 h-auto p-1">
+              {(sections || []).filter(s => s.sectionKey.startsWith('page.')).map((section) => (
                 <TabsTrigger
                   key={section.sectionKey}
                   value={section.sectionKey}
-                  className="relative"
+                  className="relative text-xs sm:text-sm px-2 sm:px-3 py-1.5"
                 >
-                  <span className="mr-2">{section.sectionName}</span>
+                  <span className="mr-1 sm:mr-2">{section.sectionName}</span>
                   <div className="flex items-center gap-1">
                     {!section.isVisible && (
-                      <Badge variant="secondary" className="text-xs px-1 py-0">
+                      <Badge variant="secondary" className="text-[10px] sm:text-xs px-1 py-0">
                         숨김
                       </Badge>
                     )}
@@ -408,61 +438,72 @@ export default function SectionsPage() {
           </div>
         )}
 
-        {sections.map((section) => (
+        {(sections || []).map((section) => (
           <TabsContent key={section.sectionKey} value={section.sectionKey}>
-            <div className="space-y-6">
-              {/* Section Actions */}
-              <Card>
-                <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        {section.sectionName} 섹션
-                        <Badge variant={section.isVisible ? 'default' : 'secondary'}>
-                          {section.isVisible ? '표시' : '숨김'}
-                        </Badge>
-                      </CardTitle>
-                      <CardDescription>
-                        순서: {section.order}번째 • 마지막 수정: {new Date(section.updatedAt).toLocaleDateString()}
-                      </CardDescription>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleVisibilityToggle(section.sectionKey, !section.isVisible)}
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        {section.isVisible ? '숨기기' : '표시하기'}
-                      </Button>
-                      <Button
-                        variant={previewSection === section.sectionKey ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setPreviewSection(
-                          previewSection === section.sectionKey ? null : section.sectionKey
-                        )}
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        {previewSection === section.sectionKey ? '미리보기 닫기' : '미리보기'}
-                      </Button>
-                      <Link href="/admin/preview">
-                        <Button variant="outline" size="sm">
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          전체 미리보기
-                        </Button>
-                      </Link>
-                    </div>
+            {/* Section Actions */}
+            <Card className="mb-4">
+              <CardHeader className="pb-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <CardTitle className="flex flex-wrap items-center gap-2">
+                      {section.sectionName} 섹션
+                      <Badge variant={section.isVisible ? 'default' : 'secondary'}>
+                        {section.isVisible ? '표시' : '숨김'}
+                      </Badge>
+                    </CardTitle>
+                    <CardDescription className="mt-1">
+                      순서: {section.order}번째 • 수정: {new Date(section.updatedAt).toLocaleDateString()}
+                    </CardDescription>
                   </div>
-                </CardHeader>
-              </Card>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleVisibilityToggle(section.sectionKey, !section.isVisible)}
+                    >
+                      <Eye className="h-4 w-4 sm:mr-2" />
+                      <span className="hidden sm:inline">{section.isVisible ? '숨기기' : '표시하기'}</span>
+                    </Button>
+                    <Button
+                      variant={showPreview ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => {
+                        setShowPreview(!showPreview)
+                        if (!showPreview) {
+                          setPreviewSection(activeTab)
+                        }
+                      }}
+                    >
+                      {showPreview ? (
+                        <><PanelRightClose className="h-4 w-4 sm:mr-2" /><span className="hidden sm:inline">미리보기 닫기</span></>
+                      ) : (
+                        <><PanelRight className="h-4 w-4 sm:mr-2" /><span className="hidden sm:inline">미리보기 열기</span></>
+                      )}
+                    </Button>
+                    <Link href="/admin/preview">
+                      <Button variant="outline" size="sm">
+                        <ExternalLink className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">전체 미리보기</span>
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+
+            {/* Side-by-side layout: Editor + Preview */}
+            <div className={`grid gap-6 ${showPreview ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
+              {/* Section Editor */}
+              <div className="space-y-6">
+                {renderSectionEditor(section)}
+              </div>
 
               {/* Section Preview - 미리보기 활성화시 표시 */}
-              {previewSection === section.sectionKey && (
-                <SectionPreview section={section} />
+              {showPreview && previewSection === section.sectionKey && (
+                <div className="lg:sticky lg:top-4 lg:self-start">
+                  <SectionPreview section={section} />
+                </div>
               )}
-
-              {/* Section Editor */}
-              {renderSectionEditor(section)}
             </div>
           </TabsContent>
         ))}

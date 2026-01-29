@@ -24,8 +24,188 @@ interface PageSectionEditorProps {
   onSave: (sectionKey: string) => void
 }
 
-// About Page Editor
+// About Page Editor - New Bilingual Format
 export function AboutPageEditor({ section, onUpdate, onSave }: PageSectionEditorProps) {
+  const content = section.content || {}
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({
+    title: true,
+    paragraphs: true,
+    images: true,
+  })
+
+  // Check if this is the new bilingual format
+  const isBilingualFormat = content.title?.ko !== undefined
+
+  const handleChange = (path: string[], value: any) => {
+    const newContent = JSON.parse(JSON.stringify(content))
+    let current = newContent
+    for (let i = 0; i < path.length - 1; i++) {
+      if (!current[path[i]]) current[path[i]] = {}
+      current = current[path[i]]
+    }
+    current[path[path.length - 1]] = value
+    onUpdate(section.sectionKey, newContent)
+  }
+
+  const toggleSection = (key: string) => {
+    setExpanded(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const addParagraph = () => {
+    const paragraphs = content.paragraphs || []
+    handleChange(['paragraphs'], [...paragraphs, { ko: '', en: '' }])
+  }
+
+  const removeParagraph = (index: number) => {
+    const paragraphs = content.paragraphs || []
+    if (paragraphs.length <= 1) return
+    handleChange(['paragraphs'], paragraphs.filter((_: any, i: number) => i !== index))
+  }
+
+  // If new bilingual format
+  if (isBilingualFormat) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>소개 페이지 콘텐츠 (한/영)</CardTitle>
+          <CardDescription>/about 페이지의 콘텐츠를 편집합니다. 별도 에디터 페이지: /admin/design/about</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Title Section */}
+          <div className="border rounded-lg">
+            <button
+              onClick={() => toggleSection('title')}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50"
+            >
+              <h3 className="font-semibold">제목 섹션</h3>
+              {expanded.title ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+            </button>
+            {expanded.title && (
+              <div className="p-4 border-t space-y-4">
+                <div>
+                  <Label>한글 제목</Label>
+                  <Input
+                    value={content.title?.ko || ''}
+                    onChange={(e) => handleChange(['title', 'ko'], e.target.value)}
+                    placeholder="유니피벗은 어떤 곳인가요?"
+                  />
+                </div>
+                <div>
+                  <Label>영문 제목</Label>
+                  <Input
+                    value={content.title?.en || ''}
+                    onChange={(e) => handleChange(['title', 'en'], e.target.value)}
+                    placeholder="About UNIPIVOT"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Paragraphs Section */}
+          <div className="border rounded-lg">
+            <button
+              onClick={() => toggleSection('paragraphs')}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50"
+            >
+              <h3 className="font-semibold">본문 단락 ({(content.paragraphs || []).length}개)</h3>
+              {expanded.paragraphs ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+            </button>
+            {expanded.paragraphs && (
+              <div className="p-4 border-t space-y-4">
+                {(content.paragraphs || []).map((para: any, index: number) => (
+                  <div key={index} className="border rounded-lg p-4 bg-gray-50/50 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-sm">단락 {index + 1}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => removeParagraph(index)}
+                      >
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                      </Button>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-gray-500">한글</Label>
+                      <Textarea
+                        value={para.ko || ''}
+                        onChange={(e) => {
+                          const newParagraphs = [...(content.paragraphs || [])]
+                          newParagraphs[index] = { ...newParagraphs[index], ko: e.target.value }
+                          handleChange(['paragraphs'], newParagraphs)
+                        }}
+                        rows={3}
+                        placeholder="한글 내용"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-gray-500">English</Label>
+                      <Textarea
+                        value={para.en || ''}
+                        onChange={(e) => {
+                          const newParagraphs = [...(content.paragraphs || [])]
+                          newParagraphs[index] = { ...newParagraphs[index], en: e.target.value }
+                          handleChange(['paragraphs'], newParagraphs)
+                        }}
+                        rows={3}
+                        placeholder="English content"
+                      />
+                    </div>
+                  </div>
+                ))}
+                <Button variant="outline" onClick={addParagraph} className="w-full">
+                  <Plus className="w-4 h-4 mr-2" />
+                  단락 추가
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Images Section */}
+          <div className="border rounded-lg">
+            <button
+              onClick={() => toggleSection('images')}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50"
+            >
+              <h3 className="font-semibold">이미지 (3개)</h3>
+              {expanded.images ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+            </button>
+            {expanded.images && (
+              <div className="p-4 border-t space-y-4">
+                {[0, 1, 2].map((index) => (
+                  <div key={index}>
+                    <Label>이미지 {index + 1} URL</Label>
+                    <Input
+                      value={(content.images || [])[index] || ''}
+                      onChange={(e) => {
+                        const newImages = [...(content.images || ['', '', ''])]
+                        newImages[index] = e.target.value
+                        handleChange(['images'], newImages)
+                      }}
+                      placeholder="https://..."
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <Button onClick={() => onSave(section.sectionKey)} className="w-full">
+            <Save className="w-4 h-4 mr-2" />
+            저장
+          </Button>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // Legacy format (for backwards compatibility)
+  return <LegacyAboutPageEditor section={section} onUpdate={onUpdate} onSave={onSave} />
+}
+
+// Legacy About Page Editor (old format with hero, stats, mission, etc.)
+function LegacyAboutPageEditor({ section, onUpdate, onSave }: PageSectionEditorProps) {
   const content = section.content || {}
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
     hero: true,

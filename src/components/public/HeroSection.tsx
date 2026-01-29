@@ -3,13 +3,14 @@
 import Link from 'next/link'
 import { motion, type Variants } from 'framer-motion'
 import { SocialIcons } from './SocialIcons'
-import { ArrowDown, Users, BookOpen, Award } from 'lucide-react'
+import { ArrowDown, Users, BookOpen, Award, CheckCircle } from 'lucide-react'
 
 interface Props {
   stats?: {
     members: number
     completedPrograms: number
     totalParticipations: number
+    totalBooks: number
   }
 }
 
@@ -154,6 +155,13 @@ export function HeroSection({ stats }: Props) {
             <motion.div className="text-center" variants={statItem}>
               <div className="flex items-center justify-center gap-2 mb-1">
                 <BookOpen className="w-5 h-5 text-primary" />
+                <span className="text-3xl md:text-4xl font-bold text-white">{stats.totalBooks}</span>
+              </div>
+              <p className="text-white/60 text-sm">읽은 책</p>
+            </motion.div>
+            <motion.div className="text-center" variants={statItem}>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <CheckCircle className="w-5 h-5 text-primary" />
                 <span className="text-3xl md:text-4xl font-bold text-white">{stats.completedPrograms}</span>
               </div>
               <p className="text-white/60 text-sm">완료된 프로그램</p>

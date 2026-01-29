@@ -4,8 +4,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./data/unipivot.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -109,6 +109,13 @@ model User {
   approvedReports          BookReport[]              @relation("BookReportApprover")
   // Phase 5-6: 세션 독후감
   sessionReports           SessionReport[]
+  // 이슈 설문 응답
+  issueSurveyResponses     IssueSurveyResponse[]     @relation("IssueSurveyResponses")
+  // Phase 6: 내 책장
+  wishBooks                WishBook[]
+  favoriteBooks            FavoriteBook[]
+  // Phase 8: 명문장
+  quotes                   Quote[]
 }
 
 model Account {
@@ -180,6 +187,7 @@ model Program {
   recruitEndDate           DateTime?
   recruitStartDate         DateTime?
   thumbnailSquare          String?
+  imagePosition            Int                           @default(0) // 0=top, 50=center, 100=bottom
   currentBookContent       String?
   scheduleContent          String?
   isLegacy                 Boolean                       @default(false)
@@ -1200,6 +1208,79 @@ model InterestSetting {
   value       String
   description String?
   updatedAt   DateTime @updatedAt
+}
+
+// 키워드 간 연결 관계 (네트워크 그래프용)
+model KeywordConnection {
+  id            String   @id @default(cuid())
+  fromKeywordId String
+  toKeywordId   String
+  strength      Int      @default(1) // 동시 선택 횟수
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([fromKeywordId, toKeywordId])
+  @@index([fromKeywordId])
+  @@index([toKeywordId])
+}
+
+// 이슈 기반 설문조사 (벽보판용)
+model IssueSurvey {
+  id          String                @id @default(cuid())
+  title       String                // 설문 제목
+  description String?               // 설문 설명
+  type        String                @default("SINGLE_CHOICE") // SINGLE_CHOICE, MULTIPLE_CHOICE, TEXT, SCALE
+  status      String                @default("DRAFT") // DRAFT, ACTIVE, CLOSED
+  startDate   DateTime?             // 시작일
+  endDate     DateTime?             // 종료일
+  isAnonymous Boolean               @default(true) // 익명 여부
+  isPinned    Boolean               @default(false) // 상단 고정
+  order       Int                   @default(0)
+  createdBy   String?               // 생성자 (관리자 ID)
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  options     IssueSurveyOption[]
+  responses   IssueSurveyResponse[]
+
+  @@index([status])
+  @@index([isPinned, order])
+}
+
+// 이슈 설문 선택지
+model IssueSurveyOption {
+  id        String                @id @default(cuid())
+  surveyId  String
+  text      String                // 선택지 텍스트
+  order     Int                   @default(0)
+  color     String?               // 결과 시각화용 색상
+  createdAt DateTime              @default(now())
+  survey    IssueSurvey           @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  responses IssueSurveyResponse[]
+
+  @@index([surveyId])
+}
+
+// 이슈 설문 응답
+model IssueSurveyResponse {
+  id         String             @id @default(cuid())
+  surveyId   String
+  optionId   String?            // 선택형 응답
+  textValue  String?            // 텍스트 응답
+  scaleValue Int?               // 척도 응답 (1-5, 1-10 등)
+  comment    String?            // 추가 의견
+  likeCount  Int                @default(0)  // 공감 수
+  userId     String?            // 회원 응답
+  sessionId  String?            // 비회원 응답
+  ipHash     String?            // 중복 방지
+  createdAt  DateTime           @default(now())
+  survey     IssueSurvey        @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  option     IssueSurveyOption? @relation(fields: [optionId], references: [id], onDelete: SetNull)
+  user       User?              @relation("IssueSurveyResponses", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([surveyId, userId])
+  @@unique([surveyId, sessionId])
+  @@index([surveyId])
+  @@index([optionId])
 }
 
 model CooperationSection {
@@ -2381,21 +2462,6 @@ model Page {
   updatedAt          DateTime @updatedAt
 }
 
-model TeamMember {
-  id           String   @id @default(cuid())
-  name         String
-  role         String
-  position     String?
-  photo        String?
-  programs     String?
-  introduction String?
-  period       String?
-  displayOrder Int      @default(0)
-  isVisible    Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-}
-
 model Member {
   id              String               @id @default(cuid())
   memberCode      String               @unique
@@ -2548,7 +2614,10 @@ model ReadBook {
   status       String       @default("COMPLETED")
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
-  bookReports  BookReport[]
+  bookReports    BookReport[]
+  // Phase 6: 내 책장
+  wishBooks      WishBook[]
+  favoriteBooks  FavoriteBook[]
 
   @@index([season])
   @@index([category])
@@ -3223,4 +3292,66 @@ model AbsenceRequest {
   @@index([sessionId])
   @@index([participantId])
   @@index([status])
+}
+
+// Phase 6: 내 책장 - 읽고 싶은 책
+model WishBook {
+  id          String    @id @default(cuid())
+
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  readBookId  String?
+  readBook    ReadBook? @relation(fields: [readBookId], references: [id])
+
+  customTitle  String?
+  customAuthor String?
+
+  memo        String?
+
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, readBookId])
+  @@index([userId])
+}
+
+// Phase 6: 내 책장 - 인생 책
+model FavoriteBook {
+  id           String   @id @default(cuid())
+
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  readBookId   String
+  readBook     ReadBook @relation(fields: [readBookId], references: [id])
+
+  comment      String?
+  displayOrder Int      @default(0)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, readBookId])
+  @@index([userId])
+}
+
+// ============================================
+// Phase 8: 명문장 (Quotes)
+// ============================================
+
+model Quote {
+  id         String   @id @default(cuid())
+  userId     String
+  bookTitle  String
+  bookAuthor String?
+  content    String
+  page       Int?
+  memo       String?
+  isPublic   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
 }

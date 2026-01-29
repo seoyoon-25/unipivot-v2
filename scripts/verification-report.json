@@ -1,0 +1,60 @@
+{
+  "timestamp": "2026-01-29T04:02:34.103Z",
+  "summary": {
+    "totalPass": 487,
+    "totalFail": 13
+  },
+  "counts": {
+    "pass": 162,
+    "fail": 1,
+    "skip": 0,
+    "mismatches": [
+      {
+        "table": "MemberStats",
+        "sqlite": 348,
+        "pg": 351
+      }
+    ]
+  },
+  "samples": {
+    "pass": 45,
+    "fail": 3,
+    "errors": [
+      "User.interests: SQLite=undefined PG=undefined",
+      "User.interestAlerts: SQLite=undefined PG=undefined",
+      "User.interestKeywordLikes: SQLite=undefined PG=undefined",
+      "User.interestLikes: SQLite=undefined PG=undefined",
+      "InterestKeyword.interests: SQLite=undefined PG=undefined",
+      "InterestKeyword.alerts: SQLite=undefined PG=undefined",
+      "InterestKeyword.keywordLikes: SQLite=undefined PG=undefined",
+      "Interest.keyword: SQLite=undefined PG=undefined",
+      "Interest.likes: SQLite=undefined PG=undefined"
+    ]
+  },
+  "boolean": {
+    "pass": 160,
+    "fail": 0
+  },
+  "dateTime": {
+    "pass": 108,
+    "fail": 0
+  },
+  "json": {
+    "pass": 12,
+    "fail": 9,
+    "validFields": [
+      "Program.legacyImages",
+      "PageContent.components",
+      "ApplicationForm.fields",
+      "ExpertProfile.categories",
+      "LabSurvey.targetCategories",
+      "SatisfactionSurvey.questions",
+      "SatisfactionSurvey.reminderDays",
+      "ChangeHistory.fullSnapshot",
+      "SurveyTemplate.questions",
+      "SurveyTemplate.settings",
+      "ReportTemplate.structure",
+      "ReportTemplate.fields"
+    ]
+  }
+}

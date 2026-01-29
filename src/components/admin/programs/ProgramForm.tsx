@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Save, Upload, Image as ImageIcon } from 'lucide-react'
+import { ArrowLeft, Save, Upload, Image as ImageIcon, Move, GripVertical } from 'lucide-react'
 import { RichTextEditor } from '@/components/editor'
 import { useAutoSave } from '@/hooks/useAutoSave'
 import { DraftRestoreAlert, AutoSaveIndicator } from '@/components/common/DraftRestoreAlert'
@@ -48,6 +48,7 @@ export interface ProgramFormData {
   status: string
   image: string
   thumbnailSquare: string
+  imagePosition: number
   recruitStartDate: string
   recruitEndDate: string
   startDate: string
@@ -80,6 +81,7 @@ const defaultFormData: ProgramFormData = {
   status: 'DRAFT',
   image: '',
   thumbnailSquare: '',
+  imagePosition: 0,
   recruitStartDate: '',
   recruitEndDate: '',
   startDate: '',
@@ -117,6 +119,7 @@ export function ProgramForm({ program, backUrl }: ProgramFormProps) {
         status: program.status || 'DRAFT',
         image: program.image || '',
         thumbnailSquare: program.thumbnailSquare || '',
+        imagePosition: program.imagePosition ?? 0,
         recruitStartDate: formatDateForInput(program.recruitStartDate),
         recruitEndDate: formatDateForInput(program.recruitEndDate),
         startDate: formatDateForInput(program.startDate),
@@ -547,6 +550,83 @@ export function ProgramForm({ program, backUrl }: ProgramFormProps) {
                 </p>
               </div>
             </div>
+
+            {/* 이미지 위치 조정 */}
+            {form.image && (
+              <div className="mt-6 pt-6 border-t border-gray-100">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <Move className="w-4 h-4 inline mr-2" />
+                  썸네일 미리보기 위치 조정
+                </label>
+                <p className="text-xs text-gray-500 mb-4">
+                  슬라이더를 조정하여 카드 목록에서 보여질 이미지 영역을 선택하세요
+                </p>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* 위치 조정 슬라이더 */}
+                  <div className="space-y-4">
+                    <div className="relative h-64 overflow-hidden rounded-xl bg-gray-100 border-2 border-dashed border-gray-300">
+                      <img
+                        src={form.image}
+                        alt="위치 조정"
+                        className="w-full h-auto absolute left-0"
+                        style={{
+                          top: `${-form.imagePosition}%`,
+                          transform: 'translateY(0)',
+                        }}
+                        draggable={false}
+                      />
+                      <div className="absolute inset-0 pointer-events-none">
+                        <div className="absolute top-0 left-0 right-0 h-1/3 bg-black/30" />
+                        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-black/30" />
+                        <div className="absolute top-1/3 left-0 right-0 h-1/3 border-2 border-primary border-dashed" />
+                      </div>
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 rounded-full p-2 shadow-lg">
+                        <GripVertical className="w-5 h-5 text-gray-600" />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-xs text-gray-500 w-8">상단</span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={form.imagePosition}
+                        onChange={(e) => setForm({ ...form, imagePosition: parseInt(e.target.value) })}
+                        className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                      />
+                      <span className="text-xs text-gray-500 w-8 text-right">하단</span>
+                    </div>
+                    <div className="text-center text-sm text-gray-600">
+                      현재 위치: {form.imagePosition}%
+                    </div>
+                  </div>
+
+                  {/* 미리보기 */}
+                  <div className="space-y-4">
+                    <p className="text-sm font-medium text-gray-700">카드 미리보기</p>
+                    <div className="bg-white rounded-2xl shadow-md overflow-hidden max-w-xs">
+                      <div className="relative h-48 bg-gray-200 overflow-hidden">
+                        <img
+                          src={form.image}
+                          alt="미리보기"
+                          className="w-full h-full object-cover"
+                          style={{ objectPosition: `center ${form.imagePosition}%` }}
+                        />
+                        <span className="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full bg-green-500 text-white shadow-lg">
+                          모집중
+                        </span>
+                      </div>
+                      <div className="p-4">
+                        <span className="text-xs text-gray-500">독서모임</span>
+                        <h3 className="font-bold text-gray-900 mt-1 line-clamp-2">
+                          {form.title || '프로그램 제목'}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 설명 */}

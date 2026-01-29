@@ -17,9 +17,9 @@ async function getConsultingRequests(params: {
   if (status) where.status = status
   if (search) {
     where.OR = [
-      { organization: { contains: search, mode: 'insensitive' } },
-      { contactName: { contains: search, mode: 'insensitive' } },
-      { email: { contains: search, mode: 'insensitive' } },
+      { organization: { contains: search, mode: 'insensitive' as const } },
+      { contactName: { contains: search, mode: 'insensitive' as const } },
+      { email: { contains: search, mode: 'insensitive' as const } },
     ]
   }
 

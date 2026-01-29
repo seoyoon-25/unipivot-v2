@@ -30,6 +30,7 @@ async function getExperts(searchParams: { category?: string; search?: string; pa
   if (searchParams.category) {
     where.categories = {
       contains: searchParams.category,
+      mode: 'insensitive' as const,
     }
   }
 
@@ -50,12 +51,12 @@ async function getExperts(searchParams: { category?: string; search?: string; pa
     where.AND = where.AND || []
     where.AND.push({
       OR: [
-        { name: { contains: searchParams.search, mode: 'insensitive' } },
-        { title: { contains: searchParams.search, mode: 'insensitive' } },
-        { organization: { contains: searchParams.search, mode: 'insensitive' } },
-        { specialties: { contains: searchParams.search, mode: 'insensitive' } },
-        { keywords: { contains: searchParams.search, mode: 'insensitive' } },
-        { lectureTopics: { contains: searchParams.search, mode: 'insensitive' } },
+        { name: { contains: searchParams.search, mode: 'insensitive' as const } },
+        { title: { contains: searchParams.search, mode: 'insensitive' as const } },
+        { organization: { contains: searchParams.search, mode: 'insensitive' as const } },
+        { specialties: { contains: searchParams.search, mode: 'insensitive' as const } },
+        { keywords: { contains: searchParams.search, mode: 'insensitive' as const } },
+        { lectureTopics: { contains: searchParams.search, mode: 'insensitive' as const } },
       ]
     })
   }

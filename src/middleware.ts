@@ -9,6 +9,23 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
   const hostname = req.headers.get('host') || ''
 
+  // 유니클럽 도메인 처리 (club.bestcome.org)
+  const isClubDomain = hostname.startsWith('club.')
+  if (isClubDomain) {
+    if (!pathname.startsWith('/club') && !pathname.startsWith('/api') && !pathname.startsWith('/_next')) {
+      const url = req.nextUrl.clone()
+      url.pathname = `/club${pathname}`
+      return NextResponse.rewrite(url)
+    }
+    return NextResponse.next()
+  }
+
+  // 메인 도메인에서 /bookshelf 접근 시 클럽 도메인으로 리다이렉트
+  if (!isClubDomain && pathname.startsWith('/bookshelf')) {
+    const clubUrl = new URL(`https://club.${MAIN_DOMAIN}/bookclub/bookshelf`)
+    return NextResponse.redirect(clubUrl)
+  }
+
   // 리서치랩 도메인 처리 (lab.bestcome.org)
   const isLabDomain = hostname.includes('lab.') || hostname === LAB_DOMAIN
 

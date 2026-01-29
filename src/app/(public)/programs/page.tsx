@@ -115,22 +115,11 @@ export default async function ProgramsPage({ searchParams }: PageProps) {
             )}
           </div>
 
-          {/* 모집중 */}
+          {/* 모집중 + 진행중 */}
           <ProgramSection
-            title="모집중"
+            title="진행 프로그램"
             emoji="🔥"
-            programs={recruiting}
-            emptyMessage="현재 모집중인 프로그램이 없습니다."
-            showAll
-            userLikes={userLikes}
-            userApplications={userApplications}
-          />
-
-          {/* 진행중 */}
-          <ProgramSection
-            title="진행중"
-            emoji="🔄"
-            programs={ongoing}
+            programs={[...recruiting, ...ongoing]}
             emptyMessage="현재 진행중인 프로그램이 없습니다."
             showAll
             userLikes={userLikes}

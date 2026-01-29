@@ -35,6 +35,81 @@ export async function GET(
   }
 }
 
+// POST - Create a new section with specific key
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { key: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN')) {
+      return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    }
+
+    const { key } = params
+    const body = await request.json()
+    const { content, sectionName, order } = body
+
+    // Check if section already exists
+    const existingSection = await prisma.siteSection.findUnique({
+      where: { sectionKey: key },
+    })
+
+    if (existingSection) {
+      return NextResponse.json({ error: '이미 존재하는 섹션입니다' }, { status: 409 })
+    }
+
+    // IP 주소 수집
+    const forwarded = request.headers.get('x-forwarded-for')
+    const ipAddress = forwarded ? forwarded.split(',')[0] : request.ip || 'unknown'
+    const userAgent = request.headers.get('user-agent')
+
+    // Create new section
+    const newSection = await prisma.siteSection.create({
+      data: {
+        sectionKey: key,
+        sectionName: sectionName || key,
+        content: content,
+        order: order || 99,
+        isVisible: true
+      }
+    })
+
+    // 변경 사항 추적
+    try {
+      await trackSiteSectionChange(
+        'CREATE',
+        newSection.id,
+        session.user.id,
+        {
+          id: newSection.id,
+          sectionKey: newSection.sectionKey,
+          sectionName: newSection.sectionName,
+          content: newSection.content,
+          isVisible: newSection.isVisible,
+          order: newSection.order
+        },
+        null,
+        {
+          description: `${newSection.sectionName} 섹션 생성`,
+          ipAddress,
+          userAgent: userAgent || undefined
+        }
+      )
+    } catch (trackingError) {
+      console.error('Error tracking section creation:', trackingError)
+    }
+
+    return NextResponse.json({ section: newSection }, { status: 201 })
+  } catch (error) {
+    console.error('Create section error:', error)
+    return NextResponse.json(
+      { error: '섹션 생성 중 오류가 발생했습니다' },
+      { status: 500 }
+    )
+  }
+}
+
 // PUT - Update specific section
 export async function PUT(
   request: NextRequest,

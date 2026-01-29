@@ -37,7 +37,7 @@ async function getSurveys(searchParams: { type?: string; status?: string; page?:
   // 대상 이주배경 필터
   if (searchParams.targetCategory) {
     where.OR = [
-      { targetCategories: { contains: searchParams.targetCategory } },
+      { targetCategories: { contains: searchParams.targetCategory, mode: 'insensitive' as const } },
       // 하위 호환: DEFECTOR → NORTH, KOREAN → SOUTH
       ...(searchParams.targetCategory === 'DEFECTOR' ? [{ targetOrigin: 'NORTH' }] : []),
       ...(searchParams.targetCategory === 'KOREAN' ? [{ targetOrigin: 'SOUTH' }] : []),

@@ -19,17 +19,18 @@ export async function GET(request: NextRequest) {
     if (category) {
       where.categories = {
         contains: category,
+        mode: 'insensitive' as const,
       }
     }
 
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { title: { contains: search, mode: 'insensitive' } },
-        { organization: { contains: search, mode: 'insensitive' } },
-        { specialties: { contains: search, mode: 'insensitive' } },
-        { keywords: { contains: search, mode: 'insensitive' } },
-        { lectureTopics: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: 'insensitive' as const } },
+        { title: { contains: search, mode: 'insensitive' as const } },
+        { organization: { contains: search, mode: 'insensitive' as const } },
+        { specialties: { contains: search, mode: 'insensitive' as const } },
+        { keywords: { contains: search, mode: 'insensitive' as const } },
+        { lectureTopics: { contains: search, mode: 'insensitive' as const } },
       ]
     }
 

@@ -22,15 +22,6 @@ async function main() {
       menuOrder: 2,
     },
     {
-      slug: 'people',
-      title: '함께하는 사람들',
-      description: '운영진 소개',
-      isPublished: false,  // 비공개로 시작
-      unpublishedMessage: '페이지 준비 중입니다. 곧 멋진 분들을 소개해 드릴게요!',
-      menuGroup: '소개',
-      menuOrder: 3,
-    },
-    {
       slug: 'books',
       title: '읽고 싶은 책',
       description: '함께 읽고 싶은 책 공유',

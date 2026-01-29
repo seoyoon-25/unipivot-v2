@@ -21,8 +21,8 @@ async function getPartners(params: {
 
   if (search) {
     where.OR = [
-      { name: { contains: search, mode: 'insensitive' } },
-      { contact: { contains: search, mode: 'insensitive' } },
+      { name: { contains: search, mode: 'insensitive' as const } },
+      { contact: { contains: search, mode: 'insensitive' as const } },
     ]
   }
 

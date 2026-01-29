@@ -17,9 +17,9 @@ async function getSurveyRequests(params: {
   if (status) where.status = status
   if (search) {
     where.OR = [
-      { requesterName: { contains: search, mode: 'insensitive' } },
-      { email: { contains: search, mode: 'insensitive' } },
-      { requirements: { contains: search, mode: 'insensitive' } },
+      { requesterName: { contains: search, mode: 'insensitive' as const } },
+      { email: { contains: search, mode: 'insensitive' as const } },
+      { requirements: { contains: search, mode: 'insensitive' as const } },
     ]
   }
 

@@ -17,7 +17,9 @@ import {
   Trash2,
   Edit,
   RefreshCw,
+  ClipboardList,
 } from 'lucide-react'
+import { SurveyManagement } from './components/SurveyManagement'
 
 interface Stats {
   totalKeywords: number
@@ -53,7 +55,7 @@ interface Interest {
 }
 
 export default function InterestAdminPage() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'keywords' | 'alerts'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'keywords' | 'alerts' | 'surveys'>('dashboard')
   const [stats, setStats] = useState<Stats | null>(null)
   const [topKeywords, setTopKeywords] = useState<Keyword[]>([])
   const [recentInterests, setRecentInterests] = useState<Interest[]>([])
@@ -140,6 +142,7 @@ export default function InterestAdminPage() {
     { key: 'dashboard', label: '대시보드', icon: BarChart3 },
     { key: 'keywords', label: '키워드 관리', icon: Hash },
     { key: 'alerts', label: '알림 관리', icon: Bell },
+    { key: 'surveys', label: '설문 관리', icon: ClipboardList },
   ] as const
 
   return (
@@ -361,6 +364,11 @@ export default function InterestAdminPage() {
           {/* 알림 관리 */}
           {activeTab === 'alerts' && (
             <AlertsTab />
+          )}
+
+          {/* 설문 관리 */}
+          {activeTab === 'surveys' && (
+            <SurveyManagement />
           )}
         </>
       )}

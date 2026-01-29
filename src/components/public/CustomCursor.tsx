@@ -6,9 +6,12 @@ export function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null)
   const dotRef = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
-  const [isMobile, setIsMobile] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+
     // Check if mobile/tablet
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 1024)
@@ -100,10 +103,10 @@ export function CustomCursor() {
       window.removeEventListener('resize', checkMobile)
       observer.disconnect()
     }
-  }, [isVisible])
+  }, [])
 
-  // Don't render on mobile
-  if (isMobile) return null
+  // Don't render on mobile or before hydration
+  if (!mounted || isMobile) return null
 
   return (
     <>

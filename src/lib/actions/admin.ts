@@ -8,6 +8,8 @@ import { revalidatePath } from 'next/cache'
 // =============================================
 
 export async function getDashboardStats() {
+  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+
   const [
     totalMembers,
     activePrograms,
@@ -15,16 +17,21 @@ export async function getDashboardStats() {
     recentMembers,
     recentActivities,
     activeSurveys,
-    pendingRefunds
+    pendingRefunds,
+    // 관심사 통계
+    totalKeywords,
+    totalInterests,
+    monthlyInterests,
+    topKeywords,
+    recentInterests,
+    pendingAlerts
   ] = await Promise.all([
     prisma.user.count(),
     prisma.program.count({ where: { status: { in: ['RECRUITING', 'ONGOING', 'OPEN', 'RECRUIT_CLOSED'] } } }),
     prisma.donation.aggregate({
       where: {
         status: 'COMPLETED',
-        createdAt: {
-          gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-        }
+        createdAt: { gte: monthStart }
       },
       _sum: { amount: true }
     }),
@@ -52,7 +59,28 @@ export async function getDashboardStats() {
     // 반환 대기 중인 보증금
     prisma.programApplication.count({
       where: { depositStatus: 'REFUND_PENDING' }
-    })
+    }),
+    // 관심사 - 전체 키워드 수
+    prisma.interestKeyword.count({ where: { isHidden: false } }),
+    // 관심사 - 전체 관심사 수
+    prisma.interest.count(),
+    // 관심사 - 이번 달 관심사
+    prisma.interest.count({ where: { createdAt: { gte: monthStart } } }),
+    // 관심사 - 인기 키워드 TOP 5
+    prisma.interestKeyword.findMany({
+      where: { isHidden: false },
+      orderBy: { totalCount: 'desc' },
+      take: 5,
+      select: { id: true, keyword: true, category: true, totalCount: true, monthlyCount: true, isFixed: true, isRecommended: true }
+    }),
+    // 관심사 - 최근 관심사 5개
+    prisma.interest.findMany({
+      take: 5,
+      orderBy: { createdAt: 'desc' },
+      include: { keyword: { select: { keyword: true, category: true } } }
+    }),
+    // 관심사 - 대기 알림 수
+    prisma.interestAlert.count({ where: { isActive: true, notifiedAt: null } })
   ])
 
   // 조사별 응답률 계산
@@ -80,7 +108,16 @@ export async function getDashboardStats() {
     },
     recentMembers,
     recentActivities,
-    activeSurveys: surveysWithRate
+    activeSurveys: surveysWithRate,
+    // 관심사 벽보판 데이터
+    interestStats: {
+      totalKeywords,
+      totalInterests,
+      monthlyInterests,
+      pendingAlerts,
+      topKeywords,
+      recentInterests
+    }
   }
 }
 
@@ -101,8 +138,8 @@ export async function getMembers(params: {
 
   if (search) {
     where.OR = [
-      { name: { contains: search } },
-      { email: { contains: search } }
+      { name: { contains: search, mode: 'insensitive' as const } },
+      { email: { contains: search, mode: 'insensitive' as const } }
     ]
   }
   if (origin) where.origin = origin
@@ -183,7 +220,7 @@ export async function getPrograms(params: {
   const { page = 1, limit = 10, search, type, status } = params
 
   const where: any = {}
-  if (search) where.title = { contains: search }
+  if (search) where.title = { contains: search, mode: 'insensitive' as const }
   if (type) where.type = type
   if (status) where.status = status
 
@@ -367,7 +404,7 @@ export async function getNotices(params: {
   const { page = 1, limit = 10, search } = params
 
   const where: any = {}
-  if (search) where.title = { contains: search }
+  if (search) where.title = { contains: search, mode: 'insensitive' as const }
 
   const [notices, total] = await Promise.all([
     prisma.notice.findMany({

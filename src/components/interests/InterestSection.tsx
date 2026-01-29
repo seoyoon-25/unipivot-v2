@@ -1,11 +1,16 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { Cloud, Share2 } from 'lucide-react'
 import { InterestInput } from './InterestInput'
 import { QuickSelectButtons } from './QuickSelectButtons'
 import { WordCloud } from './WordCloud'
 import { TopInterests } from './TopInterests'
 import { KeywordDetailModal } from './KeywordDetailModal'
+import { NetworkGraph } from './NetworkGraph'
+import { Button } from '@/components/ui/button'
+
+type ViewMode = 'wordcloud' | 'network'
 
 interface InterestSectionProps {
   className?: string
@@ -15,6 +20,7 @@ export function InterestSection({ className = '' }: InterestSectionProps) {
   const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null)
   const [inputKeyword, setInputKeyword] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
+  const [viewMode, setViewMode] = useState<ViewMode>('network')
 
   const handleKeywordSelect = useCallback((keyword: string) => {
     setInputKeyword(keyword)
@@ -31,6 +37,11 @@ export function InterestSection({ className = '' }: InterestSectionProps) {
     setSelectedKeyword(keyword)
   }, [])
 
+  // 네트워크 그래프 노드 클릭 핸들러
+  const handleNetworkNodeClick = useCallback((node: any) => {
+    setSelectedKeyword(node.keyword)
+  }, [])
+
   const handleSubmitSuccess = useCallback(() => {
     // 새로고침 트리거
     setRefreshKey(prev => prev + 1)
@@ -40,7 +51,7 @@ export function InterestSection({ className = '' }: InterestSectionProps) {
     <section className={`py-12 bg-gradient-to-b from-gray-50 to-white ${className}`}>
       <div className="container mx-auto px-4">
         {/* 헤더 */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 animate-on-scroll">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             요즘 무엇이 궁금하세요?
           </h2>
@@ -52,7 +63,7 @@ export function InterestSection({ className = '' }: InterestSectionProps) {
         {/* 메인 레이아웃 */}
         <div className="grid lg:grid-cols-2 gap-8">
           {/* 왼쪽: 입력 영역 */}
-          <div className="space-y-6">
+          <div className="space-y-6 slide-from-left">
             {/* 관심사 입력 */}
             <InterestInput onSubmit={handleSubmitSuccess} />
 
@@ -61,14 +72,40 @@ export function InterestSection({ className = '' }: InterestSectionProps) {
           </div>
 
           {/* 오른쪽: 시각화 영역 */}
-          <div className="space-y-6">
-            {/* 워드클라우드 */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                지금 많이 궁금해하는 것들
+          <div className="space-y-6 slide-from-right">
+            {/* 시각화 헤더 및 뷰 전환 */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {viewMode === 'wordcloud' ? '지금 많이 궁금해하는 것들' : '관심사 연결 네트워크'}
               </h3>
-              <WordCloud key={`wordcloud-${refreshKey}`} onKeywordClick={handleKeywordClick} />
+              <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-lg">
+                <Button
+                  variant={viewMode === 'network' ? 'default' : 'ghost'}
+                  size="sm"
+                  className="h-8 px-3"
+                  onClick={() => setViewMode('network')}
+                >
+                  <Share2 className="w-4 h-4 mr-1.5" />
+                  네트워크
+                </Button>
+                <Button
+                  variant={viewMode === 'wordcloud' ? 'default' : 'ghost'}
+                  size="sm"
+                  className="h-8 px-3"
+                  onClick={() => setViewMode('wordcloud')}
+                >
+                  <Cloud className="w-4 h-4 mr-1.5" />
+                  클라우드
+                </Button>
+              </div>
             </div>
+
+            {/* 시각화 콘텐츠 */}
+            {viewMode === 'wordcloud' ? (
+              <WordCloud key={`wordcloud-${refreshKey}`} onKeywordClick={handleKeywordClick} />
+            ) : (
+              <NetworkGraph key={`network-${refreshKey}`} onNodeClick={handleNetworkNodeClick} />
+            )}
 
             {/* 인기 순위 */}
             <TopInterests key={`top-${refreshKey}`} onKeywordClick={handleKeywordClick} />

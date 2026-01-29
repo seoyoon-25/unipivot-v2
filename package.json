@@ -14,7 +14,10 @@
     "db:generate": "prisma generate",
     "db:seed": "tsx prisma/seed.ts",
     "create-admin": "tsx scripts/create-admin.ts",
-    "backup": "./scripts/backup.sh"
+    "backup": "./scripts/backup-db.sh",
+    "sync:dry-run": "node scripts/sync-program-dates.js --dry-run",
+    "sync:run": "node scripts/sync-program-dates.js",
+    "sync:restore": "node scripts/sync-program-dates.js --restore"
   },
   "keywords": [
     "unipivot",
@@ -85,6 +88,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.3",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.1",
     "framer-motion": "^12.25.0",
@@ -106,12 +110,14 @@
     "react": "^19.2.3",
     "react-day-picker": "^9.13.0",
     "react-dom": "^19.2.3",
+    "react-force-graph-2d": "^1.29.0",
     "react-hook-form": "^7.70.0",
     "react-qr-code": "^2.0.18",
     "recharts": "^3.6.0",
     "sharp": "^0.34.5",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
+    "tesseract.js": "^7.0.0",
     "typescript": "^5.9.3",
     "uuid": "^13.0.0",
     "zod": "^4.3.5"

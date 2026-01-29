@@ -17,9 +17,9 @@ async function getLecturerRequests(params: {
   if (status) where.status = status
   if (search) {
     where.OR = [
-      { topic: { contains: search, mode: 'insensitive' } },
-      { organization: { contains: search, mode: 'insensitive' } },
-      { contactName: { contains: search, mode: 'insensitive' } },
+      { topic: { contains: search, mode: 'insensitive' as const } },
+      { organization: { contains: search, mode: 'insensitive' as const } },
+      { contactName: { contains: search, mode: 'insensitive' as const } },
     ]
   }
 

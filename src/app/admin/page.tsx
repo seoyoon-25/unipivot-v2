@@ -1,8 +1,9 @@
-import { Users, BookOpen, Wallet, TrendingUp, ClipboardList, Clock, CheckCircle, AlertCircle, ChevronRight, Palette } from 'lucide-react'
+import { Users, BookOpen, Wallet, TrendingUp, ClipboardList, Clock, CheckCircle, AlertCircle, ChevronRight, Palette, MessageSquare, Hash, Bell, Sparkles, Star, ThumbsUp } from 'lucide-react'
 import Link from 'next/link'
 import { getDashboardStats } from '@/lib/actions/admin'
 import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
+import { LogoEditor } from '@/components/admin/LogoEditor'
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(amount)
@@ -45,7 +46,7 @@ function getProgramTypeBadge(type: string) {
 }
 
 export default async function AdminDashboardPage() {
-  const { stats, recentMembers, recentActivities, activeSurveys } = await getDashboardStats()
+  const { stats, recentMembers, recentActivities, activeSurveys, interestStats } = await getDashboardStats()
 
   const statCards = [
     { label: '전체 회원', value: stats.totalMembers.toString(), icon: Users },
@@ -93,6 +94,11 @@ export default async function AdminDashboardPage() {
             <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
+      </div>
+
+      {/* Logo Editor */}
+      <div className="mb-8">
+        <LogoEditor compact defaultExpanded={false} />
       </div>
 
       {/* Survey Status Widget */}
@@ -205,6 +211,146 @@ export default async function AdminDashboardPage() {
           )}
         </div>
       )}
+
+      {/* Interest Bulletin Board Widget */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+              <MessageSquare className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">관심사 벽보판</h2>
+              <p className="text-sm text-gray-500">
+                {interestStats.totalKeywords}개 키워드 · {interestStats.totalInterests}개 관심사
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/admin/interests"
+            className="flex items-center gap-1 text-purple-600 hover:text-purple-700 text-sm font-medium"
+          >
+            전체보기
+            <ChevronRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-purple-50 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Hash className="w-4 h-4 text-purple-500" />
+              <span className="text-xs text-purple-600 font-medium">전체 키워드</span>
+            </div>
+            <p className="text-2xl font-bold text-purple-700">{interestStats.totalKeywords}</p>
+          </div>
+          <div className="bg-blue-50 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <MessageSquare className="w-4 h-4 text-blue-500" />
+              <span className="text-xs text-blue-600 font-medium">전체 관심사</span>
+            </div>
+            <p className="text-2xl font-bold text-blue-700">{interestStats.totalInterests}</p>
+          </div>
+          <div className="bg-green-50 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-4 h-4 text-green-500" />
+              <span className="text-xs text-green-600 font-medium">이번 달 관심사</span>
+            </div>
+            <p className="text-2xl font-bold text-green-700">{interestStats.monthlyInterests}</p>
+          </div>
+          <div className="bg-orange-50 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Bell className="w-4 h-4 text-orange-500" />
+              <span className="text-xs text-orange-600 font-medium">대기 알림</span>
+            </div>
+            <p className="text-2xl font-bold text-orange-700">{interestStats.pendingAlerts}</p>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Top Keywords */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              인기 키워드 TOP 5
+            </h3>
+            <div className="space-y-2">
+              {interestStats.topKeywords.length === 0 ? (
+                <p className="text-gray-400 text-sm py-4 text-center">아직 등록된 키워드가 없습니다</p>
+              ) : (
+                interestStats.topKeywords.map((kw: any, index: number) => (
+                  <div
+                    key={kw.id}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                        index === 0 ? 'bg-yellow-400 text-yellow-900' :
+                        index === 1 ? 'bg-gray-300 text-gray-700' :
+                        index === 2 ? 'bg-orange-300 text-orange-800' :
+                        'bg-gray-100 text-gray-500'
+                      }`}>
+                        {index + 1}
+                      </span>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-medium text-gray-900">#{kw.keyword}</span>
+                          {kw.isFixed && <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />}
+                          {kw.isRecommended && <ThumbsUp className="w-3 h-3 text-blue-500" />}
+                        </div>
+                        {kw.category && (
+                          <span className="text-xs text-gray-500">{kw.category}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-gray-900">{kw.totalCount}</p>
+                      <p className="text-xs text-gray-500">이번 달 +{kw.monthlyCount}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Recent Interests */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              최근 관심사
+            </h3>
+            <div className="space-y-2">
+              {interestStats.recentInterests.length === 0 ? (
+                <p className="text-gray-400 text-sm py-4 text-center">아직 등록된 관심사가 없습니다</p>
+              ) : (
+                interestStats.recentInterests.map((interest: any) => (
+                  <div
+                    key={interest.id}
+                    className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <span className="inline-block px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full font-medium mb-1">
+                          #{interest.keyword.keyword}
+                        </span>
+                        {interest.content && (
+                          <p className="text-sm text-gray-600 line-clamp-1">{interest.content}</p>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-400 whitespace-nowrap ml-2">
+                        {formatDistanceToNow(new Date(interest.createdAt), { addSuffix: true, locale: ko })}
+                      </span>
+                    </div>
+                    {interest.nickname && (
+                      <p className="text-xs text-gray-500 mt-1">by {interest.nickname}</p>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Recent Members */}

@@ -35,9 +35,9 @@ export async function generateChatResponse(
         isActive: true,
         OR: keywords.map(keyword => ({
           OR: [
-            { question: { contains: keyword } },
-            { answer: { contains: keyword } },
-            { keywords: { contains: keyword } },
+            { question: { contains: keyword, mode: 'insensitive' as const } },
+            { answer: { contains: keyword, mode: 'insensitive' as const } },
+            { keywords: { contains: keyword, mode: 'insensitive' as const } },
           ]
         }))
       },

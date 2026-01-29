@@ -161,7 +161,7 @@ export async function matchApplicant(applicant: ApplicantInfo): Promise<MatchRes
     const member = await prisma.member.findFirst({
       where: {
         name: applicant.name,
-        hometown: { contains: applicant.hometown },
+        hometown: { contains: applicant.hometown, mode: 'insensitive' as const },
       },
       select: {
         id: true,

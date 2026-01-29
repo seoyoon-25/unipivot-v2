@@ -61,10 +61,10 @@ export async function getMembers(options: GetMembersOptions = {}) {
 
   if (search) {
     where.OR = [
-      { name: { contains: search } },
-      { memberCode: { contains: search } },
-      { email: { contains: search } },
-      { phone: { contains: search } },
+      { name: { contains: search, mode: 'insensitive' as const } },
+      { memberCode: { contains: search, mode: 'insensitive' as const } },
+      { email: { contains: search, mode: 'insensitive' as const } },
+      { phone: { contains: search, mode: 'insensitive' as const } },
     ];
   }
 

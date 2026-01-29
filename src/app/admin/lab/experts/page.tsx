@@ -23,10 +23,10 @@ async function getExperts(params: {
 
   if (search) {
     where.OR = [
-      { name: { contains: search, mode: 'insensitive' } },
-      { email: { contains: search, mode: 'insensitive' } },
-      { organization: { contains: search, mode: 'insensitive' } },
-      { specialties: { contains: search, mode: 'insensitive' } },
+      { name: { contains: search, mode: 'insensitive' as const } },
+      { email: { contains: search, mode: 'insensitive' as const } },
+      { organization: { contains: search, mode: 'insensitive' as const } },
+      { specialties: { contains: search, mode: 'insensitive' as const } },
     ]
   }
 

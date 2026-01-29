@@ -45,6 +45,7 @@ export async function togglePagePublished(id: string) {
   });
 
   revalidatePath('/admin/pages');
+  revalidatePath('/admin/design/pages');
   revalidatePath('/');
   return { success: true };
 }
@@ -67,6 +68,7 @@ export async function updatePage(
   });
 
   revalidatePath('/admin/pages');
+  revalidatePath('/admin/design/pages');
   revalidatePath('/');
   return { success: true };
 }

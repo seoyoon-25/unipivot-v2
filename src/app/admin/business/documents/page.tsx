@@ -25,7 +25,7 @@ async function getDocuments(params: {
   }
 
   if (search) {
-    where.title = { contains: search, mode: 'insensitive' }
+    where.title = { contains: search, mode: 'insensitive' as const }
   }
 
   const [documents, total] = await Promise.all([

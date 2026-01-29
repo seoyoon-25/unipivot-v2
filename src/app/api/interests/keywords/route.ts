@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (search) {
-      where.keyword = { contains: search, mode: 'insensitive' }
+      where.keyword = { contains: search, mode: 'insensitive' as const }
     }
 
     let orderBy: any = { monthlyCount: 'desc' }

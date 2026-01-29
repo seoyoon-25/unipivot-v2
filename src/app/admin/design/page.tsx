@@ -11,16 +11,17 @@ import {
   History,
   Moon,
   Code,
-  Settings,
   ChevronRight,
   CheckCircle2,
   AlertCircle,
   FileText,
   Menu,
-  Type
+  Type,
+  Info
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { LogoEditor } from '@/components/admin/LogoEditor'
 
 const designModules = [
   {
@@ -111,6 +112,14 @@ const designModules = [
     status: 'active',
     features: ['본문 폰트', '제목 폰트', '글자 크기'],
   },
+  {
+    title: '소개 페이지',
+    description: '회사 소개 페이지의 내용을 편집합니다.',
+    href: '/admin/design/about',
+    icon: Info,
+    status: 'active',
+    features: ['제목', '본문 단락', '이미지 3장'],
+  },
 ]
 
 export default function AdminDesignPage() {
@@ -122,6 +131,9 @@ export default function AdminDesignPage() {
           사이트의 디자인과 콘텐츠를 관리합니다.
         </p>
       </div>
+
+      {/* Logo & Branding Section */}
+      <LogoEditor />
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -228,28 +240,59 @@ export default function AdminDesignPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
             <Link
               href="/admin/preview"
-              className="flex-1 p-4 border rounded-lg hover:bg-accent transition-colors text-center"
+              className="p-3 sm:p-4 border rounded-lg hover:bg-accent transition-colors text-center"
             >
-              <div className="text-lg font-medium">🖥️ 데스크톱</div>
-              <div className="text-sm text-muted-foreground">1920 x 1080</div>
+              <div className="text-base sm:text-lg font-medium">🖥️ 데스크톱</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">1920 x 1080</div>
             </Link>
             <Link
               href="/admin/preview?device=tablet"
-              className="flex-1 p-4 border rounded-lg hover:bg-accent transition-colors text-center"
+              className="p-3 sm:p-4 border rounded-lg hover:bg-accent transition-colors text-center"
             >
-              <div className="text-lg font-medium">📱 태블릿</div>
-              <div className="text-sm text-muted-foreground">768 x 1024</div>
+              <div className="text-base sm:text-lg font-medium">📱 태블릿</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">768 x 1024</div>
             </Link>
             <Link
               href="/admin/preview?device=mobile"
-              className="flex-1 p-4 border rounded-lg hover:bg-accent transition-colors text-center"
+              className="p-3 sm:p-4 border rounded-lg hover:bg-accent transition-colors text-center"
             >
-              <div className="text-lg font-medium">📱 모바일</div>
-              <div className="text-sm text-muted-foreground">375 x 812</div>
+              <div className="text-base sm:text-lg font-medium">📱 모바일</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">375 x 812</div>
             </Link>
+          </div>
+
+          {/* Live Preview Iframe */}
+          <div className="border rounded-lg overflow-hidden bg-gray-100">
+            <div className="bg-gray-200 px-2 sm:px-4 py-2 flex items-center justify-between border-b gap-2">
+              <div className="hidden sm:flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-400" />
+                <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                <div className="w-3 h-3 rounded-full bg-green-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="bg-white rounded-md px-2 sm:px-3 py-1 text-xs sm:text-sm text-gray-600 text-center truncate">
+                  bestcome.org
+                </div>
+              </div>
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs sm:text-sm text-blue-600 hover:underline flex items-center gap-1 whitespace-nowrap"
+              >
+                <span className="hidden sm:inline">새 탭에서 열기</span>
+                <span className="sm:hidden">열기</span>
+                <ChevronRight className="h-4 w-4" />
+              </a>
+            </div>
+            <iframe
+              src="/"
+              className="w-full h-[300px] sm:h-[500px] bg-white"
+              title="사이트 미리보기"
+            />
           </div>
         </CardContent>
       </Card>

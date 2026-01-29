@@ -89,8 +89,8 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { linkUrl: { contains: search, mode: 'insensitive' } }
+        { title: { contains: search, mode: 'insensitive' as const } },
+        { linkUrl: { contains: search, mode: 'insensitive' as const } }
       ]
     }
 

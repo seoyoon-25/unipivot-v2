@@ -20,8 +20,8 @@ export default async function AdminBooksPage({ searchParams }: PageProps) {
 
   if (params.search) {
     where.OR = [
-      { title: { contains: params.search, mode: 'insensitive' } },
-      { author: { contains: params.search, mode: 'insensitive' } }
+      { title: { contains: params.search, mode: 'insensitive' as const } },
+      { author: { contains: params.search, mode: 'insensitive' as const } }
     ]
   }
 

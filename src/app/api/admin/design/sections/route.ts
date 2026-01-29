@@ -15,7 +15,15 @@ export async function GET() {
       orderBy: { order: 'asc' },
     })
 
-    return NextResponse.json({ sections })
+    // Parse content JSON strings to objects
+    const parsedSections = sections.map(section => ({
+      ...section,
+      content: typeof section.content === 'string'
+        ? JSON.parse(section.content)
+        : section.content
+    }))
+
+    return NextResponse.json({ sections: parsedSections })
   } catch (error) {
     console.error('Get sections error:', error)
     return NextResponse.json(
@@ -159,6 +167,36 @@ export async function POST() {
       },
       // Page Sections
       {
+        sectionKey: 'page.about',
+        sectionName: '소개 페이지',
+        content: {
+          title: {
+            ko: '유니피벗은 어떤 곳인가요?',
+            en: 'About UNIPIVOT'
+          },
+          paragraphs: [
+            {
+              ko: '유니피벗은 남북청년이 수평적으로 만나 성장하고 협력하여 더 나은 나, 공동체, 대한민국을 만들어 가기 위해 2015년 남북한걸음으로 시작되었습니다.',
+              en: 'UNIPIVOT was founded in 2015 as Nambukhangeoleum to create a better self, community, and Korea through horizontal meetings, growth, and cooperation between North and South Korean youth.'
+            },
+            {
+              ko: '남북청년 뿐만 아니라 유니피벗이 추구하는 방향에 대해 공감하는 사람이라면 인종, 성별, 나이, 국적, 종교, 성적지향과 무관하게 모두와 함께합니다.',
+              en: 'We welcome everyone who resonates with our vision, regardless of race, gender, age, nationality, religion, or sexual orientation.'
+            },
+            {
+              ko: '유니피벗은 비정치적, 비종교적이며 우리 사회의 다양한 구성원들과 연대하여 분단체제를 해체하고 분단으로 인해 생긴 상처를 치유하고 회복하여 남북이 함께 살기 좋은 새로운 한반도를 만들어가고자 합니다.',
+              en: 'UNIPIVOT is non-political and non-religious, working with diverse members of our society to dismantle the division system, heal wounds caused by division, and create a new Korean Peninsula where both Koreas can live together.'
+            }
+          ],
+          images: [
+            'https://cdn.imweb.me/thumbnail/20230611/9837611e1ecc4.jpg',
+            'https://cdn.imweb.me/thumbnail/20230611/ff3fae27e81d6.jpg',
+            'https://cdn.imweb.me/thumbnail/20230611/38424c39d1b97.jpg'
+          ]
+        },
+        order: 11
+      },
+      {
         sectionKey: 'page.about-us',
         sectionName: '단체 소개',
         content: {
@@ -185,7 +223,7 @@ export async function POST() {
             title: '유니피벗이 추구하는 가치',
           },
         },
-        order: 11
+        order: 12
       },
       {
         sectionKey: 'page.history',
@@ -207,7 +245,7 @@ export async function POST() {
             ],
           },
         },
-        order: 12
+        order: 13
       }
     ]
 

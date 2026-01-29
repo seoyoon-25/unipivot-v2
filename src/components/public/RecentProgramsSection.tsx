@@ -22,6 +22,7 @@ interface Program {
   description: string | null
   image: string | null
   thumbnailSquare: string | null
+  imagePosition: number
   isOnline: boolean
   feeType: string
   feeAmount: number
@@ -49,7 +50,7 @@ export function RecentProgramsSection({ programs }: Props) {
   return (
     <section className="py-24 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-end justify-between mb-12">
+        <div className="flex items-end justify-between mb-12 animate-on-scroll">
           <div>
             <span className="text-primary text-sm font-semibold tracking-wider uppercase">Programs</span>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2">
@@ -67,8 +68,10 @@ export function RecentProgramsSection({ programs }: Props) {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {programs.map((program) => (
-            <ProgramCard key={program.id} program={program} />
+          {programs.map((program, index) => (
+            <div key={program.id} className={`animate-on-scroll stagger-${Math.min(index + 1, 4)}`}>
+              <ProgramCard program={program} />
+            </div>
           ))}
         </div>
 
@@ -117,6 +120,7 @@ function ProgramCard({ program }: { program: Program }) {
           alt={program.title}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-500"
+          style={{ objectPosition: `center ${program.imagePosition ?? 0}%` }}
         />
         {/* Status Badge */}
         <span

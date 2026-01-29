@@ -105,3 +105,70 @@ export function SwitchField({
     </FormField>
   )
 }
+
+interface TextAreaFieldProps extends FormFieldProps {
+  value: string
+  onChange: (value: string) => void
+  placeholder?: string
+  rows?: number
+}
+
+export function TextAreaField({
+  value,
+  onChange,
+  placeholder,
+  rows = 3,
+  ...fieldProps
+}: TextAreaFieldProps) {
+  return (
+    <FormField {...fieldProps}>
+      <Textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        rows={rows}
+        className={fieldProps.error ? 'border-destructive' : ''}
+      />
+    </FormField>
+  )
+}
+
+interface ImageFieldProps extends FormFieldProps {
+  value: string
+  onChange: (value: string) => void
+  placeholder?: string
+}
+
+export function ImageField({
+  value,
+  onChange,
+  placeholder,
+  ...fieldProps
+}: ImageFieldProps) {
+  return (
+    <FormField {...fieldProps}>
+      <div className="space-y-2">
+        <Input
+          type="url"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder || 'https://...'}
+          className={fieldProps.error ? 'border-destructive' : ''}
+        />
+        {value && (
+          <div className="relative w-full h-32 bg-muted rounded-lg overflow-hidden">
+            <img
+              src={value}
+              alt="Preview"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement
+                target.style.display = 'none'
+              }}
+            />
+          </div>
+        )}
+      </div>
+    </FormField>
+  )
+}

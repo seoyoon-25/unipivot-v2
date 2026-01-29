@@ -77,3 +77,15 @@ logs/
 # SQLite journal files
 *.db-shm
 *.db-wal
+
+# OCR training data
+*.traineddata
+
+# Debug artifacts
+scripts/debug-screenshots/
+
+# Database migration backups
+*.db.pre-migration
+
+# User uploads
+public/uploads/

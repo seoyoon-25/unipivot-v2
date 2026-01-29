@@ -1,0 +1,988 @@
+{
+  "timestamp": "2026-01-29T04:02:13.026Z",
+  "elapsed": "0.2s",
+  "totalRecords": 1735,
+  "totalInserted": 8,
+  "totalSkipped": 1727,
+  "totalErrors": 0,
+  "tables": [
+    {
+      "name": "User",
+      "sqlite": 9,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Account",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Session",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "VerificationToken",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "PasswordResetToken",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ApplicationForm",
+      "sqlite": 1,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Program",
+      "sqlite": 60,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Registration",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "PointHistory",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Book",
+      "sqlite": 5,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "BookOnProgram",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "BookSuggestion",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "BookVote",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Project",
+      "sqlite": 4,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Milestone",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Partner",
+      "sqlite": 5,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "PartnerOnProject",
+      "sqlite": 5,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Document",
+      "sqlite": 5,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "CalendarEvent",
+      "sqlite": 5,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Transaction",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Deposit",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Donation",
+      "sqlite": 8,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Expert",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Talent",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ChatLog",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "KnowledgeBase",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Notice",
+      "sqlite": 5,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "BlogPost",
+      "sqlite": 13,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "PageContent",
+      "sqlite": 10,
+      "inserted": 1,
+      "errors": 0
+    },
+    {
+      "name": "Menu",
+      "sqlite": 10,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SiteSetting",
+      "sqlite": 21,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Banner",
+      "sqlite": 3,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ActivityLog",
+      "sqlite": 86,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "MemberGradeHistory",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Notification",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "EmailLog",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "FiscalYear",
+      "sqlite": 1,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "FinanceAccount",
+      "sqlite": 70,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "FinanceProject",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Fund",
+      "sqlite": 1,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ProjectBudgetItem",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ProjectDocument",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Receipt",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "FinanceTransaction",
+      "sqlite": 31,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Budget",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "BudgetItem",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Donor",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "FinanceDonation",
+      "sqlite": 11,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Member",
+      "sqlite": 348,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ProgramApplication",
+      "sqlite": 2,
+      "inserted": 2,
+      "errors": 0
+    },
+    {
+      "name": "ProgramGallery",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "DepositSetting",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ProgramParticipant",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ProgramSession",
+      "sqlite": 2,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "AttendanceQR",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ProgramAttendance",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ProgramReport",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ReportComment",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ReportLike",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ProgramLike",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "NotificationTemplate",
+      "sqlite": 7,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "NotificationLog",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SystemSetting",
+      "sqlite": 8,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "InterestKeyword",
+      "sqlite": 16,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Interest",
+      "sqlite": 2,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "InterestLike",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "InterestKeywordLike",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "InterestAlert",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "InterestSetting",
+      "sqlite": 6,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "KeywordConnection",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "IssueSurvey",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "IssueSurveyOption",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "IssueSurveyResponse",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "CooperationSection",
+      "sqlite": 2,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ConsultingRequest",
+      "sqlite": 2,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "LecturerRequest",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SurveyRequest",
+      "sqlite": 1,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ExpertProfile",
+      "sqlite": 11,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "LabProfile",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "LectureMatch",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "LabSurvey",
+      "sqlite": 24,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ResearchParticipation",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "RewardClaim",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ExpertCategory",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ResearchTrend",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "BankAccount",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SatisfactionSurvey",
+      "sqlite": 1,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SurveyResponse",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SurveyReminder",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ContentTemplate",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SiteSection",
+      "sqlite": 17,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SiteSettings",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "AnnouncementBanner",
+      "sqlite": 1,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "BannerDismissal",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "BannerAnalytics",
+      "sqlite": 16,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "FloatingButton",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "FloatingButtonDismissal",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "FloatingButtonAnalytics",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SeoSetting",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SeoTemplate",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "GlobalSeoSetting",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "PreviewSession",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "PreviewSnapshot",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "PreviewDevice",
+      "sqlite": 17,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "PreviewChange",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "PopupTemplate",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Popup",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "PopupDismissal",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "PopupInteraction",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "PopupAnalytics",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ChangeHistory",
+      "sqlite": 2,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Rollback",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "BackupConfig",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "RestorePoint",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ThemeSettings",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "UserThemePreference",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ThemeAnalytics",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "CustomCode",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "CustomCodeDependency",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "CustomCodeExecution",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "CodeLibrary",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "GlobalScript",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Page",
+      "sqlite": 3,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "MemberStatusLog",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "MemberNote",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "MemberStats",
+      "sqlite": 351,
+      "inserted": 5,
+      "errors": 0
+    },
+    {
+      "name": "MemberAttendance",
+      "sqlite": 394,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "AdminNotification",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "RefundHistory",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ReadBook",
+      "sqlite": 120,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "BookReport",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "BookReportLike",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "BookReportComment",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SurveyTemplate",
+      "sqlite": 4,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ReportTemplate",
+      "sqlite": 8,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SessionReport",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "StructuredBookReport",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ProgramMembership",
+      "sqlite": 1,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "FacilitatorApplication",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SessionFacilitator",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "FacilitatorChecklistTemplate",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "FacilitatorChecklist",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SessionRSVP",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SpeakingTime",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SessionSpeakingStats",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "AIConversation",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "AIGeneratedQuestion",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SessionAnnouncement",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "AnnouncementTemplate",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "NotificationSettings",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SessionRecording",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SessionBlogPost",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Badge",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "UserBadge",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "UserProfile",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SessionArchive",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ReadingProgress",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "Highlight",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ParticipantCard",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "OrganizerNote",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "SeasonEvaluation",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "ParticipationPermission",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    },
+    {
+      "name": "AbsenceRequest",
+      "sqlite": 0,
+      "inserted": 0,
+      "errors": 0
+    }
+  ]
+}

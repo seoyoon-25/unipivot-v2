@@ -26,9 +26,9 @@ async function getSurveys(params: {
 
   if (search) {
     where.OR = [
-      { title: { contains: search, mode: 'insensitive' } },
-      { description: { contains: search, mode: 'insensitive' } },
-      { requesterOrg: { contains: search, mode: 'insensitive' } },
+      { title: { contains: search, mode: 'insensitive' as const } },
+      { description: { contains: search, mode: 'insensitive' as const } },
+      { requesterOrg: { contains: search, mode: 'insensitive' as const } },
     ]
   }
 

@@ -8,7 +8,7 @@ import { StorySection } from '@/components/public/StorySection'
 import { RecentProgramsSection } from '@/components/public/RecentProgramsSection'
 import { InstagramFeed } from '@/components/public/InstagramFeed'
 import { ResearchLabSection } from '@/components/public/ResearchLabSection'
-import { InterestSection } from '@/components/interests'
+import { BulletinBoard } from '@/components/bulletin-board'
 import { getHomePageData } from '@/lib/actions/public'
 
 export default async function HomePage() {
@@ -19,6 +19,7 @@ export default async function HomePage() {
       members: number
       completedPrograms: number
       totalParticipations: number
+      totalBooks: number
     }
   } = {
     programs: [],
@@ -26,7 +27,8 @@ export default async function HomePage() {
     stats: {
       members: 0,
       completedPrograms: 0,
-      totalParticipations: 0
+      totalParticipations: 0,
+      totalBooks: 0
     }
   }
 
@@ -43,7 +45,7 @@ export default async function HomePage() {
     <>
       <HeroSection stats={stats} />
       <MeaningSection />
-      <InterestSection />
+      <BulletinBoard />
       <DonationBanner />
       <KeyProgramsSection />
       <ResearchLabSection />

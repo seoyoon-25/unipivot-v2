@@ -4,7 +4,7 @@ export function MeaningSection() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
           {/* UNITE */}
-          <div className="relative">
+          <div className="relative slide-from-left">
             <div className="absolute -top-4 -left-4 w-20 h-20 bg-primary-light rounded-full blur-2xl opacity-60" />
             <div className="relative">
               <span className="text-primary text-sm font-semibold tracking-wider uppercase">Unite</span>
@@ -34,7 +34,7 @@ export function MeaningSection() {
           </div>
 
           {/* PIVOTING */}
-          <div className="relative">
+          <div className="relative slide-from-right">
             <div className="absolute -top-4 -right-4 w-20 h-20 bg-primary-light rounded-full blur-2xl opacity-60" />
             <div className="relative">
               <span className="text-primary text-sm font-semibold tracking-wider uppercase">Pivoting</span>

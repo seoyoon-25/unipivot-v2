@@ -47,11 +47,12 @@ export async function getHomePageData() {
         take: 5,
         orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }]
       }).catch(() => []), // 에러시 빈 배열 반환
-      // 통계
+      // 통계 (Member 테이블 기준 회원 수)
       Promise.all([
-        prisma.user.count().catch(() => 0),
+        prisma.member.count({ where: { status: 'ACTIVE' } }).catch(() => 0),
         prisma.program.count({ where: { status: 'COMPLETED' } }).catch(() => 0),
-        prisma.registration.count({ where: { status: 'APPROVED' } }).catch(() => 0)
+        prisma.registration.count({ where: { status: 'APPROVED' } }).catch(() => 0),
+        prisma.readBook.count().catch(() => 0)
       ])
     ])
 
@@ -59,9 +60,10 @@ export async function getHomePageData() {
       programs: programs || [],
       notices: notices || [],
       stats: {
-        members: stats[0] || 0,
+        members: 585, // 고정값
         completedPrograms: stats[1] || 0,
-        totalParticipations: stats[2] || 0
+        totalParticipations: stats[2] || 0,
+        totalBooks: stats[3] || 0
       }
     }
   } catch (error) {
@@ -72,9 +74,10 @@ export async function getHomePageData() {
       programs: [],
       notices: [],
       stats: {
-        members: 0,
+        members: 585, // 고정값
         completedPrograms: 0,
-        totalParticipations: 0
+        totalParticipations: 0,
+        totalBooks: 0
       }
     }
   }
@@ -658,8 +661,8 @@ export async function getPublicBlogPosts(params: {
 
   if (search) {
     where.OR = [
-      { title: { contains: search, mode: 'insensitive' } },
-      { excerpt: { contains: search, mode: 'insensitive' } },
+      { title: { contains: search, mode: 'insensitive' as const } },
+      { excerpt: { contains: search, mode: 'insensitive' as const } },
     ]
   }
 
@@ -727,4 +730,44 @@ export async function getRelatedBlogPosts(slug: string, category: string | null)
       createdAt: true
     }
   })
+}
+
+// =============================================
+// About Page
+// =============================================
+
+interface AboutPageContent {
+  title: {
+    ko: string
+    en: string
+  }
+  paragraphs: Array<{
+    ko: string
+    en: string
+  }>
+  images: string[]
+}
+
+export async function getAboutPageData(): Promise<AboutPageContent | null> {
+  try {
+    const section = await prisma.siteSection.findUnique({
+      where: { sectionKey: 'page.about' }
+    })
+
+    if (!section) return null
+
+    const content = typeof section.content === 'string'
+      ? JSON.parse(section.content)
+      : section.content
+
+    // Validate content structure
+    if (content?.title?.ko && content?.paragraphs && content?.images) {
+      return content as AboutPageContent
+    }
+
+    return null
+  } catch (error) {
+    console.error('Error fetching about page data:', error)
+    return null
+  }
 }

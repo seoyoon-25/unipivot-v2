@@ -13,6 +13,7 @@ interface Program {
   description?: string | null;
   image?: string | null;
   thumbnailSquare?: string | null;
+  imagePosition?: number;
   isOnline: boolean;
   feeType: string;
   feeAmount: number;
@@ -94,6 +95,7 @@ export default function CompletedProgramsSection({
             description={program.description}
             image={program.image}
             thumbnailSquare={program.thumbnailSquare}
+            imagePosition={program.imagePosition}
             isOnline={program.isOnline}
             feeType={program.feeType}
             feeAmount={program.feeAmount}

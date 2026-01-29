@@ -22,6 +22,7 @@ interface Program {
   status: string
   image: string
   thumbnailSquare: string
+  imagePosition: number
   recruitStartDate: string
   recruitEndDate: string
   startDate: string

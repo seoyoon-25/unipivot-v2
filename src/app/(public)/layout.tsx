@@ -3,6 +3,7 @@ import { NavbarWrapper } from '@/components/public/NavbarWrapper'
 import { Footer } from '@/components/public/Footer'
 import { ChatbotButton } from '@/components/public/ChatbotButton'
 import { CustomCursor } from '@/components/public/CustomCursor'
+import { ScrollAnimation } from '@/components/public/ScrollAnimation'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { NoSSR } from '@/components/NoSSR'
 import { TopBanners, BottomBanners } from '@/components/banners/BannerDisplay'
@@ -56,6 +57,7 @@ export default function PublicLayout({
               <FloatingButtonDisplay />
               <ChatbotButton />
               <CustomCursor />
+              <ScrollAnimation />
             </NoSSR>
           </ErrorBoundary>
         </div>

@@ -1,8 +1,22 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { SocialIcons } from './SocialIcons'
 import { getFooterMenu } from '@/lib/navigation'
+import { prisma } from '@/lib/db'
 
 const LAB_DOMAIN = process.env.NEXT_PUBLIC_LAB_DOMAIN || 'lab.bestcome.org'
+const DEFAULT_LOGO = 'https://cdn.imweb.me/upload/S20220917be2bcfda69cfe/44a86e5cb703d.png'
+
+async function getLogoUrl() {
+  try {
+    const setting = await prisma.siteSetting.findUnique({
+      where: { key: 'theme.logo' }
+    })
+    return setting?.value || DEFAULT_LOGO
+  } catch {
+    return DEFAULT_LOGO
+  }
+}
 
 type FooterLink = {
   label: string
@@ -94,12 +108,17 @@ function convertMenuToFooterLinks(menuItems: Awaited<ReturnType<typeof getFooter
 
 export async function Footer() {
   let footerLinks: FooterSection[] = defaultFooterLinks
+  let logoUrl = DEFAULT_LOGO
 
   try {
-    const menuItems = await getFooterMenu()
+    const [menuItems, logo] = await Promise.all([
+      getFooterMenu(),
+      getLogoUrl()
+    ])
     footerLinks = convertMenuToFooterLinks(menuItems)
+    logoUrl = logo
   } catch (error) {
-    console.error('Failed to fetch footer menu:', error)
+    console.error('Failed to fetch footer data:', error)
   }
   return (
     <footer className="bg-gray-900 text-white">
@@ -108,10 +127,13 @@ export async function Footer() {
           {/* Logo & Info */}
           <div className="col-span-2 md:col-span-3 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
-                <span className="text-white font-bold text-lg">U</span>
-              </div>
-              <span className="font-bold text-xl">유니피벗</span>
+              <Image
+                src={logoUrl}
+                alt="유니피벗"
+                width={120}
+                height={40}
+                className="h-8 w-auto"
+              />
             </Link>
             <p className="text-gray-400 text-sm mb-4">
               남북청년이 함께<br />

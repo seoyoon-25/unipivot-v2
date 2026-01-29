@@ -54,8 +54,8 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       where.OR = [
-        { templateKey: { contains: search, mode: 'insensitive' } },
-        { templateName: { contains: search, mode: 'insensitive' } }
+        { templateKey: { contains: search, mode: 'insensitive' as const } },
+        { templateName: { contains: search, mode: 'insensitive' as const } }
       ]
     }
 

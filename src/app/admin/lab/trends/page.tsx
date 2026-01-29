@@ -17,9 +17,9 @@ async function getTrends(params: {
   if (source) where.source = source
   if (search) {
     where.OR = [
-      { title: { contains: search, mode: 'insensitive' } },
-      { authors: { contains: search, mode: 'insensitive' } },
-      { keywords: { contains: search, mode: 'insensitive' } },
+      { title: { contains: search, mode: 'insensitive' as const } },
+      { authors: { contains: search, mode: 'insensitive' as const } },
+      { keywords: { contains: search, mode: 'insensitive' as const } },
     ]
   }
 

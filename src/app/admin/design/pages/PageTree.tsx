@@ -407,10 +407,9 @@ export default function PageTree({ pages: initialPages }: Props) {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">페이지 관리</h1>
-          <p className="text-gray-600 mt-1">페이지와 폴더를 드래그하여 순서를 변경하세요</p>
+          <p className="text-gray-600 text-sm">페이지와 폴더를 드래그하여 순서를 변경하세요</p>
         </div>
         <button
           onClick={() => setShowNewPageModal(true)}

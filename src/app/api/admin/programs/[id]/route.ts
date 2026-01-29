@@ -85,6 +85,7 @@ export async function PATCH(
         status: data.status,
         image: data.image || null,
         thumbnailSquare: data.thumbnailSquare || null,
+        imagePosition: data.imagePosition ?? 0,
         recruitStartDate: data.recruitStartDate ? new Date(data.recruitStartDate) : null,
         recruitEndDate: data.recruitEndDate ? new Date(data.recruitEndDate) : null,
         startDate: data.startDate ? new Date(data.startDate) : null,

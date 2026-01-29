@@ -24,8 +24,8 @@ export async function getBookshelfBooks(options?: {
 
   if (search) {
     where.OR = [
-      { title: { contains: search, mode: 'insensitive' } },
-      { author: { contains: search, mode: 'insensitive' } }
+      { title: { contains: search, mode: 'insensitive' as const } },
+      { author: { contains: search, mode: 'insensitive' as const } }
     ]
   }
 
