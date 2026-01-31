@@ -133,14 +133,14 @@
     "@types/nodemailer": "^7.0.5",
     "@types/pg": "^8.16.0",
     "@types/uuid": "^11.0.0",
-    "autoprefixer": "^10.4.23",
+    "autoprefixer": "^10.4.24",
     "better-sqlite3": "^12.6.0",
     "pg": "^8.17.1",
     "playwright": "^1.57.0",
     "postcss": "^8.5.6",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
-    "tailwindcss": "^3.4.19",
+    "tailwindcss": "^4.1.18",
     "tsx": "^4.21.0",
     "xlsx": "^0.18.5"
   }
