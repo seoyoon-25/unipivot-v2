@@ -16,7 +16,7 @@ export default function ClubSidebar() {
 
   return (
     <aside className="hidden lg:block w-64 min-h-[calc(100vh-3.5rem)] bg-white border-r border-gray-200">
-      <nav className="sticky top-14 p-4 space-y-6">
+      <nav className="sticky top-14 p-4 space-y-6" aria-label="클럽 메뉴">
         {menuItems.map((section) => (
           <div key={section.title}>
             <h3 className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -31,6 +31,7 @@ export default function ClubSidebar() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
+                      aria-current={isActive ? 'page' : undefined}
                       className={cn(
                         'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
                         isActive

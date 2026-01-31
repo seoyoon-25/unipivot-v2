@@ -76,7 +76,7 @@ export default function QRScanner({ onScan, onError }: QRScannerProps) {
       />
 
       {error && (
-        <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 rounded-lg p-3">
+        <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 rounded-lg p-3" role="alert" aria-live="polite">
           <XCircle className="w-4 h-4 shrink-0" />
           {error}
         </div>

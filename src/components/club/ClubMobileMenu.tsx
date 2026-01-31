@@ -38,14 +38,21 @@ export default function ClubMobileMenu({ isOpen, onClose }: ClubMobileMenuProps)
       <div
         className="fixed inset-0 z-50 bg-black/50 lg:hidden"
         onClick={onClose}
+        role="presentation"
       />
 
-      <div className="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl lg:hidden">
+      <div
+        className="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl lg:hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-label="네비게이션 메뉴"
+      >
         <div className="flex items-center justify-between h-14 px-4 border-b border-gray-200">
           <span className="text-lg font-bold text-gray-900">메뉴</span>
           <button
             onClick={onClose}
             className="p-2 -mr-2 text-gray-500 hover:text-gray-700"
+            aria-label="메뉴 닫기"
           >
             <X className="w-5 h-5" />
           </button>
@@ -67,6 +74,7 @@ export default function ClubMobileMenu({ isOpen, onClose }: ClubMobileMenuProps)
                       <Link
                         href={item.href}
                         onClick={onClose}
+                        aria-current={isActive ? 'page' : undefined}
                         className={cn(
                           'flex items-center gap-3 px-4 py-3 text-sm transition-colors',
                           isActive

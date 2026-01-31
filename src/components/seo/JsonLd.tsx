@@ -1,5 +1,10 @@
 import Script from 'next/script'
 
+// Escape </script> sequences to prevent XSS in JSON-LD blocks
+function safeJsonLdStringify(data: unknown): string {
+  return JSON.stringify(data).replace(/<\/script>/gi, '<\\/script>')
+}
+
 // 조직 정보 스키마
 export function OrganizationJsonLd() {
   const data = {
@@ -27,7 +32,7 @@ export function OrganizationJsonLd() {
     <Script
       id="organization-jsonld"
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(data) }}
     />
   )
 }
@@ -127,7 +132,7 @@ export function ProgramJsonLd({ program }: ProgramJsonLdProps) {
     <Script
       id={`program-jsonld-${program.slug}`}
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(data) }}
     />
   )
 }
@@ -180,7 +185,7 @@ export function BlogPostJsonLd({ post }: BlogPostJsonLdProps) {
     <Script
       id={`blogpost-jsonld-${post.slug}`}
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(data) }}
     />
   )
 }
@@ -211,7 +216,7 @@ export function FAQJsonLd({ items }: FAQJsonLdProps) {
     <Script
       id="faq-jsonld"
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(data) }}
     />
   )
 }
@@ -240,7 +245,7 @@ export function BreadcrumbJsonLd({ items }: BreadcrumbJsonLdProps) {
     <Script
       id="breadcrumb-jsonld"
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(data) }}
     />
   )
 }

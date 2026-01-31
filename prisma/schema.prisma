@@ -235,6 +235,8 @@ model Program {
   // Phase 13: 진행자 지원 + RSVP
   memberships              ProgramMembership[]
   checklistTemplate        FacilitatorChecklistTemplate?
+  // Phase 20: 시즌 회고
+  recap                    ProgramRecap?
   // Phase 21: 평가
   participantCards         ParticipantCard[]
   organizerNotes           OrganizerNote[]
@@ -963,6 +965,8 @@ model ProgramParticipant {
   absenceRequests      AbsenceRequest[]
 
   @@unique([programId, userId])
+  @@index([userId])
+  @@index([status])
 }
 
 model ProgramSession {
@@ -1019,6 +1023,8 @@ model ProgramSession {
   facilitatorResources    FacilitatorResource[]
 
   @@unique([programId, sessionNo])
+  @@index([programId, date])
+  @@index([status])
 }
 
 model ProgramAttendance {
@@ -1036,7 +1042,9 @@ model ProgramAttendance {
   session       ProgramSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@unique([sessionId, participantId])
+  @@index([participantId])
   @@index([qrTokenId])
+  @@index([status])
 }
 
 model ProgramReport {
@@ -3403,4 +3411,24 @@ model FacilitatorResource {
 
   @@index([sessionId])
   @@index([userId])
+}
+
+// ============================================
+// 시즌 회고 (Program Recap)
+// ============================================
+
+model ProgramRecap {
+  id                String   @id @default(cuid())
+  programId         String   @unique
+  totalSessions     Int
+  totalParticipants Int
+  avgAttendanceRate Float
+  totalReports      Int
+  totalQuotes       Int
+  highlights        Json?
+  summary           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
 }

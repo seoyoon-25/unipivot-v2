@@ -16,8 +16,10 @@ export default function ClubBottomNav() {
   if (!session) return null;
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200"
+    <nav
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      aria-label="하단 네비게이션"
     >
       <div className="flex items-center justify-around h-16">
         {navItems.map((item) => {
@@ -29,6 +31,8 @@ export default function ClubBottomNav() {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={isActive ? 'page' : undefined}
+              aria-label={item.name}
               className={cn(
                 'flex flex-col items-center justify-center w-full h-full gap-1 text-xs transition-colors',
                 isActive

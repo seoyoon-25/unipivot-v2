@@ -3,6 +3,30 @@ import { authOptions } from '@/lib/auth';
 
 export type ClubRole = 'member' | 'facilitator' | 'admin';
 
+export interface CurrentUser {
+  id: string;
+  name: string | null;
+  email: string;
+  image: string | null;
+  role: string;
+}
+
+/**
+ * 현재 로그인한 사용자 정보 반환
+ */
+export async function getCurrentUser(): Promise<CurrentUser | null> {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) return null;
+
+  return {
+    id: (session.user as { id?: string }).id || '',
+    name: session.user.name ?? null,
+    email: session.user.email,
+    image: session.user.image ?? null,
+    role: (session.user as { role?: string }).role || 'USER',
+  };
+}
+
 /**
  * 현재 세션의 사용자 역할을 ClubRole로 변환
  */

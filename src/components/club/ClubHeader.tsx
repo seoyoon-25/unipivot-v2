@@ -20,6 +20,7 @@ export default function ClubHeader() {
               <button
                 className="lg:hidden p-2 -ml-2 text-gray-500 hover:text-gray-700"
                 onClick={() => setMobileMenuOpen(true)}
+                aria-label="메뉴 열기"
               >
                 <Menu className="w-5 h-5" />
               </button>
@@ -32,7 +33,7 @@ export default function ClubHeader() {
             <div className="flex items-center gap-2">
               {session ? (
                 <>
-                  <button className="p-2 text-gray-500 hover:text-gray-700 relative">
+                  <button className="p-2 text-gray-500 hover:text-gray-700 relative" aria-label="알림">
                     <Bell className="w-5 h-5" />
                   </button>
                   <ClubUserMenu user={session.user} />
