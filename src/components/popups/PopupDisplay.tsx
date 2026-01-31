@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
+import { sanitizeHtml } from '@/lib/sanitize'
 
 interface PopupTemplate {
   id: string
@@ -402,7 +403,7 @@ export default function PopupDisplay({
             <div
               className="mb-6"
               style={{ color: template?.textColor || '#1e293b' }}
-              dangerouslySetInnerHTML={{ __html: popup.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(popup.content) }}
             />
           )}
 

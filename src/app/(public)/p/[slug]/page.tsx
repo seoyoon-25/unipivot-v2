@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import prisma from '@/lib/db'
+import { sanitizeHtml, sanitizeCss } from '@/lib/sanitize'
 
 // Force dynamic rendering for real-time content updates
 export const dynamic = 'force-dynamic'
@@ -42,13 +43,13 @@ export default async function DynamicPage({ params }: Props) {
     <>
       {/* Inject custom styles */}
       {page.styles && (
-        <style dangerouslySetInnerHTML={{ __html: page.styles }} />
+        <style dangerouslySetInnerHTML={{ __html: sanitizeCss(page.styles) }} />
       )}
 
       {/* Render HTML content */}
       <div
         className="visual-page-content"
-        dangerouslySetInnerHTML={{ __html: page.content || '' }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content || '') }}
       />
     </>
   )

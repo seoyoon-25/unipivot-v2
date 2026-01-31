@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { ArrowLeft, Calendar, Eye, Tag, User } from 'lucide-react'
 import { getBlogPostBySlug, getRelatedBlogPosts } from '@/lib/actions/public'
 import { ShareButton } from '@/components/ShareButton'
+import { sanitizeHtml } from '@/lib/sanitize'
 
 interface Props {
   params: { slug: string }
@@ -127,7 +128,7 @@ export default async function BlogDetailPage({ params }: Props) {
             {/* Main Content */}
             <div
               className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-600 prose-a:text-primary prose-img:rounded-xl"
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
             />
 
             {/* Tags */}

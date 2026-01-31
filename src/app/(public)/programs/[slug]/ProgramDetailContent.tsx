@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Heart, Calendar, MapPin, Users, Clock, ArrowLeft, BookOpen, FileText, Edit3 } from 'lucide-react'
 import { ShareButton } from '@/components/common/ShareButton'
 import { LegacyProgramContent } from '@/components/programs/LegacyProgramContent'
+import { sanitizeHtml } from '@/lib/sanitize'
 import '@/components/editor/editor.css'
 import {
   getProgramStatus,
@@ -230,7 +231,7 @@ export function ProgramDetailContent({
             {program.content && (
               <div className="bg-white rounded-2xl p-6 shadow-sm mb-8">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">프로그램 소개</h2>
-                <div className="rich-text-content prose prose-gray max-w-none" dangerouslySetInnerHTML={{ __html: program.content }} />
+                <div className="rich-text-content prose prose-gray max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(program.content) }} />
               </div>
             )}
 
@@ -238,7 +239,7 @@ export function ProgramDetailContent({
             {program.scheduleContent && (
               <div className="bg-white rounded-2xl p-6 shadow-sm mb-8">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">일정 안내</h2>
-                <div className="rich-text-content prose prose-gray max-w-none" dangerouslySetInnerHTML={{ __html: program.scheduleContent }} />
+                <div className="rich-text-content prose prose-gray max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(program.scheduleContent) }} />
               </div>
             )}
 
@@ -249,7 +250,7 @@ export function ProgramDetailContent({
                   <BookOpen className="w-5 h-5 text-primary" />
                   현재 진행 도서
                 </h2>
-                <div className="rich-text-content prose prose-gray max-w-none" dangerouslySetInnerHTML={{ __html: program.currentBookContent }} />
+                <div className="rich-text-content prose prose-gray max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(program.currentBookContent) }} />
               </div>
             )}
 

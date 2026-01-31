@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 import { generateMemberCode, normalizePhone, MEMBER_GRADES, MEMBER_STATUS } from '@/lib/services/member-matching';
 import { calculateMemberStats } from '@/lib/services/member-stats';
+import { requireAdmin } from '@/lib/actions/auth';
 
 // 회원 목록 조회 옵션
 interface GetMembersOptions {
@@ -44,6 +45,8 @@ interface UpdateMemberData extends Partial<CreateMemberData> {
  * 회원 목록 조회
  */
 export async function getMembers(options: GetMembersOptions = {}) {
+  await requireAdmin()
+
   const {
     page = 1,
     limit = 20,
@@ -119,6 +122,8 @@ export async function getMembers(options: GetMembersOptions = {}) {
  * 회원 상세 조회
  */
 export async function getMember(id: string) {
+  await requireAdmin()
+
   const member = await prisma.member.findUnique({
     where: { id },
     include: {
@@ -281,6 +286,8 @@ export async function getMember(id: string) {
  * 회원 생성
  */
 export async function createMember(data: CreateMemberData) {
+  await requireAdmin()
+
   // 고유번호 생성
   const memberCode = await generateMemberCode(
     data.birthYear || null,
@@ -324,6 +331,8 @@ export async function createMember(data: CreateMemberData) {
  * 회원 수정
  */
 export async function updateMember(data: UpdateMemberData) {
+  await requireAdmin()
+
   const { id, ...updateData } = data;
 
   // 전화번호 정규화
@@ -345,6 +354,8 @@ export async function updateMember(data: UpdateMemberData) {
  * 회원 삭제
  */
 export async function deleteMember(id: string) {
+  await requireAdmin()
+
   await prisma.member.delete({ where: { id } });
   revalidatePath('/admin/members');
 }
@@ -358,6 +369,8 @@ export async function changeMemberGrade(
   reason: string,
   changedBy: string
 ) {
+  await requireAdmin()
+
   const member = await prisma.member.findUnique({
     where: { id: memberId },
     select: { grade: true, status: true },
@@ -398,6 +411,8 @@ export async function changeMemberStatus(
   reason: string,
   changedBy: string
 ) {
+  await requireAdmin()
+
   const member = await prisma.member.findUnique({
     where: { id: memberId },
     select: { grade: true, status: true },
@@ -434,6 +449,8 @@ export async function changeMemberStatus(
  * 회원 메모 추가
  */
 export async function addMemberNote(memberId: string, content: string, createdBy: string) {
+  await requireAdmin()
+
   const note = await prisma.memberNote.create({
     data: {
       memberId,
@@ -450,6 +467,8 @@ export async function addMemberNote(memberId: string, content: string, createdBy
  * 회원 메모 삭제
  */
 export async function deleteMemberNote(noteId: string) {
+  await requireAdmin()
+
   const note = await prisma.memberNote.delete({
     where: { id: noteId },
   });
@@ -462,6 +481,8 @@ export async function deleteMemberNote(noteId: string) {
  * 블랙리스트 (WATCH, WARNING, BLOCKED) 회원 목록 조회
  */
 export async function getBlacklistMembers() {
+  await requireAdmin()
+
   const members = await prisma.member.findMany({
     where: {
       status: { in: ['WATCH', 'WARNING', 'BLOCKED'] },
@@ -505,6 +526,8 @@ export async function getBlacklistMembers() {
  * VVIP/VIP 회원 목록 조회
  */
 export async function getVIPMembers() {
+  await requireAdmin()
+
   const members = await prisma.member.findMany({
     where: {
       grade: { in: ['VVIP', 'VIP', 'STAFF'] },
@@ -537,6 +560,8 @@ export async function getVIPMembers() {
  * 회원과 웹사이트 사용자 연동
  */
 export async function linkMemberToUser(memberId: string, userId: string) {
+  await requireAdmin()
+
   // 이미 연동된 회원이 있는지 확인
   const existingMember = await prisma.member.findFirst({
     where: { userId },
@@ -559,6 +584,8 @@ export async function linkMemberToUser(memberId: string, userId: string) {
  * 회원-사용자 연동 해제
  */
 export async function unlinkMemberFromUser(memberId: string) {
+  await requireAdmin()
+
   const member = await prisma.member.update({
     where: { id: memberId },
     data: { userId: null },
@@ -582,6 +609,8 @@ export async function addMemberAttendance(
     note?: string;
   }
 ) {
+  await requireAdmin()
+
   const attendance = await prisma.memberAttendance.upsert({
     where: {
       memberId_programId_sessionNumber: {
@@ -612,6 +641,8 @@ export async function addMemberAttendance(
  * 회원 CSV 다운로드용 데이터
  */
 export async function getMembersForExport(options: { grade?: string; status?: string } = {}) {
+  await requireAdmin()
+
   const where: any = {};
 
   if (options.grade) {
@@ -655,6 +686,8 @@ export async function getMembersForExport(options: { grade?: string; status?: st
  * 회원 통계 재계산
  */
 export async function recalculateMemberStats(memberId: string) {
+  await requireAdmin()
+
   const stats = await calculateMemberStats(memberId);
   revalidatePath(`/admin/members/${memberId}`);
   return stats;

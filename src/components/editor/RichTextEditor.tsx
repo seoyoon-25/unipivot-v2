@@ -26,6 +26,7 @@ import { MarkdownShortcuts } from './extensions/MarkdownShortcuts'
 import { useAutoSave, formatTimeAgo } from '@/lib/hooks/useAutoSave'
 import { useState, useEffect, useCallback } from 'react'
 import { Save, RotateCcw, X } from 'lucide-react'
+import { sanitizeHtml } from '@/lib/sanitize'
 import './editor.css'
 
 interface RichTextEditorProps {
@@ -229,7 +230,7 @@ export function RichTextViewer({ content, className = '' }: RichTextViewerProps)
   return (
     <div
       className={`prose prose-sm sm:prose max-w-none rich-text-content ${className}`}
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }}
     />
   )
 }

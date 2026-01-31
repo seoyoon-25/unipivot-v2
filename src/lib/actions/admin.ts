@@ -2,12 +2,15 @@
 
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
+import { requireAdmin } from '@/lib/actions/auth'
 
 // =============================================
 // Dashboard Stats
 // =============================================
 
 export async function getDashboardStats() {
+  await requireAdmin()
+
   const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
 
   const [
@@ -132,6 +135,8 @@ export async function getMembers(params: {
   origin?: string
   status?: string
 }) {
+  await requireAdmin()
+
   const { page = 1, limit = 10, search, origin, status } = params
 
   const where: any = {}
@@ -162,6 +167,8 @@ export async function getMembers(params: {
 }
 
 export async function getMember(id: string) {
+  await requireAdmin()
+
   return prisma.user.findUnique({
     where: { id },
     include: {
@@ -193,6 +200,8 @@ export async function updateMember(id: string, data: {
   status?: string
   role?: string
 }) {
+  await requireAdmin()
+
   const member = await prisma.user.update({
     where: { id },
     data
@@ -202,6 +211,8 @@ export async function updateMember(id: string, data: {
 }
 
 export async function deleteMember(id: string) {
+  await requireAdmin()
+
   await prisma.user.delete({ where: { id } })
   revalidatePath('/admin/members')
 }
@@ -217,6 +228,8 @@ export async function getPrograms(params: {
   type?: string
   status?: string
 }) {
+  await requireAdmin()
+
   const { page = 1, limit = 10, search, type, status } = params
 
   const where: any = {}
@@ -241,6 +254,8 @@ export async function getPrograms(params: {
 }
 
 export async function getProgram(id: string) {
+  await requireAdmin()
+
   return prisma.program.findUnique({
     where: { id },
     include: {
@@ -276,6 +291,8 @@ export async function createProgram(data: {
   applicationFormId?: string
   reportStructure?: string
 }) {
+  await requireAdmin()
+
   const slug = data.title
     .toLowerCase()
     .replace(/[^a-z0-9가-힣]+/g, '-')
@@ -318,6 +335,8 @@ export async function updateProgram(id: string, data: {
   endDate?: Date | null
   applicationFormId?: string | null
 }) {
+  await requireAdmin()
+
   const program = await prisma.program.update({
     where: { id },
     data
@@ -329,6 +348,8 @@ export async function updateProgram(id: string, data: {
 }
 
 export async function deleteProgram(id: string) {
+  await requireAdmin()
+
   await prisma.program.delete({ where: { id } })
   revalidatePath('/admin/programs')
 }
@@ -337,6 +358,8 @@ export async function updateProgramReportStructure(
   programId: string,
   reportStructure: string | null
 ) {
+  await requireAdmin()
+
   const program = await prisma.program.update({
     where: { id: programId },
     data: {
@@ -358,6 +381,8 @@ export async function updateRegistrationStatus(
   registrationId: string,
   status: 'APPROVED' | 'REJECTED' | 'CANCELLED'
 ) {
+  await requireAdmin()
+
   const registration = await prisma.registration.update({
     where: { id: registrationId },
     data: { status },
@@ -386,6 +411,8 @@ export async function bulkUpdateRegistrationStatus(
   registrationIds: string[],
   status: 'APPROVED' | 'REJECTED' | 'CANCELLED'
 ) {
+  await requireAdmin()
+
   const results = await Promise.all(
     registrationIds.map(id => updateRegistrationStatus(id, status))
   )
@@ -401,6 +428,8 @@ export async function getNotices(params: {
   limit?: number
   search?: string
 }) {
+  await requireAdmin()
+
   const { page = 1, limit = 10, search } = params
 
   const where: any = {}
@@ -425,6 +454,8 @@ export async function createNotice(data: {
   isPinned?: boolean
   isPublic?: boolean
 }) {
+  await requireAdmin()
+
   const notice = await prisma.notice.create({ data })
   revalidatePath('/admin/contents/notices')
   return notice
@@ -436,6 +467,8 @@ export async function updateNotice(id: string, data: {
   isPinned?: boolean
   isPublic?: boolean
 }) {
+  await requireAdmin()
+
   const notice = await prisma.notice.update({
     where: { id },
     data
@@ -445,6 +478,8 @@ export async function updateNotice(id: string, data: {
 }
 
 export async function deleteNotice(id: string) {
+  await requireAdmin()
+
   await prisma.notice.delete({ where: { id } })
   revalidatePath('/admin/contents/notices')
 }
@@ -458,6 +493,8 @@ export async function getDonations(params: {
   limit?: number
   status?: string
 }) {
+  await requireAdmin()
+
   const { page = 1, limit = 10, status } = params
 
   const where: any = {}
@@ -491,6 +528,8 @@ export async function getDonations(params: {
 }
 
 export async function updateDonationStatus(id: string, status: string) {
+  await requireAdmin()
+
   const donation = await prisma.donation.update({
     where: { id },
     data: { status }
@@ -511,6 +550,8 @@ export async function getTransactions(params: {
   startDate?: Date
   endDate?: Date
 }) {
+  await requireAdmin()
+
   const { page = 1, limit = 10, type, fundId, startDate, endDate } = params
 
   const where: any = {}
@@ -565,6 +606,8 @@ export async function createFinanceTransaction(data: {
   note?: string
   createdBy?: string
 }) {
+  await requireAdmin()
+
   const transaction = await prisma.$transaction(async (tx) => {
     const newTx = await tx.financeTransaction.create({
       data,
@@ -594,6 +637,8 @@ export async function getFinanceAccounts(params?: {
   category?: string
   isActive?: boolean
 }) {
+  await requireAdmin()
+
   const where: any = {}
   if (params?.type) where.type = params.type
   if (params?.category) where.category = params.category
@@ -613,6 +658,8 @@ export async function getFunds(params?: {
   type?: string
   isActive?: boolean
 }) {
+  await requireAdmin()
+
   const where: any = {}
   if (params?.type) where.type = params.type
   if (params?.isActive !== undefined) where.isActive = params.isActive
@@ -633,6 +680,8 @@ export async function createFund(data: {
   description?: string
   financeProjectId?: string
 }) {
+  await requireAdmin()
+
   const fund = await prisma.fund.create({
     data: { ...data, balance: 0 }
   })
@@ -645,6 +694,8 @@ export async function createFund(data: {
 // =============================================
 
 export async function getFinanceSummary(year?: number) {
+  await requireAdmin()
+
   const targetYear = year || new Date().getFullYear()
   const startDate = new Date(targetYear, 0, 1)
   const endDate = new Date(targetYear, 11, 31, 23, 59, 59)
@@ -711,6 +762,8 @@ export async function logActivity(data: {
   targetId?: string
   details?: string
 }) {
+  await requireAdmin()
+
   return prisma.activityLog.create({ data })
 }
 
@@ -719,6 +772,8 @@ export async function logActivity(data: {
 // =============================================
 
 export async function getProgramParticipants(programId: string) {
+  await requireAdmin()
+
   const participants = await prisma.programParticipant.findMany({
     where: { programId },
     include: {
@@ -748,6 +803,8 @@ export async function getProgramParticipants(programId: string) {
 }
 
 export async function addParticipant(programId: string, userId: string, depositAmount?: number) {
+  await requireAdmin()
+
   const participant = await prisma.programParticipant.create({
     data: {
       programId,
@@ -766,6 +823,8 @@ export async function addParticipant(programId: string, userId: string, depositA
 // =============================================
 
 export async function getProgramSessions(programId: string) {
+  await requireAdmin()
+
   return prisma.programSession.findMany({
     where: { programId },
     include: {
@@ -787,6 +846,8 @@ export async function createProgramSession(programId: string, data: {
   description?: string
   reportDeadline?: Date
 }) {
+  await requireAdmin()
+
   const crypto = await import('crypto')
   const qrCode = crypto.randomBytes(16).toString('hex')
 
@@ -826,6 +887,8 @@ export async function createProgramSession(programId: string, data: {
 // =============================================
 
 export async function getSessionAttendance(sessionId: string) {
+  await requireAdmin()
+
   return prisma.programAttendance.findMany({
     where: { sessionId },
     include: {
@@ -842,6 +905,8 @@ export async function updateAttendance(
   participantId: string,
   status: 'PRESENT' | 'ABSENT' | 'LATE' | 'EXCUSED'
 ) {
+  await requireAdmin()
+
   const attendance = await prisma.programAttendance.upsert({
     where: { sessionId_participantId: { sessionId, participantId } },
     update: {
@@ -872,6 +937,8 @@ export async function updateAttendance(
 // =============================================
 
 export async function getDepositSetting(programId: string) {
+  await requireAdmin()
+
   return prisma.depositSetting.findUnique({ where: { programId } })
 }
 
@@ -883,6 +950,8 @@ export async function updateDepositSetting(programId: string, data: {
   attendanceRate?: number
   reportRate?: number
 }) {
+  await requireAdmin()
+
   const setting = await prisma.depositSetting.upsert({
     where: { programId },
     update: data,
@@ -898,6 +967,8 @@ export async function settleDeposit(participantId: string, data: {
   returnMethod?: string
   note?: string
 }) {
+  await requireAdmin()
+
   const participant = await prisma.programParticipant.update({
     where: { id: participantId },
     data: {
@@ -919,6 +990,8 @@ export async function settleDeposit(participantId: string, data: {
 // =============================================
 
 export async function getProgramReports(programId: string, sessionId?: string) {
+  await requireAdmin()
+
   const where: any = { programId }
   if (sessionId) where.sessionId = sessionId
 
@@ -942,6 +1015,8 @@ export async function getFinanceDonations(params: {
   limit?: number
   type?: string
 }) {
+  await requireAdmin()
+
   const { page = 1, limit = 20, type } = params
   const where: any = {}
   if (type) where.type = type
@@ -978,6 +1053,8 @@ export async function createFinanceDonation(data: {
   designation?: string
   note?: string
 }) {
+  await requireAdmin()
+
   // 기부자 생성 또는 찾기
   let donor = await prisma.donor.findFirst({
     where: { name: data.donorName }

@@ -12,6 +12,7 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '10mb',
     },
+    serverComponentsExternalPackages: ['isomorphic-dompurify', 'jsdom', 'dompurify'],
   },
   // Skip pages that fail to prerender
   generateBuildId: async () => {

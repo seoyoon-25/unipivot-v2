@@ -1,6 +1,7 @@
 'use client'
 
 import { Archive, ExternalLink } from 'lucide-react'
+import { sanitizeHtml } from '@/lib/sanitize'
 
 interface LegacyProgramContentProps {
   html: string
@@ -31,7 +32,7 @@ export function LegacyProgramContent({
       {/* 원본 HTML 렌더링 */}
       <div
         className="legacy-content prose prose-lg max-w-none"
-        dangerouslySetInnerHTML={{ __html: html }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
       />
 
       {/* 원본 링크 (있는 경우만) */}

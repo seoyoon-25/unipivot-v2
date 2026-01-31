@@ -2,9 +2,12 @@
 
 import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
+import { requireAdmin } from '@/lib/actions/auth';
 
 // 모든 페이지 조회 (어드민용)
 export async function getAllPages() {
+  await requireAdmin()
+
   return await prisma.page.findMany({
     orderBy: [
       { menuGroup: 'asc' },
@@ -36,6 +39,8 @@ export async function getPageBySlug(slug: string) {
 
 // 페이지 공개 상태 변경
 export async function togglePagePublished(id: string) {
+  await requireAdmin()
+
   const page = await prisma.page.findUnique({ where: { id } });
   if (!page) throw new Error('Page not found');
 
@@ -62,6 +67,8 @@ export async function updatePage(
     seoDescription?: string;
   }
 ) {
+  await requireAdmin()
+
   await prisma.page.update({
     where: { id },
     data,

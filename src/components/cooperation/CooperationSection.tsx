@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { sanitizeHtml } from '@/lib/sanitize'
 import '@/components/editor/editor.css'
 
 interface CooperationSectionProps {
@@ -35,7 +36,7 @@ export function CooperationSection({
         <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{title}</h2>
         <div
           className={`leading-relaxed ${isHtml ? 'rich-text-content prose prose-gray max-w-none' : 'text-gray-600 whitespace-pre-line'}`}
-          dangerouslySetInnerHTML={{ __html: isHtml ? content : content.replace(/\n/g, '<br/>') }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(isHtml ? content : content.replace(/\n/g, '<br/>')) }}
         />
         <Link
           href={buttonLink}

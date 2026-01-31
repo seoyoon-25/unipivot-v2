@@ -118,6 +118,10 @@ model User {
   quotes                   Quote[]
   // 진행자 자료
   facilitatorResources     FacilitatorResource[]
+
+  @@index([role])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model Account {
@@ -236,6 +240,10 @@ model Program {
   organizerNotes           OrganizerNote[]
   seasonEvaluations        SeasonEvaluation[]
   participationPermissions ParticipationPermission[]
+
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
 }
 
 model Registration {
@@ -438,6 +446,10 @@ model Donation {
   sourceId         String?
   sourceType       String?
   user             User?     @relation(fields: [userId], references: [id])
+
+  @@index([status])
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model Expert {
@@ -497,6 +509,8 @@ model Notice {
   views     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([isPublic, isPinned, createdAt])
 }
 
 model BlogPost {
@@ -514,6 +528,9 @@ model BlogPost {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([isPublished, createdAt])
+  @@index([category])
 }
 
 model PageContent {
