@@ -2,10 +2,12 @@
 
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { Menu, Bell } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { useState } from 'react';
 import ClubUserMenu from './ClubUserMenu';
 import ClubMobileMenu from './ClubMobileMenu';
+import NotificationBell from './notifications/NotificationBell';
+import SearchBar from './search/SearchBar';
 
 export default function ClubHeader() {
   const { data: session } = useSession();
@@ -31,11 +33,12 @@ export default function ClubHeader() {
             </div>
 
             <div className="flex items-center gap-2">
+              <div className="hidden sm:block">
+                <SearchBar />
+              </div>
               {session ? (
                 <>
-                  <button className="p-2 text-gray-500 hover:text-gray-700 relative" aria-label="알림">
-                    <Bell className="w-5 h-5" />
-                  </button>
+                  <NotificationBell />
                   <ClubUserMenu user={session.user} />
                 </>
               ) : (

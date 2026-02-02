@@ -536,6 +536,10 @@ export async function createBookReport(data: {
   // 포인트 적립 (200P)
   await addPoints(session.user.id, 200, 'REPORT', `독서 기록 작성 - ${data.bookTitle}`)
 
+  // Update reading goal progress + award badges if completed
+  const { updateGoalProgress } = await import('@/lib/club/goal-queries')
+  await updateGoalProgress(session.user.id).catch(() => {})
+
   return {
     ...report,
     isPublic: report.visibility === 'PUBLIC'

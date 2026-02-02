@@ -116,6 +116,33 @@ export async function sendPasswordResetEmail(email: string, resetLink: string): 
   })
 }
 
+export function sessionReminderTemplate(data: {
+  userName: string
+  programTitle: string
+  sessionNo: number
+  date: Date
+  location?: string
+}): string {
+  return `
+    <div style="font-family: 'Noto Sans KR', sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: #3B82F6; color: white; padding: 30px; text-align: center; border-radius: 12px 12px 0 0;">
+        <h1 style="margin: 0; font-size: 20px;">모임 리마인더</h1>
+      </div>
+      <div style="padding: 30px; background: #f9fafb; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+        <p style="color: #374151; line-height: 1.8;">안녕하세요, ${data.userName}님!</p>
+        <p style="color: #374151; line-height: 1.8;">내일 모임이 예정되어 있습니다.</p>
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e5e7eb;">
+          <p style="margin: 8px 0; color: #374151;"><strong>프로그램:</strong> ${data.programTitle}</p>
+          <p style="margin: 8px 0; color: #374151;"><strong>회차:</strong> ${data.sessionNo}회차</p>
+          <p style="margin: 8px 0; color: #374151;"><strong>일시:</strong> ${data.date.toLocaleDateString('ko-KR')} ${data.date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</p>
+          ${data.location ? `<p style="margin: 8px 0; color: #374151;"><strong>장소:</strong> ${data.location}</p>` : ''}
+        </div>
+        <p style="color: #6b7280; text-align: center; margin-top: 20px; font-size: 14px;">유니클럽</p>
+      </div>
+    </div>
+  `
+}
+
 export async function sendProgramNotification(
   email: string,
   name: string,

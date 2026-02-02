@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       // 모든 알림 읽음 처리
       await prisma.notification.updateMany({
         where: { userId: session.user.id, isRead: false },
-        data: { isRead: true }
+        data: { isRead: true, readAt: new Date() }
       })
     } else if (notificationIds && Array.isArray(notificationIds)) {
       // 특정 알림들 읽음 처리
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
           id: { in: notificationIds },
           userId: session.user.id
         },
-        data: { isRead: true }
+        data: { isRead: true, readAt: new Date() }
       })
     } else {
       return NextResponse.json({ error: '알림 ID를 지정해주세요.' }, { status: 400 })
