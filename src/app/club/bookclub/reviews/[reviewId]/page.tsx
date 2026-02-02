@@ -36,6 +36,7 @@ export default async function ReviewDetailPage({ params }: PageProps) {
           bookAuthor: review.bookAuthor,
           visibility: review.visibility,
           status: review.status,
+          rating: review.rating,
           likeCount: review.likeCount,
           viewCount: review.viewCount,
           createdAt: review.createdAt.toISOString(),

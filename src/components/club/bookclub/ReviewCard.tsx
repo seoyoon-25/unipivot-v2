@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Heart, MessageCircle, Eye, Lock, Globe } from 'lucide-react'
+import { Heart, MessageCircle, Eye, Lock, Globe, Star } from 'lucide-react'
 import { getStructureInfo } from '@/types/report'
 import type { ReportStructureCode } from '@/types/report'
 
@@ -14,6 +14,7 @@ interface ReviewCardProps {
     bookAuthor?: string | null
     visibility: string
     status: string
+    rating?: number | null
     likeCount: number
     createdAt: Date
     author?: {
@@ -72,6 +73,15 @@ export default function ReviewCard({ review, showAuthor = true }: ReviewCardProp
 
       <div className="text-xs text-gray-500 mb-2 flex items-center gap-2">
         <span>{review.bookTitle}</span>
+        {review.rating && (
+          <>
+            <span>·</span>
+            <span className="flex items-center gap-0.5 text-yellow-500">
+              <Star className="w-3 h-3 fill-current" />
+              {review.rating}
+            </span>
+          </>
+        )}
         {review.session && (
           <>
             <span>·</span>

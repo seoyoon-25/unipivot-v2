@@ -8,6 +8,8 @@ import {
   validateReview,
   REVIEW_POINTS,
 } from '@/lib/utils/review'
+import { updateGoalProgress } from '@/lib/club/goal-queries'
+import { updateChallengeProgress } from '@/lib/club/challenge-queries'
 import type {
   ReportStructureCode,
   StructuredReportData,
@@ -20,6 +22,7 @@ interface SubmitBookReportInput {
   title: string
   content: string
   isPublic?: boolean
+  rating?: number | null
 }
 
 /**
@@ -31,7 +34,14 @@ export async function submitBookReport(input: SubmitBookReportInput) {
     throw new Error('로그인이 필요합니다')
   }
 
-  const { programId, sessionId, title, content, isPublic = true } = input
+  const { programId, sessionId, title, content, isPublic = true, rating } = input
+
+  // Validate rating if provided
+  if (rating !== undefined && rating !== null) {
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+      throw new Error('별점은 1~5 사이의 정수여야 합니다')
+    }
+  }
 
   // Validate input
   const validation = validateReview(title, content)
@@ -83,6 +93,7 @@ export async function submitBookReport(input: SubmitBookReportInput) {
       visibility: isPublic ? 'PUBLIC' : 'PRIVATE',
       status: 'PUBLISHED',
       publishedAt: new Date(),
+      rating: rating ?? null,
     },
   })
 
@@ -97,6 +108,10 @@ export async function submitBookReport(input: SubmitBookReportInput) {
       balance: 0, // Should be calculated
     },
   })
+
+  // Update reading goal progress + challenge progress + award badges if completed
+  await updateGoalProgress(session.user.id).catch(() => {})
+  await updateChallengeProgress(session.user.id).catch(() => {})
 
   revalidatePath(`/mypage/programs/${programId}`)
 
@@ -115,6 +130,7 @@ interface SubmitStructuredReportInput {
   template: ReportTemplateStructure
   data: StructuredReportData
   isPublic?: boolean
+  rating?: number | null
 }
 
 /**
@@ -126,7 +142,14 @@ export async function submitStructuredReport(input: SubmitStructuredReportInput)
     throw new Error('로그인이 필요합니다')
   }
 
-  const { programId, sessionId, title, structure, template, data, isPublic = true } = input
+  const { programId, sessionId, title, structure, template, data, isPublic = true, rating } = input
+
+  // Validate rating if provided
+  if (rating !== undefined && rating !== null) {
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+      throw new Error('별점은 1~5 사이의 정수여야 합니다')
+    }
+  }
 
   // Validate title
   if (!title.trim()) {
@@ -221,6 +244,7 @@ export async function submitStructuredReport(input: SubmitStructuredReportInput)
         visibility: isPublic ? 'PUBLIC' : 'PRIVATE',
         status: 'PUBLISHED',
         publishedAt: new Date(),
+        rating: rating ?? null,
       },
     })
 
@@ -247,6 +271,10 @@ export async function submitStructuredReport(input: SubmitStructuredReportInput)
       balance: 0,
     },
   })
+
+  // Update reading goal progress + challenge progress + award badges if completed
+  await updateGoalProgress(session.user.id).catch(() => {})
+  await updateChallengeProgress(session.user.id).catch(() => {})
 
   revalidatePath(`/mypage/programs/${programId}`)
 
@@ -330,6 +358,7 @@ export async function updateStructuredReport(
     template?: ReportTemplateStructure
     data?: StructuredReportData
     isPublic?: boolean
+    rating?: number | null
   }
 ) {
   const session = await getServerSession(authOptions)
@@ -366,6 +395,13 @@ export async function updateStructuredReport(
 
   if (input.isPublic !== undefined) {
     updateData.visibility = input.isPublic ? 'PUBLIC' : 'PRIVATE'
+  }
+
+  if (input.rating !== undefined) {
+    if (input.rating !== null && (!Number.isInteger(input.rating) || input.rating < 1 || input.rating > 5)) {
+      throw new Error('별점은 1~5 사이의 정수여야 합니다')
+    }
+    updateData.rating = input.rating
   }
 
   // Update structured content
@@ -471,7 +507,7 @@ export async function getReportTemplate(code: string) {
  */
 export async function updateBookReport(
   reportId: string,
-  data: { title?: string; content?: string; isPublic?: boolean }
+  data: { title?: string; content?: string; isPublic?: boolean; rating?: number | null }
 ) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {
@@ -506,12 +542,20 @@ export async function updateBookReport(
     }
   }
 
+  // Validate rating
+  if (data.rating !== undefined && data.rating !== null) {
+    if (!Number.isInteger(data.rating) || data.rating < 1 || data.rating > 5) {
+      throw new Error('별점은 1~5 사이의 정수여야 합니다')
+    }
+  }
+
   await prisma.bookReport.update({
     where: { id: reportId },
     data: {
       title: data.title,
       content: data.content,
       visibility: data.isPublic !== undefined ? (data.isPublic ? 'PUBLIC' : 'PRIVATE') : undefined,
+      rating: data.rating !== undefined ? (data.rating ?? null) : undefined,
     },
   })
 

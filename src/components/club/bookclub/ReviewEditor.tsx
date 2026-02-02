@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, Send } from 'lucide-react'
 import { submitBookReport, submitStructuredReport, updateBookReport, updateStructuredReport, getReportTemplates } from '@/lib/actions/review'
+import StarRating from '@/components/club/rating/StarRating'
 import { saveReviewDraft, loadReviewDraft, clearReviewDraft, formatCharCount, REVIEW_GUIDELINES } from '@/lib/utils/review'
 import TemplateSelector from './TemplateSelector'
 import AutoSaveIndicator from './AutoSaveIndicator'
@@ -19,6 +20,7 @@ interface ReviewEditorProps {
     title: string
     content: string
     visibility: string
+    rating?: number | null
     structuredData?: {
       structure: string
       sections: Record<string, SectionData>
@@ -37,6 +39,7 @@ export default function ReviewEditor({
   const [title, setTitle] = useState(existingReview?.title || '')
   const [content, setContent] = useState(existingReview?.content || '')
   const [isPublic, setIsPublic] = useState(existingReview?.visibility !== 'PRIVATE')
+  const [rating, setRating] = useState<number | null>(existingReview?.rating ?? null)
   const [templates, setTemplates] = useState<ReportTemplate[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<ReportTemplate | null>(null)
   const [structuredSections, setStructuredSections] = useState<Record<string, SectionData>>({})
@@ -149,9 +152,10 @@ export default function ReviewEditor({
             template: selectedTemplate.structure,
             data: { structure: selectedTemplate.code, sections: structuredSections },
             isPublic,
+            rating,
           })
         } else {
-          await updateBookReport(existingReview!.id, { title, content, isPublic })
+          await updateBookReport(existingReview!.id, { title, content, isPublic, rating })
         }
       } else {
         if (selectedTemplate) {
@@ -163,9 +167,10 @@ export default function ReviewEditor({
             template: selectedTemplate.structure,
             data: { structure: selectedTemplate.code, sections: structuredSections },
             isPublic,
+            rating,
           })
         } else {
-          await submitBookReport({ programId, sessionId, title, content, isPublic })
+          await submitBookReport({ programId, sessionId, title, content, isPublic, rating })
         }
         clearReviewDraft(programId, sessionId)
       }
@@ -384,6 +389,14 @@ export default function ReviewEditor({
           </div>
         </div>
       )}
+
+      {/* Star Rating */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          이 책을 평가해주세요 <span className="text-gray-400 font-normal">(선택)</span>
+        </label>
+        <StarRating value={rating} onChange={setRating} size="lg" />
+      </div>
 
       {/* Visibility + Auto-save status */}
       <div className="flex items-center justify-between">

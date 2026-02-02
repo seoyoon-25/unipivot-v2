@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Heart, MessageCircle, Edit, Globe, Lock, Send } from 'lucide-react'
+import { ArrowLeft, Heart, MessageCircle, Edit, Globe, Lock, Send, Star } from 'lucide-react'
 import { toggleReviewLike, addReviewComment } from '@/lib/actions/review'
 
 interface ReviewDetailClientProps {
@@ -15,6 +15,7 @@ interface ReviewDetailClientProps {
     bookAuthor?: string | null
     visibility: string
     status: string
+    rating?: number | null
     likeCount: number
     viewCount: number
     createdAt: string
@@ -113,6 +114,21 @@ export default function ReviewDetailClient({ review }: ReviewDetailClientProps) 
                 </>
               )}
             </div>
+            {review.rating && (
+              <div className="flex items-center gap-1 mt-1.5">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`w-4 h-4 ${
+                      star <= review.rating!
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : 'fill-none text-gray-300'
+                    }`}
+                  />
+                ))}
+                <span className="text-sm text-gray-500 ml-1">{review.rating}점</span>
+              </div>
+            )}
           </div>
           {review.structureInfo && (
             <span className={`text-xs px-2 py-1 rounded ${review.structureInfo.color}`}>

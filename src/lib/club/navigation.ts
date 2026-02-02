@@ -9,6 +9,11 @@ import {
   FolderOpen,
   LayoutDashboard,
   Settings,
+  Megaphone,
+  MessagesSquare,
+  Star,
+  Sparkles,
+  Flame,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -53,6 +58,7 @@ export const sidebarMenuItems = {
       title: '홈',
       items: [
         { name: '대시보드', href: '/club', icon: Home },
+        { name: '공지사항', href: '/club/notices', icon: Megaphone },
       ],
     },
     {
@@ -61,8 +67,10 @@ export const sidebarMenuItems = {
         { name: '책장', href: '/club/bookclub/bookshelf', icon: BookOpen },
         { name: '내 책장', href: '/club/bookclub/my-bookshelf', icon: BookOpen },
         { name: '소감나눔', href: '/club/bookclub/reviews', icon: MessageSquare },
+        { name: '평점 높은 책', href: '/club/bookclub/top-rated', icon: Star },
         { name: '명문장', href: '/club/bookclub/quotes', icon: BookOpen },
         { name: '스탬프', href: '/club/bookclub/stamps', icon: CheckSquare },
+        { name: 'AI 책 추천', href: '/club/recommendations', icon: Sparkles },
       ],
     },
     {
@@ -70,6 +78,8 @@ export const sidebarMenuItems = {
       items: [
         { name: '내 프로그램', href: '/club/programs', icon: BookOpen },
         { name: '출석 현황', href: '/club/attendance', icon: CheckSquare },
+        { name: '독서 챌린지', href: '/club/challenges', icon: Flame },
+        { name: '커뮤니티', href: '/club/community', icon: MessagesSquare },
       ],
     },
   ],

@@ -46,6 +46,9 @@ model User {
   residenceRegion          String?
   termsAgreed              Boolean                   @default(false)
   termsAgreedAt            DateTime?
+  // Phase 24: 프로필 확장
+  favoriteGenre            String?
+  isPublicProfile          Boolean                   @default(true)
   accounts                 Account[]
   activityLogs             ActivityLog[]
   bankAccounts             BankAccount[]
@@ -118,6 +121,18 @@ model User {
   quotes                   Quote[]
   // 진행자 자료
   facilitatorResources     FacilitatorResource[]
+  // Phase 21-23: 클럽 공지
+  clubNotices              ClubNotice[]
+  // Phase 27: 커뮤니티
+  communityPosts           CommunityPost[]
+  communityComments        CommunityComment[]
+  communityLikes           CommunityLike[]
+  // Phase 31: 독서 목표
+  readingGoals             ReadingGoal[]
+  bookRecommendations      BookRecommendation[]
+  // Phase 34: 독서 챌린지
+  readingChallenges        ReadingChallenge[]
+  challengeParticipants    ChallengeParticipant[]
 
   @@index([role])
   @@index([status])
@@ -622,15 +637,21 @@ model MemberGradeHistory {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
   type      String
   title     String
   content   String?
   link      String?
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isRead    Boolean   @default(false)
+  readAt    DateTime?
+  programId String?
+  sessionId String?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
 }
 
 model EmailLog {
@@ -3041,14 +3062,21 @@ model AnnouncementTemplate {
 
 // 알림 설정
 model NotificationSettings {
-  id                 String  @id @default(cuid())
-  userId             String  @unique
-  oneWeekEnabled     Boolean @default(true)
-  facilitatorEnabled Boolean @default(true)
-  rsvpEnabled        Boolean @default(true)
-  reportEnabled      Boolean @default(true)
-  quietHoursStart    Int     @default(22) // 22:00
-  quietHoursEnd      Int     @default(8) // 08:00
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  oneWeekEnabled       Boolean  @default(true)
+  facilitatorEnabled   Boolean  @default(true)
+  rsvpEnabled          Boolean  @default(true)
+  reportEnabled        Boolean  @default(true)
+  quietHoursStart      Int      @default(22) // 22:00
+  quietHoursEnd        Int      @default(8) // 08:00
+  sessionReminder      Boolean  @default(true)
+  newSession           Boolean  @default(true)
+  reportComment        Boolean  @default(true)
+  announcement         Boolean  @default(true)
+  reminderHoursBefore  Int      @default(24)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -3431,4 +3459,162 @@ model ProgramRecap {
   updatedAt         DateTime @updatedAt
 
   program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// Phase 21-23: 클럽 공지사항
+// ============================================
+
+model ClubNotice {
+  id          String    @id @default(cuid())
+  authorId    String
+  title       String
+  content     String    @db.Text
+  isPinned    Boolean   @default(false)
+  isPublished Boolean   @default(true)
+  views       Int       @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  author      User      @relation(fields: [authorId], references: [id])
+
+  @@index([isPublished, isPinned, createdAt])
+}
+
+// ============================================
+// Phase 27: 커뮤니티
+// ============================================
+
+model CommunityPost {
+  id        String   @id @default(cuid())
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category  String   @default("FREE")
+  title     String
+  content   String   @db.Text
+  viewCount Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  comments CommunityComment[]
+  likes    CommunityLike[]
+
+  @@index([category, createdAt])
+  @@index([authorId])
+}
+
+model CommunityComment {
+  id       String        @id @default(cuid())
+  postId   String
+  post     CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId String
+  author   User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  content  String        @db.Text
+  parentId String?
+  parent   CommunityComment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  CommunityComment[] @relation("CommentReplies")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId, createdAt])
+  @@index([authorId])
+}
+
+model CommunityLike {
+  id     String        @id @default(cuid())
+  postId String
+  post   CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+  @@index([postId])
+}
+
+// Phase 31: 독서 목표
+model ReadingGoal {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  year          Int
+  month         Int?
+  targetBooks   Int
+  achievedBooks Int       @default(0)
+
+  isCompleted   Boolean   @default(false)
+  completedAt   DateTime?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([userId, year, month])
+  @@index([userId, year])
+}
+
+// ============================================
+// Phase 33: AI 책 추천
+// ============================================
+model BookRecommendation {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bookTitle   String
+  bookAuthor  String?
+  reason      String    @db.Text
+
+  isSaved     Boolean   @default(false)
+  isRead      Boolean   @default(false)
+
+  createdAt   DateTime  @default(now())
+
+  @@index([userId, createdAt])
+}
+
+// ============================================
+// Phase 34: 독서 챌린지
+// ============================================
+model ReadingChallenge {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?   @db.Text
+
+  type          String    // BOOKS_COUNT, PAGES_COUNT, GENRE_SPECIFIC
+  targetValue   Int       // 목표값 (권수 또는 페이지수)
+  targetGenre   String?   // 특정 장르 챌린지인 경우
+
+  startDate     DateTime
+  endDate       DateTime
+
+  isActive      Boolean   @default(true)
+
+  createdBy     String
+  creator       User      @relation(fields: [createdBy], references: [id])
+
+  participants  ChallengeParticipant[]
+
+  createdAt     DateTime  @default(now())
+
+  @@index([isActive, startDate])
+}
+
+model ChallengeParticipant {
+  id            String    @id @default(cuid())
+  challengeId   String
+  challenge     ReadingChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  progress      Int       @default(0)
+  isCompleted   Boolean   @default(false)
+  completedAt   DateTime?
+
+  joinedAt      DateTime  @default(now())
+
+  @@unique([challengeId, userId])
+  @@index([challengeId, progress])
 }

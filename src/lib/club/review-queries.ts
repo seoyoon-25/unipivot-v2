@@ -202,6 +202,7 @@ export async function getMyAllReviews() {
     bookAuthor: r.bookAuthor,
     visibility: r.visibility,
     status: r.status,
+    rating: r.rating,
     likeCount: r.likeCount,
     createdAt: r.createdAt,
     session: r.session
@@ -279,6 +280,7 @@ export async function getSessionForReview(sessionId: string) {
           title: existingReview.title,
           content: existingReview.content,
           visibility: existingReview.visibility,
+          rating: existingReview.rating,
           structuredData: existingReview.structuredReport
             ? {
                 structure: existingReview.structuredReport.structure,
