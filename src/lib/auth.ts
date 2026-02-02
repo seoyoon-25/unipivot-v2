@@ -9,7 +9,7 @@ import { prisma } from './db'
 
 // OAuth providers - 환경변수가 설정된 경우에만 활성화
 const getProviders = () => {
-  const providers: any[] = [
+  const providers: NextAuthOptions['providers'] = [
     CredentialsProvider({
       name: 'credentials',
       credentials: {
@@ -126,9 +126,9 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id
-        token.role = (user as { role?: string }).role ?? 'USER'
-        token.grade = (user as { grade?: number }).grade ?? 1
-        token.profileCompleted = (user as { profileCompleted?: boolean }).profileCompleted ?? true
+        token.role = user.role ?? 'USER'
+        token.grade = user.grade ?? 1
+        token.profileCompleted = user.profileCompleted ?? true
       }
       // 세션 업데이트 시 등급 정보 갱신
       if (trigger === 'update') {
@@ -146,10 +146,10 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as { id?: string }).id = token.id as string
-        (session.user as { role?: string }).role = token.role as string
-        (session.user as { grade?: number }).grade = token.grade as number
-        (session.user as { profileCompleted?: boolean }).profileCompleted = token.profileCompleted as boolean
+        session.user.id = token.id as string
+        session.user.role = token.role as string
+        session.user.grade = token.grade as number
+        session.user.profileCompleted = token.profileCompleted as boolean
       }
       return session
     },
@@ -169,11 +169,9 @@ export const authOptions: NextAuthOptions = {
               profileCompleted: false,
             },
           })
-          // 신규 사용자의 profileCompleted 상태를 user 객체에 추가
-          ;(user as { profileCompleted?: boolean }).profileCompleted = false
+          user.profileCompleted = false
         } else {
-          // 기존 사용자의 profileCompleted 상태를 user 객체에 추가
-          ;(user as { profileCompleted?: boolean }).profileCompleted = existingUser.profileCompleted
+          user.profileCompleted = existingUser.profileCompleted
         }
       } else {
         // 일반 로그인의 경우 DB에서 profileCompleted 상태 조회
@@ -181,7 +179,7 @@ export const authOptions: NextAuthOptions = {
           where: { email: user.email! },
           select: { profileCompleted: true }
         })
-        ;(user as { profileCompleted?: boolean }).profileCompleted = dbUser?.profileCompleted ?? true
+        user.profileCompleted = dbUser?.profileCompleted ?? true
       }
       return true
     },

@@ -41,10 +41,13 @@ export async function POST(request: NextRequest) {
         continue
       }
 
-      // Generate unique filename
+      // Generate unique filename - derive extension from MIME type, not filename
+      const MIME_TO_EXT: Record<string, string> = {
+        'image/jpeg': 'jpg', 'image/png': 'png', 'image/gif': 'gif', 'image/webp': 'webp',
+      }
       const timestamp = Date.now()
       const random = Math.random().toString(36).substring(2, 8)
-      const ext = file.name.split('.').pop() || 'jpg'
+      const ext = MIME_TO_EXT[file.type] || 'jpg'
       const filename = `${timestamp}-${random}.${ext}`
       const filepath = path.join(uploadDir, filename)
 

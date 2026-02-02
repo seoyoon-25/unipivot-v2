@@ -9,6 +9,9 @@ import { redirect } from 'next/navigation'
 // Auth helper
 // ---------------------------------------------------------------------------
 
+const VALID_PROGRAM_TYPES = ['BOOKCLUB', 'SEMINAR', 'DEBATE']
+const VALID_PROGRAM_STATUSES = ['DRAFT', 'RECRUITING', 'ONGOING', 'COMPLETED']
+
 async function checkAdminAuth() {
   const user = await getCurrentUser()
   if (!user) {
@@ -54,6 +57,13 @@ export async function createProgram(formData: {
   const { error, user } = await checkAdminAuth()
   if (error || !user) {
     return { error: error ?? '인증에 실패했습니다.' }
+  }
+
+  if (!VALID_PROGRAM_TYPES.includes(formData.type)) {
+    return { error: '유효하지 않은 프로그램 유형입니다.' }
+  }
+  if (formData.status && !VALID_PROGRAM_STATUSES.includes(formData.status)) {
+    return { error: '유효하지 않은 상태값입니다.' }
   }
 
   try {
@@ -103,6 +113,13 @@ export async function updateProgram(
     return { error: error ?? '인증에 실패했습니다.' }
   }
 
+  if (data.type !== undefined && !VALID_PROGRAM_TYPES.includes(data.type)) {
+    return { error: '유효하지 않은 프로그램 유형입니다.' }
+  }
+  if (data.status !== undefined && !VALID_PROGRAM_STATUSES.includes(data.status)) {
+    return { error: '유효하지 않은 상태값입니다.' }
+  }
+
   try {
     await prisma.program.update({
       where: { id: programId },
@@ -134,9 +151,10 @@ export async function updateProgram(
 // ---------------------------------------------------------------------------
 
 export async function deleteProgram(programId: string) {
-  const { error, user } = await checkAdminAuth()
-  if (error || !user) {
-    return { error: error ?? '인증에 실패했습니다.' }
+  const user = await getCurrentUser()
+  if (!user) return { error: '로그인이 필요합니다.' }
+  if (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN') {
+    return { error: '프로그램 삭제는 관리자만 가능합니다.' }
   }
 
   try {
@@ -169,6 +187,11 @@ export async function addSession(data: {
     return { error: error ?? '인증에 실패했습니다.' }
   }
 
+  const parsedDate = new Date(data.date)
+  if (isNaN(parsedDate.getTime())) {
+    return { error: '유효하지 않은 날짜입니다.' }
+  }
+
   try {
     // Auto-calculate sessionNo based on existing sessions
     const lastSession = await prisma.programSession.findFirst({
@@ -183,7 +206,7 @@ export async function addSession(data: {
       data: {
         programId: data.programId,
         sessionNo,
-        date: new Date(data.date),
+        date: parsedDate,
         title: data.title ?? null,
         bookTitle: data.bookTitle ?? null,
         bookAuthor: data.bookAuthor ?? null,

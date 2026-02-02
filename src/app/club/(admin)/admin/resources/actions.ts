@@ -36,6 +36,16 @@ export async function createResource(data: {
     return { error: error ?? '인증에 실패했습니다.' };
   }
 
+  const VALID_RESOURCE_TYPES = ['NOTE', 'LINK', 'FILE', 'VIDEO'];
+  if (data.type && !VALID_RESOURCE_TYPES.includes(data.type)) {
+    return { error: '유효하지 않은 자료 유형입니다.' };
+  }
+  if (data.url) {
+    try { new URL(data.url); } catch {
+      return { error: '유효하지 않은 URL입니다.' };
+    }
+  }
+
   try {
     await prisma.facilitatorResource.create({
       data: {

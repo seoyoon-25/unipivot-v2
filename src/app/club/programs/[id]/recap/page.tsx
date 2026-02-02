@@ -1,4 +1,6 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/db';
 import {
   getProgramRecap,
@@ -18,6 +20,9 @@ interface Props {
 }
 
 export default async function ProgramRecapPage({ params }: Props) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) redirect('/login');
+
   const { id } = await params;
 
   const program = await prisma.program.findUnique({

@@ -12,6 +12,10 @@ const chatSchema = z.object({
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 })
+    }
+
     const body = await request.json()
 
     const validatedData = chatSchema.parse(body)
@@ -19,7 +23,7 @@ export async function POST(request: Request) {
     const response = await generateChatResponse(
       validatedData.message,
       validatedData.sessionId,
-      session?.user?.id
+      session.user.id
     )
 
     return NextResponse.json({ response })

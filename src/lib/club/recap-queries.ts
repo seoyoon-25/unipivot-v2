@@ -19,24 +19,35 @@ export async function getProgramRecap(programId: string) {
  * 프로그램 회고 데이터 자동 생성
  */
 export async function generateProgramRecap(programId: string) {
+  // Use _count + select to avoid loading full session/participant objects
   const program = await prisma.program.findUnique({
     where: { id: programId },
     include: {
-      sessions: true,
-      participants: true,
+      sessions: { select: { bookTitle: true } },
+      _count: { select: { sessions: true, participants: true } },
     },
   });
 
   if (!program) throw new Error('Program not found');
 
-  const totalSessions = program.sessions.length;
-  const totalParticipants = program.participants.length;
+  const totalSessions = program._count.sessions;
+  const totalParticipants = program._count.participants;
 
-  // 출석률 계산
-  const attendances = await prisma.programAttendance.findMany({
-    where: { session: { programId } },
-    select: { status: true },
-  });
+  const bookTitles = program.sessions
+    .map((s) => s.bookTitle)
+    .filter((t): t is string => !!t);
+
+  // Run remaining queries in parallel (3 concurrent instead of 3 serial)
+  const [attendances, totalReports, totalQuotes] = await Promise.all([
+    prisma.programAttendance.findMany({
+      where: { session: { programId } },
+      select: { status: true },
+    }),
+    prisma.bookReport.count({ where: { programId } }),
+    bookTitles.length > 0
+      ? prisma.quote.count({ where: { bookTitle: { in: bookTitles } } })
+      : Promise.resolve(0),
+  ]);
 
   const presentCount = attendances.filter(
     (a) => a.status === 'PRESENT' || a.status === 'LATE',
@@ -44,24 +55,6 @@ export async function generateProgramRecap(programId: string) {
   const avgAttendanceRate =
     attendances.length > 0
       ? Math.round((presentCount / attendances.length) * 100)
-      : 0;
-
-  // 독후감 수 - BookReport는 Member를 통해 참조됨
-  // programId가 있는 독후감만 카운트하거나, 세션의 bookTitle 기준으로 매칭
-  const totalReports = await prisma.bookReport.count({
-    where: { programId },
-  });
-
-  // 명문장 수 - Quote는 User 소속이며 bookTitle로 매칭
-  const bookTitles = program.sessions
-    .map((s) => s.bookTitle)
-    .filter((t): t is string => !!t);
-
-  const totalQuotes =
-    bookTitles.length > 0
-      ? await prisma.quote.count({
-          where: { bookTitle: { in: bookTitles } },
-        })
       : 0;
 
   return prisma.programRecap.create({

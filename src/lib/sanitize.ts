@@ -1,10 +1,12 @@
 import DOMPurify from 'isomorphic-dompurify'
 
 export function sanitizeHtml(dirty: string): string {
-  return DOMPurify.sanitize(dirty, {
+  const clean = DOMPurify.sanitize(dirty, {
     ADD_TAGS: ['iframe'],
-    ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'target'],
+    ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'target', 'sandbox'],
   })
+  // Force sandbox on all iframes to prevent script execution
+  return clean.replace(/<iframe(?![^>]*\bsandbox\b)/gi, '<iframe sandbox="allow-scripts allow-same-origin"')
 }
 
 export function sanitizeCss(dirty: string): string {
