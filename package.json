@@ -151,7 +151,7 @@
     "@types/pg": "^8.16.0",
     "@types/swagger-ui-react": "^5.18.0",
     "@types/uuid": "^11.0.0",
-    "autoprefixer": "^10.4.23",
+    "autoprefixer": "^10.4.24",
     "better-sqlite3": "^12.6.0",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
@@ -160,7 +160,7 @@
     "postcss": "^8.5.6",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
-    "tailwindcss": "^3.4.19",
+    "tailwindcss": "^4.1.18",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "xlsx": "^0.18.5"
