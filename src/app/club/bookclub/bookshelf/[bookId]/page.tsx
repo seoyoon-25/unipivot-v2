@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { ArrowLeft, BookOpen, MessageSquare, Calendar } from 'lucide-react';
@@ -43,9 +44,11 @@ export default async function BookDetailPage({ params }: Props) {
           {/* 표지 */}
           <div className="w-full md:w-48 flex-shrink-0">
             {book.image ? (
-              <img
+              <Image
                 src={book.image}
                 alt={book.title}
+                width={192}
+                height={256}
                 className="w-full aspect-[3/4] object-cover rounded-lg shadow-md"
               />
             ) : (

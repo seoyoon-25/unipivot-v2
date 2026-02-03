@@ -1,6 +1,7 @@
 import prisma from '@/lib/db'
+import { createCachedQuery, CacheTags } from '@/lib/cache'
 
-export async function getClubNotices(options?: {
+async function _getClubNotices(options?: {
   page?: number
   limit?: number
   includeUnpublished?: boolean
@@ -30,6 +31,12 @@ export async function getClubNotices(options?: {
     pages: Math.ceil(total / limit),
   }
 }
+
+export const getClubNotices = createCachedQuery(
+  _getClubNotices,
+  ['club-notices', 'list'],
+  { tags: [CacheTags.clubNotices], revalidate: 300 }
+)
 
 export async function getClubNoticeById(id: string) {
   const notice = await prisma.clubNotice.findUnique({

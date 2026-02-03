@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { X, ChevronRight } from 'lucide-react';
 import { sidebarMenuItems } from '@/lib/club/navigation';
 import { cn } from '@/lib/utils';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface ClubMobileMenuProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ interface ClubMobileMenuProps {
 
 export default function ClubMobileMenu({ isOpen, onClose }: ClubMobileMenuProps) {
   const pathname = usePathname();
+  const menuRef = useFocusTrap<HTMLDivElement>(isOpen);
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -38,10 +40,11 @@ export default function ClubMobileMenu({ isOpen, onClose }: ClubMobileMenuProps)
       <div
         className="fixed inset-0 z-50 bg-black/50 lg:hidden"
         onClick={onClose}
-        role="presentation"
+        aria-hidden="true"
       />
 
       <div
+        ref={menuRef}
         className="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl lg:hidden"
         role="dialog"
         aria-modal="true"

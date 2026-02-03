@@ -133,6 +133,9 @@ model User {
   // Phase 34: 독서 챌린지
   readingChallenges        ReadingChallenge[]
   challengeParticipants    ChallengeParticipant[]
+  // Phase 36: 소셜 (팔로우)
+  followers                UserFollow[]              @relation("Followers")
+  following                UserFollow[]              @relation("Following")
 
   @@index([role])
   @@index([status])
@@ -3617,4 +3620,21 @@ model ChallengeParticipant {
 
   @@unique([challengeId, userId])
   @@index([challengeId, progress])
+}
+
+// ============================================
+// Phase 36: 소셜 (팔로우)
+// ============================================
+model UserFollow {
+  id          String   @id @default(cuid())
+  followerId  String
+  follower    User     @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User     @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
 }

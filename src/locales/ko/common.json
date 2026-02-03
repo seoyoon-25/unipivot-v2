@@ -1,0 +1,37 @@
+{
+  "nav": {
+    "home": "홈",
+    "bookclub": "책장",
+    "community": "커뮤니티",
+    "notifications": "알림",
+    "profile": "프로필",
+    "settings": "설정",
+    "logout": "로그아웃"
+  },
+  "actions": {
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "수정",
+    "create": "만들기",
+    "submit": "제출",
+    "search": "검색",
+    "filter": "필터",
+    "loadMore": "더 보기",
+    "back": "뒤로",
+    "close": "닫기",
+    "confirm": "확인"
+  },
+  "status": {
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "success": "성공",
+    "noData": "데이터가 없습니다"
+  },
+  "time": {
+    "justNow": "방금 전",
+    "minutesAgo": "{{count}}분 전",
+    "hoursAgo": "{{count}}시간 전",
+    "daysAgo": "{{count}}일 전"
+  }
+}

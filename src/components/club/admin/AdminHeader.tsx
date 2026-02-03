@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu, X, LayoutDashboard, BookOpen, Users, CheckSquare, FolderOpen } from 'lucide-react';
 
@@ -52,7 +53,7 @@ export default function AdminHeader({ user }: Props) {
             <p className="text-xs text-gray-500">{roleLabels[user.role] || user.role}</p>
           </div>
           {user.image ? (
-            <img src={user.image} alt="" className="w-8 h-8 rounded-full" />
+            <Image src={user.image} alt="" width={32} height={32} className="w-8 h-8 rounded-full" />
           ) : (
             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
               <span className="text-sm font-medium text-blue-700">

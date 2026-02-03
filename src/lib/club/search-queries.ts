@@ -1,4 +1,5 @@
 import prisma from '@/lib/db'
+import { createCachedQuery, CacheTags } from '@/lib/cache'
 
 interface SearchResult {
   type: 'program' | 'notice' | 'report' | 'quote'
@@ -10,7 +11,7 @@ interface SearchResult {
   meta?: Record<string, string>
 }
 
-export async function searchAll(
+async function _searchAll(
   query: string,
   options?: { limit?: number }
 ): Promise<{
@@ -163,3 +164,9 @@ export async function searchAll(
       programResults.length + noticeResults.length + reportResults.length + quoteResults.length,
   }
 }
+
+export const searchAll = createCachedQuery(
+  _searchAll,
+  ['search', 'all'],
+  { tags: [CacheTags.search], revalidate: 120 }
+)

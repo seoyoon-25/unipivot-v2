@@ -17,11 +17,19 @@ export async function getMyProfile(userId: string) {
 
   if (!user) return null
 
+  // BookReport.authorId references Member.id, not User.id
+  const member = await prisma.member.findFirst({
+    where: { userId },
+    select: { id: true },
+  })
+
   const [programCount, reportCount, quoteCount, attendances] = await Promise.all([
     prisma.programParticipant.count({
       where: { userId, status: 'ACTIVE' },
     }),
-    prisma.bookReport.count({ where: { authorId: userId } }),
+    member
+      ? prisma.bookReport.count({ where: { authorId: member.id } })
+      : Promise.resolve(0),
     prisma.quote.count({ where: { userId } }),
     prisma.programAttendance.findMany({
       where: { participant: { userId } },
@@ -69,13 +77,21 @@ export async function getUserProfile(userId: string) {
     return { user, isPublic: false as const }
   }
 
+  // BookReport.authorId references Member.id, not User.id
+  const member = await prisma.member.findFirst({
+    where: { userId },
+    select: { id: true },
+  })
+
   const [programCount, reportCount, quoteCount] = await Promise.all([
     prisma.programParticipant.count({
       where: { userId, status: 'ACTIVE' },
     }),
-    prisma.bookReport.count({
-      where: { authorId: userId, isPublic: true },
-    }),
+    member
+      ? prisma.bookReport.count({
+          where: { authorId: member.id, isPublic: true },
+        })
+      : Promise.resolve(0),
     prisma.quote.count({ where: { userId } }),
   ])
 
@@ -87,6 +103,12 @@ export async function getUserProfile(userId: string) {
 }
 
 export async function getRecentActivity(userId: string, limit = 10) {
+  // BookReport.authorId references Member.id, not User.id
+  const member = await prisma.member.findFirst({
+    where: { userId },
+    select: { id: true },
+  })
+
   const [attendances, reports, quotes] = await Promise.all([
     prisma.programAttendance.findMany({
       where: {
@@ -105,12 +127,14 @@ export async function getRecentActivity(userId: string, limit = 10) {
       orderBy: { session: { date: 'desc' } },
       take: limit,
     }),
-    prisma.bookReport.findMany({
-      where: { authorId: userId },
-      select: { id: true, bookTitle: true, createdAt: true },
-      orderBy: { createdAt: 'desc' },
-      take: limit,
-    }),
+    member
+      ? prisma.bookReport.findMany({
+          where: { authorId: member.id },
+          select: { id: true, bookTitle: true, createdAt: true },
+          orderBy: { createdAt: 'desc' },
+          take: limit,
+        })
+      : (Promise.resolve([]) as Promise<{ id: string; bookTitle: string; createdAt: Date }[]>),
     prisma.quote.findMany({
       where: { userId },
       select: { id: true, bookTitle: true, createdAt: true },

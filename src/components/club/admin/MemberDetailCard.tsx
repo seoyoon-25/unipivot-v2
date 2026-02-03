@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { UserCog } from 'lucide-react';
@@ -40,9 +41,11 @@ export default function MemberDetailCard({ member }: Props) {
         <div className="flex items-start gap-6">
           {/* 프로필 이미지 */}
           {member.image ? (
-            <img
+            <Image
               src={member.image}
               alt=""
+              width={96}
+              height={96}
               className="w-24 h-24 rounded-full object-cover"
             />
           ) : (

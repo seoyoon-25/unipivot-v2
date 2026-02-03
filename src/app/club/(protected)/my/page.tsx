@@ -1,5 +1,6 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import Image from 'next/image';
 import { User, Mail } from 'lucide-react';
 
 export const metadata = {
@@ -18,9 +19,11 @@ export default async function MyPage() {
       <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
         <div className="flex items-center gap-4">
           {user?.image ? (
-            <img
+            <Image
               src={user.image}
               alt={user.name || '프로필'}
+              width={80}
+              height={80}
               className="w-20 h-20 rounded-full object-cover"
             />
           ) : (

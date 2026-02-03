@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { Heart, MessageCircle, Eye, MoreHorizontal, Edit, Trash2, Lock, Users, Globe } from 'lucide-react'
@@ -94,9 +95,11 @@ export function ReportCard({
             <>
               <div className="w-10 h-10 rounded-full bg-gray-100 overflow-hidden">
                 {report.user.image ? (
-                  <img
+                  <Image
                     src={report.user.image}
                     alt={report.user.name || ''}
+                    width={40}
+                    height={40}
                     className="w-full h-full object-cover"
                   />
                 ) : (

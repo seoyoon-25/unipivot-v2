@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, UserCog, ChevronLeft, ChevronRight, Shield } from 'lucide-react';
 import { format } from 'date-fns';
@@ -100,9 +101,11 @@ export default function MemberTable({ members, currentPage, totalPages }: Props)
                           className="flex items-center gap-2.5 hover:text-blue-600"
                         >
                           {member.image ? (
-                            <img
+                            <Image
                               src={member.image}
                               alt=""
+                              width={32}
+                              height={32}
                               className="w-8 h-8 rounded-full object-cover"
                             />
                           ) : (

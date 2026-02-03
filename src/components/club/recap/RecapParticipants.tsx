@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Trophy } from 'lucide-react';
 
 interface Participant {
@@ -54,9 +55,11 @@ export default function RecapParticipants({ participants }: Props) {
             className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
           >
             {p.user.image ? (
-              <img
+              <Image
                 src={p.user.image}
                 alt=""
+                width={40}
+                height={40}
                 className="w-10 h-10 rounded-full object-cover"
               />
             ) : (

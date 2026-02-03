@@ -1,0 +1,47 @@
+{
+  "bookclub": {
+    "title": "책장",
+    "myBooks": "내 책",
+    "reviews": "독후감",
+    "quotes": "명문장",
+    "writeReview": "독후감 쓰기",
+    "addQuote": "명문장 등록"
+  },
+  "program": {
+    "title": "프로그램",
+    "recruiting": "모집중",
+    "ongoing": "진행중",
+    "completed": "완료",
+    "join": "참가하기",
+    "participants": "참가자",
+    "sessions": "세션"
+  },
+  "attendance": {
+    "title": "출석",
+    "present": "출석",
+    "late": "지각",
+    "absent": "결석",
+    "checkIn": "출석체크"
+  },
+  "community": {
+    "title": "커뮤니티",
+    "newPost": "글쓰기",
+    "comments": "댓글",
+    "likes": "좋아요"
+  },
+  "goals": {
+    "title": "독서 목표",
+    "yearly": "연간 목표",
+    "monthly": "월간 목표",
+    "achieved": "달성",
+    "remaining": "남음"
+  },
+  "social": {
+    "followers": "팔로워",
+    "following": "팔로잉",
+    "follow": "팔로우",
+    "unfollow": "팔로우 취소",
+    "feed": "활동 피드",
+    "discover": "친구 찾기"
+  }
+}

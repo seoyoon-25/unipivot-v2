@@ -1,0 +1,47 @@
+{
+  "bookclub": {
+    "title": "Bookshelf",
+    "myBooks": "My Books",
+    "reviews": "Reviews",
+    "quotes": "Quotes",
+    "writeReview": "Write Review",
+    "addQuote": "Add Quote"
+  },
+  "program": {
+    "title": "Programs",
+    "recruiting": "Recruiting",
+    "ongoing": "Ongoing",
+    "completed": "Completed",
+    "join": "Join",
+    "participants": "Participants",
+    "sessions": "Sessions"
+  },
+  "attendance": {
+    "title": "Attendance",
+    "present": "Present",
+    "late": "Late",
+    "absent": "Absent",
+    "checkIn": "Check In"
+  },
+  "community": {
+    "title": "Community",
+    "newPost": "New Post",
+    "comments": "Comments",
+    "likes": "Likes"
+  },
+  "goals": {
+    "title": "Reading Goals",
+    "yearly": "Yearly Goal",
+    "monthly": "Monthly Goal",
+    "achieved": "Achieved",
+    "remaining": "Remaining"
+  },
+  "social": {
+    "followers": "Followers",
+    "following": "Following",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "feed": "Activity Feed",
+    "discover": "Find Friends"
+  }
+}

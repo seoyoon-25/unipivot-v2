@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { BookOpen, ChevronRight, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -64,9 +65,11 @@ export default function MyProgramsCard({ programs }: MyProgramsCardProps) {
             className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors"
           >
             {program.image ? (
-              <img
+              <Image
                 src={program.image}
                 alt={program.title}
+                width={56}
+                height={56}
                 className="w-14 h-14 rounded-lg object-cover"
               />
             ) : (

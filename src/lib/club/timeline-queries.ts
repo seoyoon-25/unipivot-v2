@@ -56,31 +56,39 @@ export async function getTimeline(
   }
 
   if (type === 'all' || type === 'report') {
-    const reports = await prisma.bookReport.findMany({
-      where: {
-        authorId: userId,
-        ...(cursorDate && { createdAt: { lt: cursorDate } }),
-      },
-      select: {
-        id: true,
-        bookTitle: true,
-        bookAuthor: true,
-        createdAt: true,
-      },
-      orderBy: { createdAt: 'desc' },
-      take: limit + 1,
+    // BookReport.authorId references Member.id, not User.id
+    const member = await prisma.member.findFirst({
+      where: { userId },
+      select: { id: true },
     })
 
-    items.push(
-      ...reports.map((r) => ({
-        id: `report-${r.id}`,
-        type: 'report' as const,
-        title: `"${r.bookTitle}" 독후감 작성`,
-        description: r.bookAuthor ? `저자: ${r.bookAuthor}` : undefined,
-        link: `/club/bookclub/reviews/${r.id}`,
-        createdAt: r.createdAt,
-      }))
-    )
+    if (member) {
+      const reports = await prisma.bookReport.findMany({
+        where: {
+          authorId: member.id,
+          ...(cursorDate && { createdAt: { lt: cursorDate } }),
+        },
+        select: {
+          id: true,
+          bookTitle: true,
+          bookAuthor: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: 'desc' },
+        take: limit + 1,
+      })
+
+      items.push(
+        ...reports.map((r) => ({
+          id: `report-${r.id}`,
+          type: 'report' as const,
+          title: `"${r.bookTitle}" 독후감 작성`,
+          description: r.bookAuthor ? `저자: ${r.bookAuthor}` : undefined,
+          link: `/club/bookclub/reviews/${r.id}`,
+          createdAt: r.createdAt,
+        }))
+      )
+    }
   }
 
   if (type === 'all' || type === 'quote') {

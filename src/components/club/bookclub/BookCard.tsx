@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { BookOpen, MessageSquare } from 'lucide-react';
 
 interface BookCardProps {
@@ -21,10 +22,12 @@ export default function BookCard({ book }: BookCardProps) {
       {/* 책 표지 */}
       <div className="aspect-[3/4] bg-gray-100 relative overflow-hidden">
         {book.image ? (
-          <img
+          <Image
             src={book.image}
             alt={book.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            sizes="(max-width: 768px) 50vw, 25vw"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">

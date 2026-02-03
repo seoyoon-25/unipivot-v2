@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 
@@ -29,9 +30,11 @@ export default function ProfileHeader({ profile, showEmail = true }: Props) {
   return (
     <div className="flex items-start gap-6">
       {profile.image ? (
-        <img
+        <Image
           src={profile.image}
           alt={profile.name || '프로필'}
+          width={96}
+          height={96}
           className="w-24 h-24 rounded-full object-cover shrink-0"
         />
       ) : (

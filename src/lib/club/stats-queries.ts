@@ -18,6 +18,12 @@ function getPeriodStart(period: Period): Date | null {
 export async function getStatsOverview(userId: string, period: Period) {
   const periodStart = getPeriodStart(period)
 
+  // BookReport.authorId references Member.id, not User.id
+  const member = await prisma.member.findFirst({
+    where: { userId },
+    select: { id: true },
+  })
+
   const [thisMonthAttendance, totalAttendance, totalBooks] = await Promise.all([
     prisma.programAttendance.count({
       where: {
@@ -37,12 +43,14 @@ export async function getStatsOverview(userId: string, period: Period) {
       },
       select: { status: true },
     }),
-    prisma.bookReport.count({
-      where: {
-        authorId: userId,
-        ...(periodStart && { createdAt: { gte: periodStart } }),
-      },
-    }),
+    member
+      ? prisma.bookReport.count({
+          where: {
+            authorId: member.id,
+            ...(periodStart && { createdAt: { gte: periodStart } }),
+          },
+        })
+      : Promise.resolve(0),
   ])
 
   const attendanceRate =
@@ -102,9 +110,17 @@ export async function getMonthlyAttendance(userId: string, period: Period) {
 export async function getMonthlyReading(userId: string, period: Period) {
   const periodStart = getPeriodStart(period)
 
+  // BookReport.authorId references Member.id, not User.id
+  const member = await prisma.member.findFirst({
+    where: { userId },
+    select: { id: true },
+  })
+
+  if (!member) return []
+
   const reports = await prisma.bookReport.findMany({
     where: {
-      authorId: userId,
+      authorId: member.id,
       ...(periodStart && { createdAt: { gte: periodStart } }),
     },
     select: { createdAt: true },

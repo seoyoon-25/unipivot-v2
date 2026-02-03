@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { X, CreditCard } from 'lucide-react'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { BANKS, type Bank } from '@/lib/constants/banks'
 
 interface BankAccount {
@@ -21,6 +22,23 @@ interface BankAccountModalProps {
 }
 
 export function BankAccountModal({ isOpen, onClose, onSave, account }: BankAccountModalProps) {
+  const modalRef = useFocusTrap<HTMLDivElement>(isOpen)
+
+  const handleEsc = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') onClose()
+  }, [onClose])
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleEsc)
+      document.body.style.overflow = 'hidden'
+    }
+    return () => {
+      document.removeEventListener('keydown', handleEsc)
+      document.body.style.overflow = ''
+    }
+  }, [isOpen, handleEsc])
+
   const [formData, setFormData] = useState({
     bankCode: '',
     accountNumber: '',
@@ -105,19 +123,21 @@ export function BankAccountModal({ isOpen, onClose, onSave, account }: BankAccou
   const selectedBank = BANKS.find((b) => b.code === formData.bankCode)
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="bank-modal-title">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
+      <div ref={modalRef} className="relative bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* 헤더 */}
         <div className="flex items-center justify-between p-5 border-b">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
               <CreditCard className="w-5 h-5 text-primary" />
             </div>
-            <h2 className="text-lg font-bold">{account ? '계좌 수정' : '계좌 등록'}</h2>
+            <h2 id="bank-modal-title" className="text-lg font-bold">{account ? '계좌 수정' : '계좌 등록'}</h2>
           </div>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="닫기"
           >
             <X className="w-5 h-5" />
           </button>

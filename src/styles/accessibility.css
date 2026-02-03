@@ -1,0 +1,32 @@
+/* 포커스 스타일 */
+:focus-visible {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+}
+
+/* 모션 감소 설정 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 고대비 모드 */
+@media (prefers-contrast: high) {
+  :root {
+    --border-color: #000;
+    --text-muted: #333;
+  }
+
+  .border-gray-200 {
+    border-color: var(--border-color);
+  }
+
+  .text-gray-500 {
+    color: var(--text-muted);
+  }
+}

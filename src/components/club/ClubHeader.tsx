@@ -3,15 +3,23 @@
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { Menu } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import ClubUserMenu from './ClubUserMenu';
 import ClubMobileMenu from './ClubMobileMenu';
 import NotificationBell from './notifications/NotificationBell';
 import SearchBar from './search/SearchBar';
+import LanguageSwitch from '@/components/LanguageSwitch';
+import { defaultLocale, isValidLocale, type Locale } from '@/i18n/config';
 
 export default function ClubHeader() {
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const locale = useMemo<Locale>(() => {
+    if (typeof document === 'undefined') return defaultLocale;
+    const match = document.cookie.match(/(?:^|;\s*)locale=(\w+)/);
+    const val = match?.[1];
+    return val && isValidLocale(val) ? val : defaultLocale;
+  }, []);
 
   return (
     <>
@@ -36,6 +44,7 @@ export default function ClubHeader() {
               <div className="hidden sm:block">
                 <SearchBar />
               </div>
+              <LanguageSwitch currentLocale={locale} />
               {session ? (
                 <>
                   <NotificationBell />

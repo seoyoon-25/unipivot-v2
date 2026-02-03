@@ -1,5 +1,6 @@
 import { Users, BookOpen, CheckCircle, UserPlus, Calendar } from 'lucide-react';
 import { getAdminStats, getRecentActivity } from '@/lib/club/admin-queries';
+import Image from 'next/image';
 import StatCard from '@/components/club/admin/StatCard';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -49,9 +50,11 @@ export default async function AdminDashboardPage() {
             {activity.recentMembers.map((member) => (
               <div key={member.id} className="flex items-center gap-3">
                 {member.image ? (
-                  <img
+                  <Image
                     src={member.image}
                     alt=""
+                    width={32}
+                    height={32}
                     className="w-8 h-8 rounded-full object-cover"
                   />
                 ) : (

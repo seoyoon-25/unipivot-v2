@@ -79,6 +79,7 @@ export const sidebarMenuItems = {
         { name: '내 프로그램', href: '/club/programs', icon: BookOpen },
         { name: '출석 현황', href: '/club/attendance', icon: CheckSquare },
         { name: '독서 챌린지', href: '/club/challenges', icon: Flame },
+        { name: '활동 피드', href: '/club/social/feed', icon: Users },
         { name: '커뮤니티', href: '/club/community', icon: MessagesSquare },
       ],
     },

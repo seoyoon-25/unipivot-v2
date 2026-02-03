@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { X, Search, BookOpen } from 'lucide-react';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { addWishBook } from '@/app/club/bookclub/my-bookshelf/actions';
 
 interface AvailableBook {
@@ -29,6 +31,22 @@ export default function AddWishBookModal({
   const [customTitle, setCustomTitle] = useState('');
   const [customAuthor, setCustomAuthor] = useState('');
   const [memo, setMemo] = useState('');
+  const modalRef = useFocusTrap<HTMLDivElement>(isOpen);
+
+  const handleEsc = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') { onClose(); resetForm(); }
+  }, [onClose]);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleEsc);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, handleEsc]);
 
   if (!isOpen) return null;
 
@@ -72,12 +90,13 @@ export default function AddWishBookModal({
   const canSubmit = mode === 'select' ? !!selectedBook : !!customTitle;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl max-h-[80vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="wishbook-modal-title">
+      <div className="absolute inset-0 bg-black/50" onClick={() => { onClose(); resetForm(); }} aria-hidden="true" />
+      <div ref={modalRef} className="relative w-full max-w-md bg-white rounded-2xl shadow-xl max-h-[80vh] overflow-hidden flex flex-col">
         {/* 헤더 */}
         <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold text-gray-900">읽고 싶은 책 추가</h2>
-          <button onClick={() => { onClose(); resetForm(); }} className="p-1 text-gray-400 hover:text-gray-600">
+          <h2 id="wishbook-modal-title" className="text-lg font-semibold text-gray-900">읽고 싶은 책 추가</h2>
+          <button onClick={() => { onClose(); resetForm(); }} className="p-1 text-gray-400 hover:text-gray-600" aria-label="닫기">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -140,9 +159,11 @@ export default function AddWishBookModal({
                       }`}
                     >
                       {book.image ? (
-                        <img
+                        <Image
                           src={book.image}
                           alt={book.title}
+                          width={40}
+                          height={56}
                           className="w-10 h-14 object-cover rounded"
                         />
                       ) : (

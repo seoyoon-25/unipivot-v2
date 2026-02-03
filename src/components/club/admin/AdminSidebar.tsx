@@ -8,6 +8,7 @@ import {
   Users,
   CheckSquare,
   FolderOpen,
+  BarChart3,
 } from 'lucide-react';
 
 const menuItems = [
@@ -16,6 +17,7 @@ const menuItems = [
   { href: '/club/admin/members', label: '회원 관리', icon: Users },
   { href: '/club/admin/attendance', label: '출석 관리', icon: CheckSquare },
   { href: '/club/admin/resources', label: '자료 관리', icon: FolderOpen },
+  { href: '/club/admin/analytics', label: '분석', icon: BarChart3 },
 ];
 
 interface Props {

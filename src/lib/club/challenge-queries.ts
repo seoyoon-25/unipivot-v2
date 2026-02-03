@@ -151,7 +151,7 @@ export async function updateChallengeProgress(userId: string) {
 
     // 챌린지 완료 시 배지 부여 (기존 Badge + UserBadge 시스템 사용)
     if (isCompleted && !participation.isCompleted) {
-      await awardChallengeBadge(userId, challenge.title, challenge.targetValue)
+      await awardChallengeBadge(userId, challenge.id, challenge.title, challenge.targetValue)
     }
   }
 }
@@ -161,10 +161,12 @@ export async function updateChallengeProgress(userId: string) {
  */
 async function awardChallengeBadge(
   userId: string,
+  challengeId: string,
   challengeTitle: string,
   targetValue: number
 ) {
-  const code = `CHALLENGE_${challengeTitle}`
+  // Use challengeId (cuid) for safe, unique badge code instead of user-supplied title
+  const code = `CHALLENGE_${challengeId}`
 
   const badge = await prisma.badge.upsert({
     where: { code },

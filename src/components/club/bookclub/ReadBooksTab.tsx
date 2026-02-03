@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { BookOpen, Calendar } from 'lucide-react';
@@ -40,10 +41,12 @@ export default function ReadBooksTab({ books }: ReadBooksTabProps) {
           {/* 표지 */}
           <div className="aspect-[3/4] bg-gray-100 relative">
             {book.image ? (
-              <img
+              <Image
                 src={book.image}
                 alt={book.title}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, AlertTriangle } from 'lucide-react';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { changeUserRole } from '@/app/club/(admin)/admin/members/actions';
 
 interface Props {
@@ -30,6 +31,20 @@ export default function RoleChangeModal({ user, onClose }: Props) {
   const [selectedRole, setSelectedRole] = useState(user.role);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const modalRef = useFocusTrap<HTMLDivElement>(true);
+
+  const handleEsc = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleEsc);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+      document.body.style.overflow = '';
+    };
+  }, [handleEsc]);
 
   const handleSubmit = async () => {
     if (selectedRole === user.role) {
@@ -52,14 +67,16 @@ export default function RoleChangeModal({ user, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="role-modal-title">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
+      <div ref={modalRef} className="relative w-full max-w-md bg-white rounded-2xl shadow-xl">
         {/* 헤더 */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold">역할 변경</h2>
+          <h2 id="role-modal-title" className="text-lg font-semibold">역할 변경</h2>
           <button
             onClick={onClose}
             className="p-1 text-gray-400 hover:text-gray-600"
+            aria-label="닫기"
           >
             <X className="w-5 h-5" />
           </button>

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { BookOpen, X } from 'lucide-react';
 
 interface BookCardSmallProps {
@@ -34,9 +35,11 @@ export default function BookCardSmall({
       {/* 표지 */}
       <div className="w-16 h-20 flex-shrink-0">
         {book.image ? (
-          <img
+          <Image
             src={book.image}
             alt={book.title}
+            width={64}
+            height={80}
             className="w-full h-full object-cover rounded-lg"
           />
         ) : (

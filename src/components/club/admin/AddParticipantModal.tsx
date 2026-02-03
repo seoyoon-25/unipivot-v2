@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { X, Search, UserPlus } from 'lucide-react';
 import { addParticipant } from '@/app/club/(admin)/admin/programs/actions';
 
@@ -104,9 +105,11 @@ export default function AddParticipantModal({ programId, onClose }: Props) {
               {results.map((user) => (
                 <div key={user.id} className="p-4 flex items-center gap-3">
                   {user.image ? (
-                    <img
+                    <Image
                       src={user.image}
                       alt=""
+                      width={40}
+                      height={40}
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   ) : (

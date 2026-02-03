@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { User, Settings, LogOut, ChevronDown } from 'lucide-react';
 
 interface ClubUserMenuProps {
@@ -34,9 +35,11 @@ export default function ClubUserMenu({ user }: ClubUserMenuProps) {
         className="flex items-center gap-2 p-1.5 rounded-full hover:bg-gray-100 transition-colors"
       >
         {user.image ? (
-          <img
+          <Image
             src={user.image}
             alt={user.name || '사용자'}
+            width={32}
+            height={32}
             className="w-8 h-8 rounded-full object-cover"
           />
         ) : (
