@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
+      return NextResponse.json({ error: '권한이 없습니다.' }, { status: 403 })
+    }
+
     const { searchParams } = new URL(request.url)
     const year = parseInt(searchParams.get('year') || new Date().getFullYear().toString())
     const month = parseInt(searchParams.get('month') || (new Date().getMonth() + 1).toString())

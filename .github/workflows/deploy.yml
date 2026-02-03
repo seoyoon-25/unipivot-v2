@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20'
 
 jobs:
   build:
@@ -16,20 +16,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
         run: npx prisma generate
 
       - name: Build
-        run: npm run build
+        run: pnpm build
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
@@ -42,7 +47,7 @@ jobs:
           path: |
             .next
             package.json
-            package-lock.json
+            pnpm-lock.yaml
             prisma
             ecosystem.config.js
             public
@@ -54,7 +59,7 @@ jobs:
     needs: build
     environment:
       name: production
-      url: https://unipivot.org
+      url: https://bestcome.org
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -71,60 +76,60 @@ jobs:
           script: |
             cd /var/www/unihome-v2
 
-            # Backup database
-            if [ -f "prisma/production.db" ]; then
-              cp prisma/production.db /var/backups/unipivot/db_$(date +%Y%m%d_%H%M%S).db
-            fi
+            # Backup database before deploy
+            ./scripts/backup-db.sh || echo "Backup skipped"
 
             # Pull latest code
             git fetch origin main
             git reset --hard origin/main
 
             # Install dependencies
-            npm ci --production=false
+            pnpm install --frozen-lockfile
 
-            # Generate Prisma client
+            # Generate Prisma client and push schema
             npx prisma generate
-
-            # Run migrations
             npx prisma db push
 
             # Build application
-            npm run build
+            pnpm build
 
             # Reload PM2
             pm2 reload ecosystem.config.js --env production
 
             # Health check
             sleep 5
-            curl -f http://localhost:3000 || exit 1
+            curl -sf http://localhost:3000/api/health || exit 1
 
             echo "Deployment completed successfully!"
 
-      - name: Notify on Success
+      - name: Notify Slack on Success
         if: success()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: context.sha,
-              state: 'success',
-              description: 'Deployment successful',
-              context: 'deploy/production'
-            })
+        continue-on-error: true
+        run: |
+          if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
+            curl -s -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+              -H "Content-Type: application/json" \
+              -d '{
+                "attachments": [{
+                  "color": "#36a64f",
+                  "title": "Deploy Success",
+                  "text": "Production deployment completed.\nCommit: ${{ github.sha }}\nAuthor: ${{ github.actor }}"
+                }]
+              }'
+          fi
 
-      - name: Notify on Failure
+      - name: Notify Slack on Failure
         if: failure()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: context.sha,
-              state: 'failure',
-              description: 'Deployment failed',
-              context: 'deploy/production'
-            })
+        continue-on-error: true
+        run: |
+          if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
+            curl -s -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+              -H "Content-Type: application/json" \
+              -d '{
+                "attachments": [{
+                  "color": "#EF4444",
+                  "title": "Deploy Failed",
+                  "text": "Production deployment failed.\nCommit: ${{ github.sha }}\nAuthor: ${{ github.actor }}"
+                }]
+              }'
+          fi

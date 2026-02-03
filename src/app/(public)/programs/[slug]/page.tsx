@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { ProgramJsonLd } from '@/components/seo/JsonLd'
 import { ProgramDetailContent } from './ProgramDetailContent'
 
 interface PageProps {
@@ -88,13 +89,30 @@ export default async function ProgramDetailPage({ params }: PageProps) {
   }
 
   return (
-    <ProgramDetailContent
-      program={program}
-      isLiked={isLiked}
-      hasApplied={hasApplied}
-      application={application}
-      isLoggedIn={!!session}
-      userRole={session?.user?.role}
-    />
+    <>
+      <ProgramJsonLd
+        program={{
+          title: program.title,
+          slug: program.slug,
+          description: program.description,
+          image: program.image,
+          startDate: program.startDate?.toISOString() ?? null,
+          endDate: program.endDate?.toISOString() ?? null,
+          location: program.location,
+          isOnline: program.isOnline,
+          fee: program.fee,
+          capacity: program.capacity,
+          status: program.status,
+        }}
+      />
+      <ProgramDetailContent
+        program={program}
+        isLiked={isLiked}
+        hasApplied={hasApplied}
+        application={application}
+        isLoggedIn={!!session}
+        userRole={session?.user?.role}
+      />
+    </>
   )
 }

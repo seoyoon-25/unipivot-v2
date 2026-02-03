@@ -31,6 +31,15 @@ function formatDateForICal(date: Date): string {
   return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
 }
 
+/** Escape text per RFC 5545 Section 3.3.11 */
+function escapeICalText(text: string): string {
+  return text
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\n/g, '\\n')
+}
+
 export function generateICalEvent(event: CalendarEvent): string {
   const startDate = formatDateForICal(event.startDate)
   const endDate = formatDateForICal(
@@ -46,11 +55,11 @@ export function generateICalEvent(event: CalendarEvent): string {
     `DTSTAMP:${formatDateForICal(new Date())}`,
     `DTSTART:${startDate}`,
     `DTEND:${endDate}`,
-    `SUMMARY:${event.title}`,
+    `SUMMARY:${escapeICalText(event.title)}`,
   ]
 
-  if (event.description) lines.push(`DESCRIPTION:${event.description}`)
-  if (event.location) lines.push(`LOCATION:${event.location}`)
+  if (event.description) lines.push(`DESCRIPTION:${escapeICalText(event.description)}`)
+  if (event.location) lines.push(`LOCATION:${escapeICalText(event.location)}`)
 
   lines.push('END:VEVENT', 'END:VCALENDAR')
 

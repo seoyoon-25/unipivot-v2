@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
@@ -13,10 +14,20 @@ import RecapHighlights from '@/components/club/recap/RecapHighlights';
 import RecapParticipants from '@/components/club/recap/RecapParticipants';
 import type { AIHighlights } from '@/lib/club/recap-ai';
 
-export const metadata = { title: '시즌 회고' };
-
 interface Props {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const program = await prisma.program.findUnique({
+    where: { id },
+    select: { title: true },
+  });
+
+  return {
+    title: program ? `${program.title} 시즌 회고` : '시즌 회고',
+  };
 }
 
 export default async function ProgramRecapPage({ params }: Props) {

@@ -15,6 +15,11 @@ const FONT_SETTINGS_KEYS = {
 // GET: 폰트 설정 조회
 export async function GET() {
   try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user || !['ADMIN', 'SUPER_ADMIN'].includes((session.user as any).role)) {
+      return NextResponse.json({ error: '권한이 없습니다.' }, { status: 403 })
+    }
+
     const settings = await prisma.siteSetting.findMany({
       where: {
         key: {

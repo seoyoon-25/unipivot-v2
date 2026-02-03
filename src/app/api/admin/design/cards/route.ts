@@ -18,6 +18,11 @@ const defaultCardSettings = {
 // GET - 현재 카드 설정 조회
 export async function GET() {
   try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
+      return NextResponse.json({ error: '권한이 없습니다.' }, { status: 403 })
+    }
+
     const settings = await prisma.siteSetting.findMany({
       where: {
         key: {

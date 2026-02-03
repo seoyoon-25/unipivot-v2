@@ -45,8 +45,15 @@ interface PageProps {
 }
 
 export default async function ProgramsPage({ searchParams }: PageProps) {
-  const [session, header, params] = await Promise.all([
-    getServerSession(authOptions),
+  // 세션 조회 실패 시에도 페이지 렌더링 가능하도록 try-catch
+  let session: any = null;
+  try {
+    session = await getServerSession(authOptions);
+  } catch {
+    // NextAuth 설정 오류 시에도 페이지는 렌더링
+  }
+
+  const [header, params] = await Promise.all([
     getHeaderContent(),
     searchParams,
   ]);
@@ -64,19 +71,23 @@ export default async function ProgramsPage({ searchParams }: PageProps) {
   let userApplications: Set<string> = new Set();
 
   if (session?.user?.id) {
-    const [likes, applications] = await Promise.all([
-      prisma.programLike.findMany({
-        where: { userId: session.user.id },
-        select: { programId: true },
-      }),
-      prisma.programApplication.findMany({
-        where: { userId: session.user.id },
-        select: { programId: true },
-      }),
-    ]);
+    try {
+      const [likes, applications] = await Promise.all([
+        prisma.programLike.findMany({
+          where: { userId: session.user.id },
+          select: { programId: true },
+        }),
+        prisma.programApplication.findMany({
+          where: { userId: session.user.id },
+          select: { programId: true },
+        }),
+      ]);
 
-    userLikes = new Set(likes.map((l) => l.programId));
-    userApplications = new Set(applications.map((a) => a.programId));
+      userLikes = new Set(likes.map((l) => l.programId));
+      userApplications = new Set(applications.map((a) => a.programId));
+    } catch {
+      // 좋아요/신청 조회 실패 시 빈 Set 유지
+    }
   }
 
   const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN';

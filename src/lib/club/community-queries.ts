@@ -11,9 +11,11 @@ export async function getCommunityPosts(options: {
   const where: Record<string, unknown> = {}
   if (category && category !== 'all') where.category = category
   if (search) {
+    // Escape SQL wildcard characters to prevent unintended matching
+    const escaped = search.replace(/[%_]/g, (ch) => `\\${ch}`)
     where.OR = [
-      { title: { contains: search, mode: 'insensitive' } },
-      { content: { contains: search, mode: 'insensitive' } },
+      { title: { contains: escaped, mode: 'insensitive' } },
+      { content: { contains: escaped, mode: 'insensitive' } },
     ]
   }
 

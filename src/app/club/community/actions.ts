@@ -48,6 +48,15 @@ export async function updatePost(postId: string, formData: FormData) {
   const title = formData.get('title') as string
   const content = formData.get('content') as string
 
+  const validCategories = ['FREE', 'BOOK_REVIEW', 'QUESTION', 'MEETUP']
+  if (!validCategories.includes(category)) {
+    return { error: '유효하지 않은 카테고리입니다.' }
+  }
+
+  if (!title?.trim() || !content?.trim()) {
+    return { error: '제목과 내용을 입력해주세요.' }
+  }
+
   await prisma.communityPost.update({
     where: { id: postId },
     data: {

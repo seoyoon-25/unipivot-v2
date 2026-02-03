@@ -1,5 +1,6 @@
 'use client'
 
+import * as Sentry from '@sentry/nextjs'
 import React from 'react'
 
 interface ErrorBoundaryState {
@@ -23,7 +24,11 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo)
+    Sentry.captureException(error, {
+      extra: {
+        componentStack: errorInfo.componentStack,
+      },
+    })
   }
 
   render() {
@@ -35,32 +40,13 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
       }
 
       return (
-        <div style={{
-          padding: '20px',
-          backgroundColor: '#fee',
-          color: '#c00',
-          border: '1px solid #c00',
-          borderRadius: '5px',
-          margin: '20px'
-        }}>
-          <h2>Something went wrong</h2>
-          <details style={{ whiteSpace: 'pre-wrap' }}>
-            <summary>Error details</summary>
-            {this.state.error?.toString()}
-          </details>
+        <div className="p-6 bg-red-50 border border-red-200 rounded-xl text-center">
+          <p className="text-red-800 font-medium">컴포넌트 로딩 중 오류 발생</p>
           <button
             onClick={() => this.setState({ hasError: false, error: undefined })}
-            style={{
-              marginTop: '10px',
-              padding: '10px',
-              backgroundColor: '#c00',
-              color: 'white',
-              border: 'none',
-              borderRadius: '3px',
-              cursor: 'pointer'
-            }}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
           >
-            Try again
+            다시 시도
           </button>
         </div>
       )
@@ -72,31 +58,19 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
 export function ErrorFallback({ error }: { error: Error }) {
   return (
-    <div style={{
-      padding: '20px',
-      backgroundColor: '#fee',
-      color: '#c00',
-      border: '1px solid #c00',
-      borderRadius: '5px',
-      margin: '20px'
-    }}>
-      <h2>페이지 로딩 중 오류가 발생했습니다</h2>
-      <p>다음 오류가 발생했습니다:</p>
-      <details style={{ whiteSpace: 'pre-wrap', marginTop: '10px' }}>
-        <summary>상세 오류 정보</summary>
-        <code>{error.toString()}</code>
-      </details>
+    <div className="p-6 bg-red-50 border border-red-200 rounded-xl text-center">
+      <h2 className="text-red-800 font-medium mb-2">페이지 로딩 중 오류가 발생했습니다</h2>
+      {process.env.NODE_ENV === 'development' && (
+        <details className="text-left mt-3 text-sm text-red-700">
+          <summary className="cursor-pointer">상세 오류 정보</summary>
+          <code className="block mt-2 p-2 bg-red-100 rounded whitespace-pre-wrap text-xs">
+            {error.toString()}
+          </code>
+        </details>
+      )}
       <button
         onClick={() => window.location.reload()}
-        style={{
-          marginTop: '10px',
-          padding: '10px',
-          backgroundColor: '#c00',
-          color: 'white',
-          border: 'none',
-          borderRadius: '3px',
-          cursor: 'pointer'
-        }}
+        className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
       >
         페이지 새로고침
       </button>

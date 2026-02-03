@@ -14,6 +14,7 @@ import {
   Star,
   Sparkles,
   Flame,
+  HelpCircle,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -81,6 +82,7 @@ export const sidebarMenuItems = {
         { name: '독서 챌린지', href: '/club/challenges', icon: Flame },
         { name: '활동 피드', href: '/club/social/feed', icon: Users },
         { name: '커뮤니티', href: '/club/community', icon: MessagesSquare },
+        { name: '도움말', href: '/club/help', icon: HelpCircle },
       ],
     },
   ],

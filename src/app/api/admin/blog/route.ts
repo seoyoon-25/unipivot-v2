@@ -5,6 +5,11 @@ import { authOptions } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
+      return NextResponse.json({ error: '권한이 없습니다.' }, { status: 403 })
+    }
+
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')

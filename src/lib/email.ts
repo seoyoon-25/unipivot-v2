@@ -1,6 +1,16 @@
 import nodemailer from 'nodemailer'
 import { prisma } from './db'
 
+/** Escape user-supplied strings for safe HTML template interpolation */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT || '587'),
@@ -62,7 +72,7 @@ export async function sendWelcomeEmail(email: string, name: string): Promise<boo
         <h1 style="color: white; margin: 0;">유니피벗</h1>
       </div>
       <div style="padding: 40px; background: #f9fafb;">
-        <h2 style="color: #111827; margin-bottom: 20px;">${name}님, 환영합니다!</h2>
+        <h2 style="color: #111827; margin-bottom: 20px;">${escapeHtml(name)}님, 환영합니다!</h2>
         <p style="color: #4b5563; line-height: 1.8;">
           유니피벗에 가입해주셔서 감사합니다.<br>
           이제 남북청년과 함께 새로운 한반도를 만들어갈 수 있습니다.
@@ -129,13 +139,13 @@ export function sessionReminderTemplate(data: {
         <h1 style="margin: 0; font-size: 20px;">모임 리마인더</h1>
       </div>
       <div style="padding: 30px; background: #f9fafb; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-        <p style="color: #374151; line-height: 1.8;">안녕하세요, ${data.userName}님!</p>
+        <p style="color: #374151; line-height: 1.8;">안녕하세요, ${escapeHtml(data.userName)}님!</p>
         <p style="color: #374151; line-height: 1.8;">내일 모임이 예정되어 있습니다.</p>
         <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e5e7eb;">
-          <p style="margin: 8px 0; color: #374151;"><strong>프로그램:</strong> ${data.programTitle}</p>
+          <p style="margin: 8px 0; color: #374151;"><strong>프로그램:</strong> ${escapeHtml(data.programTitle)}</p>
           <p style="margin: 8px 0; color: #374151;"><strong>회차:</strong> ${data.sessionNo}회차</p>
           <p style="margin: 8px 0; color: #374151;"><strong>일시:</strong> ${data.date.toLocaleDateString('ko-KR')} ${data.date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</p>
-          ${data.location ? `<p style="margin: 8px 0; color: #374151;"><strong>장소:</strong> ${data.location}</p>` : ''}
+          ${data.location ? `<p style="margin: 8px 0; color: #374151;"><strong>장소:</strong> ${escapeHtml(data.location)}</p>` : ''}
         </div>
         <p style="color: #6b7280; text-align: center; margin-top: 20px; font-size: 14px;">유니클럽</p>
       </div>
@@ -155,10 +165,10 @@ export async function sendProgramNotification(
         <h1 style="color: white; margin: 0;">유니피벗</h1>
       </div>
       <div style="padding: 40px; background: #f9fafb;">
-        <h2 style="color: #111827; margin-bottom: 20px;">${name}님, 프로그램이 곧 시작됩니다!</h2>
+        <h2 style="color: #111827; margin-bottom: 20px;">${escapeHtml(name)}님, 프로그램이 곧 시작됩니다!</h2>
         <div style="background: white; padding: 20px; border-radius: 12px; margin: 20px 0;">
-          <h3 style="color: #FF6B35; margin: 0 0 10px 0;">${programTitle}</h3>
-          <p style="color: #4b5563; margin: 0;">일시: ${date}</p>
+          <h3 style="color: #FF6B35; margin: 0 0 10px 0;">${escapeHtml(programTitle)}</h3>
+          <p style="color: #4b5563; margin: 0;">일시: ${escapeHtml(date)}</p>
         </div>
         <a href="${process.env.NEXT_PUBLIC_SITE_URL}/my/programs"
            style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: #FF6B35; color: white; text-decoration: none; border-radius: 8px;">
@@ -170,7 +180,7 @@ export async function sendProgramNotification(
 
   return sendEmail({
     to: email,
-    subject: `[유니피벗] ${programTitle} 안내`,
+    subject: `[유니피벗] ${escapeHtml(programTitle)} 안내`,
     html,
   })
 }

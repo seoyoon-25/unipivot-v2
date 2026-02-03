@@ -11,17 +11,21 @@ interface Props {
 
 export default function KakaoShareButton({ params, className }: Props) {
   useEffect(() => {
+    const KAKAO_SDK_URL = 'https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js'
+
+    // Prevent duplicate script loading
+    const existing = document.querySelector(`script[src="${KAKAO_SDK_URL}"]`)
+    if (existing) {
+      initKakao()
+      return
+    }
+
     const script = document.createElement('script')
-    script.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js'
+    script.src = KAKAO_SDK_URL
     script.async = true
+    script.crossOrigin = 'anonymous'
     script.onload = () => initKakao()
     document.head.appendChild(script)
-
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script)
-      }
-    }
   }, [])
 
   const handleShare = () => {

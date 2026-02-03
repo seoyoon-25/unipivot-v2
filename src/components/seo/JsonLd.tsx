@@ -55,11 +55,8 @@ interface ProgramJsonLdProps {
 }
 
 export function ProgramJsonLd({ program }: ProgramJsonLdProps) {
-  const eventStatus = program.status === 'COMPLETED'
-    ? 'EventPostponed'
-    : program.status === 'RECRUITING' || program.status === 'ONGOING'
-    ? 'EventScheduled'
-    : 'EventScheduled'
+  // Schema.org에 EventCompleted가 없으므로 COMPLETED도 EventScheduled 유지
+  const eventStatus = 'EventScheduled'
 
   const attendanceMode = program.isOnline
     ? 'OnlineEventAttendanceMode'
@@ -215,6 +212,64 @@ export function FAQJsonLd({ items }: FAQJsonLdProps) {
   return (
     <Script
       id="faq-jsonld"
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(data) }}
+    />
+  )
+}
+
+// 독후감(리뷰) 스키마
+interface BookReviewJsonLdProps {
+  review: {
+    id: string
+    bookTitle: string
+    bookAuthor?: string | null
+    content: string
+    rating?: number | null
+    createdAt: string
+    authorName?: string | null
+  }
+}
+
+export function BookReviewJsonLd({ review }: BookReviewJsonLdProps) {
+  const data: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Review',
+    itemReviewed: {
+      '@type': 'Book',
+      name: review.bookTitle,
+      ...(review.bookAuthor && {
+        author: {
+          '@type': 'Person',
+          name: review.bookAuthor,
+        },
+      }),
+    },
+    reviewBody: review.content.replace(/<[^>]*>/g, '').slice(0, 500),
+    author: {
+      '@type': 'Person',
+      name: review.authorName || '유니클럽 회원',
+    },
+    datePublished: review.createdAt,
+    publisher: {
+      '@type': 'Organization',
+      name: '유니피벗',
+    },
+    url: `https://bestcome.org/club/bookclub/reviews/${review.id}`,
+  }
+
+  if (review.rating) {
+    data.reviewRating = {
+      '@type': 'Rating',
+      ratingValue: review.rating,
+      bestRating: 5,
+      worstRating: 1,
+    }
+  }
+
+  return (
+    <Script
+      id={`review-jsonld-${review.id}`}
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(data) }}
     />
