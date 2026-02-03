@@ -99,7 +99,7 @@
     "dotenv": "^17.2.3",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.1",
-    "framer-motion": "^12.25.0",
+    "framer-motion": "^12.30.1",
     "grapesjs": "^0.22.14",
     "grapesjs-blocks-basic": "^1.0.2",
     "grapesjs-plugin-forms": "^2.0.6",
