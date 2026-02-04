@@ -21,7 +21,7 @@ export default async function FollowingPage() {
       <div>
         <Link
           href="/club/social/feed"
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4"
+          className="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-700 mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
           피드
@@ -29,11 +29,11 @@ export default async function FollowingPage() {
         <div className="flex items-center gap-4">
           <Link
             href="/club/social/followers"
-            className="text-sm text-gray-500 hover:text-blue-600"
+            className="text-sm text-zinc-500 hover:text-blue-600"
           >
             팔로워 {counts.followers}
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-zinc-900">
             팔로잉 ({counts.following})
           </h1>
         </div>
@@ -41,7 +41,7 @@ export default async function FollowingPage() {
 
       {followingUsers.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500 text-sm mb-4">아직 팔로잉하는 사람이 없습니다.</p>
+          <p className="text-zinc-500 text-sm mb-4">아직 팔로잉하는 사람이 없습니다.</p>
           <Link
             href="/club/social/discover"
             className="text-sm text-blue-600 hover:text-blue-700"

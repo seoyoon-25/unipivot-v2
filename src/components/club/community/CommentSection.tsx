@@ -38,7 +38,7 @@ export default function CommentSection({ postId, comments, currentUserId }: Prop
 
   return (
     <div className="mt-8">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">
+      <h2 className="text-lg font-semibold text-zinc-900 mb-4">
         댓글 {comments.reduce((acc, c) => acc + 1 + c.replies.length, 0)}개
       </h2>
 

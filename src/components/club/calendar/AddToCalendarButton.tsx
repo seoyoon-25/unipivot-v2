@@ -38,7 +38,7 @@ export default function AddToCalendarButton({ event }: Props) {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-sm"
+        className="flex items-center gap-2 px-4 py-2 border border-zinc-200 rounded-lg hover:bg-zinc-50 text-sm"
       >
         <Calendar className="w-4 h-4" />
         캘린더에 추가
@@ -48,16 +48,16 @@ export default function AddToCalendarButton({ event }: Props) {
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg border border-gray-200 shadow-lg z-20">
+          <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl border border-zinc-100 shadow-sm shadow-lg z-20">
             <button
               onClick={handleGoogleCalendar}
-              className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 rounded-t-lg"
+              className="w-full px-4 py-2 text-left text-sm hover:bg-zinc-50 rounded-t-lg"
             >
               Google Calendar
             </button>
             <button
               onClick={handleICalDownload}
-              className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 rounded-b-lg"
+              className="w-full px-4 py-2 text-left text-sm hover:bg-zinc-50 rounded-b-lg"
             >
               Apple Calendar / Outlook
             </button>

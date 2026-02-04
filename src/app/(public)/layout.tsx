@@ -1,14 +1,17 @@
+import nextDynamic from 'next/dynamic'
 import { Providers } from '@/components/Providers'
 import { NavbarWrapper } from '@/components/public/NavbarWrapper'
 import { Footer } from '@/components/public/Footer'
-import { ChatbotButton } from '@/components/public/ChatbotButton'
-import { CustomCursor } from '@/components/public/CustomCursor'
-import { ScrollAnimation } from '@/components/public/ScrollAnimation'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { NoSSR } from '@/components/NoSSR'
 import { TopBanners, BottomBanners } from '@/components/banners/BannerDisplay'
-import PopupDisplay from '@/components/popups/PopupDisplay'
-import { FloatingButtonDisplay } from '@/components/floating-buttons/FloatingButtonDisplay'
+
+// Below-fold / client-only components — lazy load to reduce main bundle & render delay
+const PopupDisplay = nextDynamic(() => import('@/components/popups/PopupDisplay'), { ssr: false })
+const FloatingButtonDisplay = nextDynamic(() => import('@/components/floating-buttons/FloatingButtonDisplay').then(m => ({ default: m.FloatingButtonDisplay })), { ssr: false })
+const ChatbotButton = nextDynamic(() => import('@/components/public/ChatbotButton').then(m => ({ default: m.ChatbotButton })), { ssr: false })
+const CustomCursor = nextDynamic(() => import('@/components/public/CustomCursor').then(m => ({ default: m.CustomCursor })), { ssr: false })
+const ScrollAnimation = nextDynamic(() => import('@/components/public/ScrollAnimation').then(m => ({ default: m.ScrollAnimation })), { ssr: false })
 
 // Force dynamic rendering for all public pages to avoid prerender errors
 export const dynamic = 'force-dynamic'
@@ -50,15 +53,13 @@ export default function PublicLayout({
             </NoSSR>
           </ErrorBoundary>
 
-          {/* 클라이언트 전용 컴포넌트들 */}
+          {/* 클라이언트 전용 컴포넌트들 — lazy loaded via next/dynamic ssr:false */}
           <ErrorBoundary>
-            <NoSSR>
-              <PopupDisplay />
-              <FloatingButtonDisplay />
-              <ChatbotButton />
-              <CustomCursor />
-              <ScrollAnimation />
-            </NoSSR>
+            <PopupDisplay />
+            <FloatingButtonDisplay />
+            <ChatbotButton />
+            <CustomCursor />
+            <ScrollAnimation />
           </ErrorBoundary>
         </div>
       </ErrorBoundary>

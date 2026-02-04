@@ -32,7 +32,7 @@ export default function ClubUserMenu({ user }: ClubUserMenuProps) {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+        className="flex items-center gap-2 p-1.5 rounded-full hover:bg-zinc-100 transition-colors"
       >
         {user.image ? (
           <Image
@@ -43,20 +43,20 @@ export default function ClubUserMenu({ user }: ClubUserMenuProps) {
             className="w-8 h-8 rounded-full object-cover"
           />
         ) : (
-          <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-            <User className="w-4 h-4 text-gray-500" />
+          <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center">
+            <User className="w-4 h-4 text-zinc-500" />
           </div>
         )}
-        <ChevronDown className="w-4 h-4 text-gray-500 hidden sm:block" />
+        <ChevronDown className="w-4 h-4 text-zinc-500 hidden sm:block" />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-          <div className="px-4 py-3 border-b border-gray-100">
-            <p className="text-sm font-medium text-gray-900 truncate">
+        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-zinc-200 py-1 z-50">
+          <div className="px-4 py-3 border-b border-zinc-100">
+            <p className="text-sm font-medium text-zinc-900 truncate">
               {user.name || '사용자'}
             </p>
-            <p className="text-xs text-gray-500 truncate">
+            <p className="text-xs text-zinc-500 truncate">
               {user.email}
             </p>
           </div>
@@ -64,7 +64,7 @@ export default function ClubUserMenu({ user }: ClubUserMenuProps) {
           <div className="py-1">
             <Link
               href="/club/my"
-              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+              className="flex items-center gap-3 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
               onClick={() => setIsOpen(false)}
             >
               <User className="w-4 h-4" />
@@ -72,7 +72,7 @@ export default function ClubUserMenu({ user }: ClubUserMenuProps) {
             </Link>
             <Link
               href="/club/my/settings"
-              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+              className="flex items-center gap-3 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
               onClick={() => setIsOpen(false)}
             >
               <Settings className="w-4 h-4" />
@@ -80,7 +80,7 @@ export default function ClubUserMenu({ user }: ClubUserMenuProps) {
             </Link>
           </div>
 
-          <div className="border-t border-gray-100 py-1">
+          <div className="border-t border-zinc-100 py-1">
             <button
               onClick={() => signOut({ callbackUrl: '/' })}
               className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"

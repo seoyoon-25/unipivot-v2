@@ -18,12 +18,12 @@ export default function RecapHeader({ program }: Props) {
         <span className="text-sm font-medium">시즌 회고</span>
       </div>
 
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <h1 className="text-3xl font-bold text-zinc-900 mb-2">
         {program.title}
       </h1>
 
       {program.startDate && program.endDate && (
-        <p className="text-gray-500">
+        <p className="text-zinc-500">
           {format(new Date(program.startDate), 'yyyy.M.d', { locale: ko })}
           {' ~ '}
           {format(new Date(program.endDate), 'yyyy.M.d', { locale: ko })}

@@ -47,25 +47,25 @@ export default function RecommendationCard({ recommendation }: Props) {
 
   return (
     <div
-      className={`bg-white rounded-xl border p-5 transition-all ${
-        read ? 'border-green-200 bg-green-50/30' : 'border-gray-200'
+      className={`club-card p-5 transition-all duration-200 ${
+        read ? 'border-emerald-200 bg-emerald-50/30' : ''
       }`}
     >
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900">{recommendation.bookTitle}</h3>
+          <h3 className="font-semibold text-zinc-900">{recommendation.bookTitle}</h3>
           {recommendation.bookAuthor && (
-            <p className="text-sm text-gray-500">{recommendation.bookAuthor}</p>
+            <p className="text-sm text-zinc-500">{recommendation.bookAuthor}</p>
           )}
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={handleSave}
             disabled={isPending}
-            className={`p-1.5 rounded-lg transition-colors ${
+            className={`p-1.5 rounded-lg transition-colors duration-200 ${
               saved
                 ? 'text-blue-600 bg-blue-50 hover:bg-blue-100'
-                : 'text-gray-400 hover:text-blue-600 hover:bg-gray-100'
+                : 'text-zinc-400 hover:text-blue-600 hover:bg-zinc-100'
             }`}
             aria-label={saved ? '저장 취소' : '저장'}
           >
@@ -74,10 +74,10 @@ export default function RecommendationCard({ recommendation }: Props) {
           <button
             onClick={handleRead}
             disabled={isPending}
-            className={`p-1.5 rounded-lg transition-colors ${
+            className={`p-1.5 rounded-lg transition-colors duration-200 ${
               read
-                ? 'text-green-600 bg-green-50 hover:bg-green-100'
-                : 'text-gray-400 hover:text-green-600 hover:bg-gray-100'
+                ? 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100'
+                : 'text-zinc-400 hover:text-emerald-600 hover:bg-zinc-100'
             }`}
             aria-label={read ? '읽음 취소' : '읽음 표시'}
           >
@@ -86,7 +86,7 @@ export default function RecommendationCard({ recommendation }: Props) {
           <button
             onClick={handleDelete}
             disabled={isPending}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-zinc-100 transition-colors duration-200"
             aria-label="삭제"
           >
             <Trash2 className="w-4 h-4" />
@@ -94,20 +94,20 @@ export default function RecommendationCard({ recommendation }: Props) {
         </div>
       </div>
 
-      <p className="text-sm text-gray-600 leading-relaxed">{recommendation.reason}</p>
+      <p className="text-sm text-zinc-600 leading-relaxed">{recommendation.reason}</p>
 
       <div className="flex items-center gap-2 mt-3">
         {read && (
-          <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+          <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">
             읽음
           </span>
         )}
         {saved && (
-          <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+          <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full font-medium">
             저장됨
           </span>
         )}
-        <span className="text-xs text-gray-400 ml-auto">
+        <span className="text-xs text-zinc-400 ml-auto">
           {new Date(recommendation.createdAt).toLocaleDateString('ko-KR', {
             month: 'short',
             day: 'numeric',

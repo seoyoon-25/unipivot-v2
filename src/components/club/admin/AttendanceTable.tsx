@@ -66,8 +66,8 @@ const STATUS_CONFIG: Record<
   },
   EXCUSED: {
     label: '사유결석',
-    color: 'text-gray-600',
-    bg: 'bg-gray-100',
+    color: 'text-zinc-600',
+    bg: 'bg-zinc-100',
     icon: AlertCircle,
   },
 };
@@ -143,51 +143,51 @@ export default function AttendanceTable({ sessions }: AttendanceTableProps) {
 
   if (participants.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-        <p className="text-gray-500">등록된 참가자가 없습니다.</p>
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-12 text-center">
+        <p className="text-zinc-500">등록된 참가자가 없습니다.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="text-left px-4 py-3 font-medium text-gray-500 sticky left-0 bg-gray-50 z-10 min-w-[160px]">
+            <tr className="border-b border-zinc-200 bg-zinc-50">
+              <th className="text-left px-4 py-3 font-medium text-zinc-500 sticky left-0 bg-zinc-50 z-10 min-w-[160px]">
                 참가자
               </th>
               {sessions.map((session) => (
                 <th
                   key={session.id}
-                  className="text-center px-3 py-3 font-medium text-gray-500 min-w-[90px]"
+                  className="text-center px-3 py-3 font-medium text-zinc-500 min-w-[90px]"
                 >
                   <div className="flex flex-col items-center gap-0.5">
                     <span>{session.sessionNo}회차</span>
-                    <span className="text-[10px] font-normal text-gray-400">
+                    <span className="text-[10px] font-normal text-zinc-400">
                       {format(new Date(session.date), 'M/d', { locale: ko })}
                     </span>
                   </div>
                 </th>
               ))}
-              <th className="text-center px-4 py-3 font-medium text-gray-500 min-w-[80px]">
+              <th className="text-center px-4 py-3 font-medium text-zinc-500 min-w-[80px]">
                 출석률
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-zinc-100">
             {participants.map((participant) => {
               const summary = summaries.get(participant.id);
               const rate = summary?.rate ?? 0;
 
               return (
-                <tr key={participant.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={participant.id} className="hover:bg-zinc-50 transition-colors">
                   {/* Participant info */}
                   <td className="px-4 py-3 sticky left-0 bg-white z-10">
                     <div>
-                      <p className="font-medium text-gray-900">{participant.name}</p>
-                      <p className="text-xs text-gray-400">{participant.email}</p>
+                      <p className="font-medium text-zinc-900">{participant.name}</p>
+                      <p className="text-xs text-zinc-400">{participant.email}</p>
                     </div>
                   </td>
 
@@ -201,7 +201,7 @@ export default function AttendanceTable({ sessions }: AttendanceTableProps) {
                         {status ? (
                           <StatusBadge status={status} />
                         ) : (
-                          <span className="text-xs text-gray-300">-</span>
+                          <span className="text-xs text-zinc-300">-</span>
                         )}
                       </td>
                     );
@@ -229,9 +229,9 @@ export default function AttendanceTable({ sessions }: AttendanceTableProps) {
       </div>
 
       {/* Summary footer */}
-      <div className="border-t border-gray-200 bg-gray-50 px-4 py-3">
-        <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
-          <span className="font-medium text-gray-700">범례:</span>
+      <div className="border-t border-zinc-200 bg-zinc-50 px-4 py-3">
+        <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-500">
+          <span className="font-medium text-zinc-700">범례:</span>
           {Object.entries(STATUS_CONFIG).map(([key, config]) => {
             const Icon = config.icon;
             return (

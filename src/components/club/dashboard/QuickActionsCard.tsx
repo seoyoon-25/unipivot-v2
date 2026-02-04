@@ -12,16 +12,14 @@ export default function QuickActionsCard({ hasTodayMeeting }: QuickActionsCardPr
       href: '/club/bookclub/reviews/write',
       icon: MessageSquare,
       bgColor: 'bg-blue-50',
-      hoverBorder: 'hover:border-blue-300',
       iconColor: 'text-blue-600',
     },
     {
       name: '출석 체크',
       href: '/club/attendance',
       icon: CheckSquare,
-      bgColor: 'bg-green-50',
-      hoverBorder: 'hover:border-green-300',
-      iconColor: 'text-green-600',
+      bgColor: 'bg-emerald-50',
+      iconColor: 'text-emerald-600',
       highlight: hasTodayMeeting,
     },
     {
@@ -29,7 +27,6 @@ export default function QuickActionsCard({ hasTodayMeeting }: QuickActionsCardPr
       href: '/club/bookclub/bookshelf',
       icon: BookOpen,
       bgColor: 'bg-purple-50',
-      hoverBorder: 'hover:border-purple-300',
       iconColor: 'text-purple-600',
     },
     {
@@ -37,7 +34,6 @@ export default function QuickActionsCard({ hasTodayMeeting }: QuickActionsCardPr
       href: '/club/bookclub/quotes',
       icon: Quote,
       bgColor: 'bg-amber-50',
-      hoverBorder: 'hover:border-amber-300',
       iconColor: 'text-amber-600',
     },
   ];
@@ -48,19 +44,15 @@ export default function QuickActionsCard({ hasTodayMeeting }: QuickActionsCardPr
         <Link
           key={action.name}
           href={action.href}
-          className={`
-            relative bg-white rounded-xl p-4 border border-gray-200
-            ${action.hoverBorder} hover:shadow-md transition-all
-            flex flex-col items-center gap-2 text-center
-          `}
+          className="group relative club-card flex flex-col items-center gap-2 p-4 text-center hover:bg-zinc-50 transition-colors duration-200"
         >
           {action.highlight && (
-            <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+            <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-600 rounded-full animate-pulse" />
           )}
-          <div className={`p-2.5 ${action.bgColor} rounded-lg`}>
+          <div className={`w-12 h-12 rounded-2xl ${action.bgColor} flex items-center justify-center group-hover:-translate-y-0.5 transition-transform duration-200`}>
             <action.icon className={`w-5 h-5 ${action.iconColor}`} />
           </div>
-          <span className="text-sm font-medium text-gray-700">{action.name}</span>
+          <span className="text-sm font-medium text-zinc-700">{action.name}</span>
         </Link>
       ))}
     </div>

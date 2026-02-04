@@ -28,11 +28,11 @@ export default function AdminSidebar({ userRole }: Props) {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden lg:flex w-64 bg-white border-r border-gray-200 flex-col">
+    <aside className="hidden lg:flex w-64 bg-white border-r border-zinc-200 flex-col">
       {/* 로고 */}
-      <div className="p-6 border-b border-gray-200">
+      <div className="p-6 border-b border-zinc-200">
         <Link href="/club/admin" className="flex items-center gap-2">
-          <span className="text-xl font-bold text-gray-900">유니클럽</span>
+          <span className="text-xl font-bold text-zinc-900">유니클럽</span>
           <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-medium">
             Admin
           </span>
@@ -55,7 +55,7 @@ export default function AdminSidebar({ userRole }: Props) {
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                     isActive
                       ? 'bg-blue-50 text-blue-700 font-medium'
-                      : 'text-gray-600 hover:bg-gray-50'
+                      : 'text-zinc-600 hover:bg-zinc-50'
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -68,10 +68,10 @@ export default function AdminSidebar({ userRole }: Props) {
       </nav>
 
       {/* 하단 */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-zinc-200">
         <Link
           href="/club"
-          className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700"
+          className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-700"
         >
           &larr; 유니클럽으로 돌아가기
         </Link>

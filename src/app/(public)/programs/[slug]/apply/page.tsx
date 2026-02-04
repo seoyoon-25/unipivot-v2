@@ -171,7 +171,7 @@ export default async function ApplyPage({ params }: PageProps) {
               신청 상태: <span className="font-medium">{getStatusLabel(existingApplication.status)}</span>
             </p>
             <Link
-              href="/mypage/applications"
+              href="/my/applications"
               className="text-orange-500 hover:underline"
             >
               마이페이지에서 확인하기

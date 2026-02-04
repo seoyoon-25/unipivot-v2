@@ -29,7 +29,7 @@ export default function ResponsiveTable<T>({
 
   if (data.length === 0) {
     return (
-      <div className="p-12 text-center text-gray-500 bg-white rounded-xl border border-gray-200">
+      <div className="p-12 text-center text-zinc-500 bg-white rounded-2xl border border-zinc-100 shadow-sm">
         {emptyMessage}
       </div>
     )
@@ -46,25 +46,25 @@ export default function ResponsiveTable<T>({
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
       <table className="w-full">
-        <thead className="bg-gray-50 border-b border-gray-200">
+        <thead className="bg-zinc-50 border-b border-zinc-200">
           <tr>
             {columns
               .filter((col) => !col.mobileHidden)
               .map((col) => (
                 <th
                   key={col.key}
-                  className="px-4 py-3 text-left text-sm font-medium text-gray-500"
+                  className="px-4 py-3 text-left text-sm font-medium text-zinc-500"
                 >
                   {col.header}
                 </th>
               ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-zinc-200">
           {data.map((item) => (
-            <tr key={keyExtractor(item)} className="hover:bg-gray-50">
+            <tr key={keyExtractor(item)} className="hover:bg-zinc-50">
               {columns
                 .filter((col) => !col.mobileHidden)
                 .map((col) => (

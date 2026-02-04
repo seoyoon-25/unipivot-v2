@@ -26,13 +26,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path === '' ? 1 : 0.8,
   }))
 
-  // 동적 페이지 - 공개 독후감
-  const reviews = await prisma.bookReport.findMany({
-    where: { isPublic: true },
-    select: { id: true, updatedAt: true },
-    orderBy: { updatedAt: 'desc' },
-    take: 1000,
-  })
+  // 동적 페이지 - 병렬 쿼리로 sitemap 생성 시간 단축
+  const [reviews, programs, notices] = await Promise.all([
+    prisma.bookReport.findMany({
+      where: { isPublic: true },
+      select: { id: true, updatedAt: true },
+      orderBy: { updatedAt: 'desc' },
+      take: 1000,
+    }),
+    prisma.program.findMany({
+      where: { status: { in: ['RECRUITING', 'ONGOING', 'COMPLETED'] } },
+      select: { slug: true, updatedAt: true },
+      orderBy: { updatedAt: 'desc' },
+      take: 1000,
+    }),
+    prisma.notice.findMany({
+      where: { isPublic: true },
+      select: { id: true, updatedAt: true },
+      orderBy: { updatedAt: 'desc' },
+      take: 500,
+    }),
+  ])
 
   const reviewPages = reviews.map((review) => ({
     url: `${baseUrl}/club/bookclub/reviews/${review.id}`,
@@ -41,26 +55,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  // 동적 페이지 - 프로그램 (slug 기반)
-  const programs = await prisma.program.findMany({
-    where: { status: { in: ['RECRUITING', 'ONGOING', 'COMPLETED'] } },
-    select: { slug: true, updatedAt: true },
-  })
-
   const programPages = programs.map((program) => ({
     url: `${baseUrl}/programs/${program.slug}`,
     lastModified: program.updatedAt,
     changeFrequency: 'daily' as const,
     priority: 0.7,
   }))
-
-  // 동적 페이지 - 공지사항
-  const notices = await prisma.notice.findMany({
-    where: { isPublic: true },
-    select: { id: true, updatedAt: true },
-    orderBy: { updatedAt: 'desc' },
-    take: 500,
-  })
 
   const noticePages = notices.map((notice) => ({
     url: `${baseUrl}/notice/${notice.id}`,

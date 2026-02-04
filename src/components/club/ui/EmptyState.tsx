@@ -18,17 +18,19 @@ export default function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className="text-center py-8">
-      <Icon className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-      <p className="text-gray-500 font-medium">{title}</p>
+      <div className="w-16 h-16 rounded-2xl bg-zinc-100 text-zinc-400 mx-auto mb-4 flex items-center justify-center">
+        <Icon className="w-8 h-8" />
+      </div>
+      <p className="text-base font-semibold text-zinc-900 mb-1">{title}</p>
       {description && (
-        <p className="text-sm text-gray-400 mt-1">{description}</p>
+        <p className="text-sm text-zinc-500 mb-6">{description}</p>
       )}
       {actionLabel && actionHref && (
         <Link
           href={actionHref}
-          className="inline-block mt-4 text-sm text-blue-600 hover:underline"
+          className="club-btn-primary"
         >
-          {actionLabel} &rarr;
+          {actionLabel}
         </Link>
       )}
     </div>

@@ -40,7 +40,7 @@ export default function FollowButton({ userId, initialFollowing }: Props) {
       <button
         onClick={handleToggle}
         disabled={isLoading}
-        className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 border border-zinc-200 rounded-lg text-sm text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 transition-colors"
       >
         <UserCheck className="w-4 h-4" />
         팔로잉

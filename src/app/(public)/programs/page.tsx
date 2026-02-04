@@ -11,6 +11,7 @@ import ProgramSection from './ProgramSection';
 import CompletedProgramsSection from './CompletedProgramsSection';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
+import { ClubBanner } from '@/components/public/ClubBanner';
 
 export const metadata: Metadata = {
   title: '전체 프로그램 | 유니피벗',
@@ -112,6 +113,9 @@ export default async function ProgramsPage({ searchParams }: PageProps) {
       {/* Content Section */}
       <section className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
+          {/* 유니클럽 배너 */}
+          <ClubBanner />
+
           {/* 필터 + 등록 버튼 */}
           <div className="flex items-center justify-between gap-4 mb-6">
             <ProgramTypeFilters currentType={type} />
@@ -128,7 +132,7 @@ export default async function ProgramsPage({ searchParams }: PageProps) {
 
           {/* 모집중 + 진행중 */}
           <ProgramSection
-            title="진행 프로그램"
+            title="모집 또는 진행중인 프로그램"
             emoji="🔥"
             programs={[...recruiting, ...ongoing]}
             emptyMessage="현재 진행중인 프로그램이 없습니다."
@@ -138,7 +142,25 @@ export default async function ProgramsPage({ searchParams }: PageProps) {
           />
 
           {/* 완료 */}
-          <Suspense fallback={<div className="animate-pulse bg-gray-200 h-96 rounded-xl" />}>
+          <Suspense fallback={
+            <div className="space-y-6 min-h-[384px]">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-7 bg-gray-200 rounded w-48 animate-pulse" />
+              </div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm animate-pulse">
+                    <div className="aspect-square bg-gray-200" />
+                    <div className="p-4 space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-1/3" />
+                      <div className="h-5 bg-gray-200 rounded w-3/4" />
+                      <div className="h-4 bg-gray-100 rounded w-1/2" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          }>
             <CompletedProgramsSection
               initialPrograms={initialCompleted}
               totalCount={completed.length}

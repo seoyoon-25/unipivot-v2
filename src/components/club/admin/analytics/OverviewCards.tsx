@@ -37,7 +37,7 @@ export default function OverviewCards({ data }: Props) {
         const isPositive = card.change !== null && card.change >= 0
 
         return (
-          <div key={card.title} className="bg-white rounded-xl border border-gray-200 p-6">
+          <div key={card.title} className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <div className={`p-2 rounded-lg ${colorStyles[card.color]}`}>
                 <Icon className="w-5 h-5" />
@@ -57,8 +57,8 @@ export default function OverviewCards({ data }: Props) {
                 </div>
               )}
             </div>
-            <p className="text-2xl font-bold text-gray-900">{card.value.toLocaleString()}</p>
-            <p className="text-sm text-gray-500 mt-1">{card.title}</p>
+            <p className="text-2xl font-bold text-zinc-900">{card.value.toLocaleString()}</p>
+            <p className="text-sm text-zinc-500 mt-1">{card.title}</p>
           </div>
         )
       })}

@@ -107,7 +107,7 @@ export default function ProgramEditSessions({ sessions, programId }: ProgramEdit
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-lg font-semibold text-zinc-900">
           세션 목록 ({sessions.length}개)
         </h3>
         <button
@@ -130,11 +130,11 @@ export default function ProgramEditSessions({ sessions, programId }: ProgramEdit
       {showAddForm && (
         <form
           onSubmit={handleAddSession}
-          className="p-4 bg-gray-50 border border-gray-200 rounded-lg space-y-3"
+          className="p-4 bg-zinc-50 border border-zinc-200 rounded-lg space-y-3"
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="session-date" className="block text-xs font-medium text-gray-600 mb-1">
+              <label htmlFor="session-date" className="block text-xs font-medium text-zinc-600 mb-1">
                 날짜 <span className="text-red-500">*</span>
               </label>
               <input
@@ -143,11 +143,11 @@ export default function ProgramEditSessions({ sessions, programId }: ProgramEdit
                 value={newDate}
                 onChange={(e) => setNewDate(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
             <div>
-              <label htmlFor="session-title" className="block text-xs font-medium text-gray-600 mb-1">
+              <label htmlFor="session-title" className="block text-xs font-medium text-zinc-600 mb-1">
                 제목
               </label>
               <input
@@ -156,11 +156,11 @@ export default function ProgramEditSessions({ sessions, programId }: ProgramEdit
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 placeholder="세션 제목"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
             <div>
-              <label htmlFor="session-book-title" className="block text-xs font-medium text-gray-600 mb-1">
+              <label htmlFor="session-book-title" className="block text-xs font-medium text-zinc-600 mb-1">
                 도서명
               </label>
               <input
@@ -169,11 +169,11 @@ export default function ProgramEditSessions({ sessions, programId }: ProgramEdit
                 value={newBookTitle}
                 onChange={(e) => setNewBookTitle(e.target.value)}
                 placeholder="도서 제목"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
             <div>
-              <label htmlFor="session-book-author" className="block text-xs font-medium text-gray-600 mb-1">
+              <label htmlFor="session-book-author" className="block text-xs font-medium text-zinc-600 mb-1">
                 저자
               </label>
               <input
@@ -182,11 +182,11 @@ export default function ProgramEditSessions({ sessions, programId }: ProgramEdit
                 value={newBookAuthor}
                 onChange={(e) => setNewBookAuthor(e.target.value)}
                 placeholder="저자"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="session-location" className="block text-xs font-medium text-gray-600 mb-1">
+              <label htmlFor="session-location" className="block text-xs font-medium text-zinc-600 mb-1">
                 장소
               </label>
               <input
@@ -195,7 +195,7 @@ export default function ProgramEditSessions({ sessions, programId }: ProgramEdit
                 value={newLocation}
                 onChange={(e) => setNewLocation(e.target.value)}
                 placeholder="장소"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
           </div>
@@ -211,7 +211,7 @@ export default function ProgramEditSessions({ sessions, programId }: ProgramEdit
               type="button"
               onClick={resetForm}
               disabled={isPending}
-              className="px-4 py-2 bg-white text-gray-700 text-sm font-medium border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 bg-white text-zinc-700 text-sm font-medium border border-zinc-300 rounded-lg hover:bg-zinc-50 transition-colors"
             >
               취소
             </button>
@@ -221,54 +221,54 @@ export default function ProgramEditSessions({ sessions, programId }: ProgramEdit
 
       {/* Sessions list */}
       {sessions.length === 0 ? (
-        <div className="py-8 text-center text-gray-400 text-sm">
+        <div className="py-8 text-center text-zinc-400 text-sm">
           등록된 세션이 없습니다.
         </div>
       ) : (
-        <div className="border border-gray-200 rounded-lg overflow-hidden">
+        <div className="border border-zinc-200 rounded-lg overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="text-left px-4 py-3 font-medium text-gray-500 w-16">회차</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">날짜</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">제목</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">도서</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">장소</th>
-                <th className="text-right px-4 py-3 font-medium text-gray-500 w-16">삭제</th>
+              <tr className="border-b border-zinc-200 bg-zinc-50">
+                <th className="text-left px-4 py-3 font-medium text-zinc-500 w-16">회차</th>
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">날짜</th>
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">제목</th>
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">도서</th>
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">장소</th>
+                <th className="text-right px-4 py-3 font-medium text-zinc-500 w-16">삭제</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-zinc-100">
               {sessions.map((session) => (
-                <tr key={session.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 text-gray-900 font-medium">
+                <tr key={session.id} className="hover:bg-zinc-50 transition-colors">
+                  <td className="px-4 py-3 text-zinc-900 font-medium">
                     {session.sessionNo}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-4 py-3 text-zinc-600">
                     {formatSessionDate(session.date)}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-4 py-3 text-zinc-600">
                     {session.title || '-'}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-4 py-3 text-zinc-600">
                     {session.bookTitle ? (
                       <span>
                         {session.bookTitle}
                         {session.bookAuthor && (
-                          <span className="text-gray-400 ml-1">({session.bookAuthor})</span>
+                          <span className="text-zinc-400 ml-1">({session.bookAuthor})</span>
                         )}
                       </span>
                     ) : (
                       '-'
                     )}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-4 py-3 text-zinc-600">
                     {session.location || '-'}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => handleDeleteSession(session.id, session.sessionNo)}
                       disabled={isPending || deletingId === session.id}
-                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                      className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                       title="삭제"
                     >
                       <Trash2 className="w-4 h-4" />

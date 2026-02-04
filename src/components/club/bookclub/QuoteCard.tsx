@@ -38,32 +38,32 @@ export default function QuoteCard({ quote, onDelete, onGenerateImage }: QuoteCar
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow">
+    <div className="club-card p-5 hover:shadow-md transition-all duration-200">
       <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="text-xs text-gray-500 flex items-center gap-1.5">
-          <span className="font-medium text-gray-700">{quote.bookTitle}</span>
+        <div className="text-xs text-zinc-500 flex items-center gap-1.5">
+          <span className="font-medium text-zinc-700">{quote.bookTitle}</span>
           {quote.bookAuthor && <span>· {quote.bookAuthor}</span>}
           {quote.page && <span>· p.{quote.page}</span>}
         </div>
         {quote.isPublic ? (
-          <Globe className="w-3.5 h-3.5 text-green-500 shrink-0" />
+          <Globe className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
         ) : (
-          <Lock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+          <Lock className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
         )}
       </div>
 
-      <blockquote className="text-gray-800 text-sm leading-relaxed border-l-3 border-blue-300 pl-3 mb-3 italic">
+      <blockquote className="text-zinc-800 text-sm leading-relaxed border-l-3 border-blue-300 pl-3 mb-3 italic">
         &ldquo;{quote.content}&rdquo;
       </blockquote>
 
       {quote.memo && (
-        <p className="text-xs text-gray-500 mb-3 bg-gray-50 rounded-lg p-2">
+        <p className="text-xs text-zinc-500 mb-3 bg-zinc-50 rounded-xl p-2">
           {quote.memo}
         </p>
       )}
 
       <div className="flex items-center justify-between">
-        <div className="text-xs text-gray-400 flex items-center gap-2">
+        <div className="text-xs text-zinc-400 flex items-center gap-2">
           <span>{quote.user.name}</span>
           <span>
             {new Date(quote.createdAt).toLocaleDateString('ko-KR', {
@@ -76,7 +76,7 @@ export default function QuoteCard({ quote, onDelete, onGenerateImage }: QuoteCar
           {onGenerateImage && (
             <button
               onClick={() => onGenerateImage(quote)}
-              className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors"
+              className="p-1.5 text-zinc-400 hover:text-blue-600 rounded-lg hover:bg-zinc-50 transition-colors duration-200"
               title="이미지 생성"
             >
               <Image className="w-4 h-4" />
@@ -86,7 +86,7 @@ export default function QuoteCard({ quote, onDelete, onGenerateImage }: QuoteCar
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="p-1.5 text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
+              className="p-1.5 text-zinc-400 hover:text-red-500 rounded-lg hover:bg-zinc-50 transition-colors duration-200 disabled:opacity-50"
               title="삭제"
             >
               <Trash2 className="w-4 h-4" />

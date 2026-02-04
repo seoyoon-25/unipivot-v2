@@ -140,7 +140,7 @@ function AttendanceScanContent() {
               <Button
                 variant="outline"
                 className="flex-1"
-                onClick={() => router.push('/mypage')}
+                onClick={() => router.push('/my')}
               >
                 마이페이지
               </Button>
@@ -164,7 +164,7 @@ function AttendanceScanContent() {
               <Button
                 variant="outline"
                 className="flex-1"
-                onClick={() => router.push('/mypage')}
+                onClick={() => router.push('/my')}
               >
                 마이페이지
               </Button>

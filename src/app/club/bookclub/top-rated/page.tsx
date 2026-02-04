@@ -13,12 +13,12 @@ export default async function TopRatedBooksPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">평점 높은 책</h1>
+      <h1 className="text-2xl font-bold text-zinc-900 mb-6">평점 높은 책</h1>
 
       {books.length === 0 ? (
-        <div className="bg-gray-50 rounded-xl border border-gray-200 p-8 text-center">
-          <p className="text-gray-500">아직 평점 데이터가 충분하지 않습니다.</p>
-          <p className="text-sm text-gray-400 mt-1">
+        <div className="bg-zinc-50 rounded-2xl border border-zinc-100 shadow-sm p-8 text-center">
+          <p className="text-zinc-500">아직 평점 데이터가 충분하지 않습니다.</p>
+          <p className="text-sm text-zinc-400 mt-1">
             독후감 작성 시 별점을 남기면 이곳에 표시됩니다.
           </p>
         </div>
@@ -27,15 +27,15 @@ export default async function TopRatedBooksPage() {
           {books.map((book, index) => (
             <div
               key={`${book.bookTitle}-${index}`}
-              className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4"
+              className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 flex items-center gap-4"
             >
               <span className="w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm shrink-0">
                 {index + 1}
               </span>
               <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-gray-900 truncate">{book.bookTitle}</h3>
+                <h3 className="font-medium text-zinc-900 truncate">{book.bookTitle}</h3>
                 {book.bookAuthor && (
-                  <p className="text-sm text-gray-500 truncate">{book.bookAuthor}</p>
+                  <p className="text-sm text-zinc-500 truncate">{book.bookAuthor}</p>
                 )}
               </div>
               <div className="shrink-0">

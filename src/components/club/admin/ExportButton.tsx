@@ -51,7 +51,7 @@ export default function ExportButton({
     <button
       onClick={handleExport}
       disabled={isExporting}
-      className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50 transition-colors"
+      className="flex items-center gap-2 px-4 py-2 border border-zinc-200 rounded-lg text-sm hover:bg-zinc-50 disabled:opacity-50 transition-colors"
     >
       <Download className="w-4 h-4" />
       {isExporting ? '내보내는 중...' : label}

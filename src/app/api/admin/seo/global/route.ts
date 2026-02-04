@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { z } from 'zod'
 
+export const dynamic = 'force-dynamic'
+
 // 전역 SEO 설정 스키마
 const globalSeoSettingSchema = z.object({
   settingKey: z.string().min(1, '설정 키를 입력해주세요'),

@@ -49,20 +49,20 @@ export default async function EditProgramPage({ params }: Props) {
       <div className="flex items-center gap-3">
         <Link
           href="/club/admin/programs"
-          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-lg transition-colors"
           title="뒤로"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">프로그램 수정</h1>
-          <p className="text-gray-500 mt-1">{program.title}</p>
+          <h1 className="text-2xl font-bold text-zinc-900">프로그램 수정</h1>
+          <p className="text-zinc-500 mt-1">{program.title}</p>
         </div>
       </div>
 
       {/* Basic Info Form */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">기본 정보</h2>
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-zinc-900 mb-4">기본 정보</h2>
         <ProgramForm
           mode="edit"
           programId={program.id}
@@ -78,14 +78,14 @@ export default async function EditProgramPage({ params }: Props) {
       </div>
 
       {/* Sessions */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
         <ProgramEditSessions sessions={sessions} programId={program.id} />
       </div>
 
       {/* Participants */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
         <ProgramEditParticipants participants={participants} programId={program.id} />
-        <div className="mt-4 pt-4 border-t border-gray-200 flex gap-2">
+        <div className="mt-4 pt-4 border-t border-zinc-200 flex gap-2">
           <ExportButton type="participants" programId={program.id} label="참가자 CSV" />
           <ExportButton type="attendance" programId={program.id} label="출석 CSV" />
         </div>

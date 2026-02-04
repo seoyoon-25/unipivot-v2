@@ -24,7 +24,7 @@ export default function UserCard({
   const isMe = currentUserId === user.id
 
   return (
-    <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+    <div className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-zinc-100 shadow-sm">
       <Link href={`/club/profile/${user.id}`} className="shrink-0">
         {user.image ? (
           <Image
@@ -35,7 +35,7 @@ export default function UserCard({
             className="w-11 h-11 rounded-full object-cover"
           />
         ) : (
-          <div className="w-11 h-11 rounded-full bg-gray-200 flex items-center justify-center text-lg text-gray-400">
+          <div className="w-11 h-11 rounded-full bg-zinc-200 flex items-center justify-center text-lg text-zinc-400">
             {user.name?.[0] || '?'}
           </div>
         )}
@@ -43,12 +43,12 @@ export default function UserCard({
       <div className="flex-1 min-w-0">
         <Link
           href={`/club/profile/${user.id}`}
-          className="text-sm font-medium text-gray-900 hover:text-blue-600 truncate block"
+          className="text-sm font-medium text-zinc-900 hover:text-blue-600 truncate block"
         >
           {user.name || '(이름 없음)'}
         </Link>
         {user.bio && (
-          <p className="text-xs text-gray-500 truncate">{user.bio}</p>
+          <p className="text-xs text-zinc-500 truncate">{user.bio}</p>
         )}
         {user.reason && (
           <p className="text-xs text-blue-500">{user.reason}</p>

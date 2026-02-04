@@ -192,7 +192,7 @@ export default function ReviewEditor({
           value={(value as string) || ''}
           onChange={(e) => updateSection(section.id, e.target.value)}
           placeholder={section.placeholder || `${section.title}을(를) 작성해주세요`}
-          className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[120px] resize-y"
+          className="w-full rounded-lg border border-zinc-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[120px] resize-y"
         />
       )
     }
@@ -205,7 +205,7 @@ export default function ReviewEditor({
             value={quoteData.quote || ''}
             onChange={(e) => updateSection(section.id, { ...quoteData, quote: e.target.value })}
             placeholder="인상 깊은 구절을 입력하세요"
-            className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[80px] resize-y"
+            className="w-full rounded-lg border border-zinc-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[80px] resize-y"
           />
           <div className="flex gap-2">
             <input
@@ -213,14 +213,14 @@ export default function ReviewEditor({
               value={quoteData.page || ''}
               onChange={(e) => updateSection(section.id, { ...quoteData, page: e.target.value })}
               placeholder="페이지 (선택)"
-              className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             />
           </div>
           <textarea
             value={quoteData.reason || ''}
             onChange={(e) => updateSection(section.id, { ...quoteData, reason: e.target.value })}
             placeholder="이 구절을 선택한 이유"
-            className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[60px] resize-y"
+            className="w-full rounded-lg border border-zinc-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[60px] resize-y"
           />
         </div>
       )
@@ -233,7 +233,7 @@ export default function ReviewEditor({
         <div className="space-y-2">
           {items.map((item, i) => (
             <div key={i} className="flex gap-2">
-              <span className="text-sm text-gray-400 pt-2">{i + 1}.</span>
+              <span className="text-sm text-zinc-400 pt-2">{i + 1}.</span>
               <input
                 type="text"
                 value={item}
@@ -243,7 +243,7 @@ export default function ReviewEditor({
                   updateSection(section.id, { items: newItems })
                 }}
                 placeholder={`항목 ${i + 1}`}
-                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
           ))}
@@ -278,7 +278,7 @@ export default function ReviewEditor({
                 className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
                   (emotionData.emotions || []).includes(opt)
                     ? 'bg-blue-100 border-blue-300 text-blue-700'
-                    : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                    : 'bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100'
                 }`}
               >
                 {opt}
@@ -289,7 +289,7 @@ export default function ReviewEditor({
             value={emotionData.description || ''}
             onChange={(e) => updateSection(section.id, { ...emotionData, description: e.target.value })}
             placeholder="감정에 대해 자세히 적어주세요"
-            className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[80px] resize-y"
+            className="w-full rounded-lg border border-zinc-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[80px] resize-y"
           />
         </div>
       )
@@ -302,7 +302,7 @@ export default function ReviewEditor({
         <div className="space-y-2">
           {questions.map((q, i) => (
             <div key={i} className="flex gap-2">
-              <span className="text-sm text-gray-400 pt-2">Q{i + 1}.</span>
+              <span className="text-sm text-zinc-400 pt-2">Q{i + 1}.</span>
               <input
                 type="text"
                 value={q}
@@ -312,7 +312,7 @@ export default function ReviewEditor({
                   updateSection(section.id, { questions: newQ })
                 }}
                 placeholder={`토론 질문 ${i + 1}`}
-                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
           ))}
@@ -347,13 +347,13 @@ export default function ReviewEditor({
 
       {/* Title */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">제목</label>
+        <label className="block text-sm font-medium text-zinc-700 mb-1">제목</label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="독후감 제목을 입력하세요"
-          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          className="w-full rounded-lg border border-zinc-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           maxLength={REVIEW_GUIDELINES.titleMaxLength}
         />
       </div>
@@ -363,12 +363,12 @@ export default function ReviewEditor({
         <div className="space-y-5">
           {selectedTemplate.structure.sections.map((section) => (
             <div key={section.id}>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-zinc-700 mb-1.5">
                 {section.emoji} {section.title}
                 {section.required && <span className="text-red-500 ml-1">*</span>}
               </label>
               {section.guide && (
-                <p className="text-xs text-gray-500 mb-2">{section.guide}</p>
+                <p className="text-xs text-zinc-500 mb-2">{section.guide}</p>
               )}
               {renderSectionEditor(section)}
             </div>
@@ -376,15 +376,15 @@ export default function ReviewEditor({
         </div>
       ) : (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">내용</label>
+          <label className="block text-sm font-medium text-zinc-700 mb-1">내용</label>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="독후감을 작성해주세요"
-            className="w-full rounded-lg border border-gray-300 p-4 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[300px] resize-y"
+            className="w-full rounded-lg border border-zinc-300 p-4 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[300px] resize-y"
             maxLength={REVIEW_GUIDELINES.maxLength}
           />
-          <div className="text-right text-xs text-gray-400 mt-1">
+          <div className="text-right text-xs text-zinc-400 mt-1">
             {formatCharCount(content.length, REVIEW_GUIDELINES.maxLength)}
           </div>
         </div>
@@ -392,8 +392,8 @@ export default function ReviewEditor({
 
       {/* Star Rating */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">
-          이 책을 평가해주세요 <span className="text-gray-400 font-normal">(선택)</span>
+        <label className="block text-sm font-medium text-zinc-700 mb-1.5">
+          이 책을 평가해주세요 <span className="text-zinc-400 font-normal">(선택)</span>
         </label>
         <StarRating value={rating} onChange={setRating} size="lg" />
       </div>
@@ -406,7 +406,7 @@ export default function ReviewEditor({
           className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border transition-colors ${
             isPublic
               ? 'bg-green-50 border-green-200 text-green-700'
-              : 'bg-gray-50 border-gray-200 text-gray-600'
+              : 'bg-zinc-50 border-zinc-200 text-zinc-600'
           }`}
         >
           {isPublic ? (

@@ -22,9 +22,9 @@ export default async function FacilitatorResourcesPage() {
         <div className="p-2 bg-amber-50 rounded-lg">
           <FolderOpen className="w-6 h-6 text-amber-600" />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">진행자 자료실</h1>
+        <h1 className="text-2xl font-bold text-zinc-900">진행자 자료실</h1>
       </div>
-      <p className="text-sm text-gray-500 mb-6 ml-[52px]">
+      <p className="text-sm text-zinc-500 mb-6 ml-[52px]">
         스크립트와 가이드
       </p>
 

@@ -18,8 +18,8 @@ export default async function QuotesPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">명문장</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-zinc-900">명문장</h1>
+        <p className="text-sm text-zinc-500 mt-1">
           책에서 발견한 아름다운 문장을 모아보세요
         </p>
       </div>

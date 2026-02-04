@@ -43,13 +43,13 @@ export default function StarRating({ value, onChange, size = 'md', readonly = fa
             className={`${sizes[size]} ${
               star <= displayValue
                 ? 'fill-yellow-400 text-yellow-400'
-                : 'fill-none text-gray-300'
+                : 'fill-none text-zinc-300'
             }`}
           />
         </button>
       ))}
       {value !== null && value !== undefined && (
-        <span className="ml-2 text-sm text-gray-600">{value}점</span>
+        <span className="ml-2 text-sm text-zinc-600">{value}점</span>
       )}
     </div>
   )

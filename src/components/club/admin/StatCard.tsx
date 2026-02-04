@@ -17,11 +17,11 @@ const colorStyles = {
 
 export default function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
+    <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-500">{title}</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1">{value}</p>
+          <p className="text-sm text-zinc-500">{title}</p>
+          <p className="text-3xl font-bold text-zinc-900 mt-1">{value}</p>
         </div>
         <div className={`p-3 rounded-xl ${colorStyles[color]}`}>
           <Icon className="w-6 h-6" />

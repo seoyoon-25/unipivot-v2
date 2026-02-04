@@ -16,8 +16,8 @@ export default function GoalChart({ data }: Props) {
   const maxValue = Math.max(...data.map((d) => Math.max(d.target, d.achieved)))
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h3 className="font-semibold text-gray-900 mb-4">월별 달성률</h3>
+    <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+      <h3 className="font-semibold text-zinc-900 mb-4">월별 달성률</h3>
       <div className="flex items-end gap-2 h-40">
         {data.map((item) => {
           const targetHeight = maxValue > 0 ? (item.target / maxValue) * 100 : 0
@@ -27,7 +27,7 @@ export default function GoalChart({ data }: Props) {
             <div key={item.label} className="flex-1 flex flex-col items-center gap-1">
               <div className="w-full flex items-end gap-0.5" style={{ height: '128px' }}>
                 <div
-                  className="flex-1 bg-gray-200 rounded-t"
+                  className="flex-1 bg-zinc-200 rounded-t"
                   style={{ height: `${targetHeight}%` }}
                   title={`목표: ${item.target}권`}
                 />
@@ -39,14 +39,14 @@ export default function GoalChart({ data }: Props) {
                   title={`달성: ${item.achieved}권`}
                 />
               </div>
-              <span className="text-xs text-gray-500">{item.label}</span>
+              <span className="text-xs text-zinc-500">{item.label}</span>
             </div>
           )
         })}
       </div>
-      <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
+      <div className="flex items-center gap-4 mt-3 text-xs text-zinc-500">
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-gray-200 rounded" />
+          <div className="w-3 h-3 bg-zinc-200 rounded" />
           목표
         </div>
         <div className="flex items-center gap-1">

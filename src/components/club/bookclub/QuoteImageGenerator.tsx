@@ -111,26 +111,26 @@ export default function QuoteImageGenerator({ quote, onClose }: QuoteImageGenera
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl max-w-[860px] w-full p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-gray-900">이미지 카드 생성</h3>
-          <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600">
+          <h3 className="font-semibold text-zinc-900">이미지 카드 생성</h3>
+          <button onClick={onClose} className="p-1 text-zinc-400 hover:text-zinc-600">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <canvas
           ref={canvasRef}
-          className="w-full rounded-lg border border-gray-200 mb-4"
+          className="w-full rounded-2xl border border-zinc-100 shadow-sm mb-4"
           style={{ maxHeight: '400px', objectFit: 'contain' }}
         />
 
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-sm text-gray-600">배경:</span>
+          <span className="text-sm text-zinc-600">배경:</span>
           {BACKGROUNDS.map((bg, i) => (
             <button
               key={i}
               onClick={() => handleBgChange(i)}
               className={`w-8 h-8 rounded-full border-2 transition-all ${
-                bgIndex === i ? 'border-blue-500 scale-110' : 'border-gray-300'
+                bgIndex === i ? 'border-blue-500 scale-110' : 'border-zinc-300'
               }`}
               style={{
                 background: `linear-gradient(135deg, ${bg.gradient[0]}, ${bg.gradient[1]})`,

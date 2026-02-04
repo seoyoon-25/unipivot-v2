@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { BookOpen, Mic, MapPin, MessageSquare, Users, Lightbulb, Heart, Star, Zap, Globe, LucideIcon } from 'lucide-react'
 import { prisma } from '@/lib/db'
 
@@ -120,7 +121,7 @@ export async function KeyProgramsSection() {
   const content = await getProgramSectionContent()
 
   return (
-    <section id="programs" className="py-24 bg-gray-50">
+    <section id="programs" className="py-24 bg-gray-50 min-h-[600px]">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-16 animate-on-scroll">
           {content.sectionLabel && (
@@ -149,10 +150,13 @@ export async function KeyProgramsSection() {
               >
                 <div className={`relative h-48 overflow-hidden ${program.image ? '' : `bg-gradient-to-br ${program.gradient}`}`}>
                   {program.image ? (
-                    <img
+                    <Image
                       src={program.image}
                       alt={program.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      fill
+                      loading="lazy"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center">

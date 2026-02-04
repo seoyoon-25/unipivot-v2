@@ -1,6 +1,6 @@
 export function MeaningSection() {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-white min-h-[500px]">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
           {/* UNITE */}

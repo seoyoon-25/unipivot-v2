@@ -120,7 +120,7 @@ export function BulletinBoard({ className }: BulletinBoardProps) {
   const getRandomRotation = (index: number) => (index % 3 - 1) * 2
 
   return (
-    <section className={cn('py-16', className)}>
+    <section className={cn('py-16 min-h-[600px]', className)}>
       <div className="container mx-auto px-4">
         {/* 헤더 */}
         <div className="text-center mb-10">
@@ -137,8 +137,56 @@ export function BulletinBoard({ className }: BulletinBoardProps) {
           </p>
         </div>
 
+        {/* 로딩 스켈레톤 — 실제 콘텐츠 레이아웃과 높이 일치 (CLS 방지) */}
+        {loading && (
+          <div className="cork-board-light p-6 md:p-8 min-h-[600px]">
+            <div className="space-y-4 animate-pulse">
+              {/* 설문 섹션 스켈레톤 */}
+              <div className="bg-white rounded-xl p-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-amber-200 rounded-lg" />
+                  <div className="h-5 bg-amber-200 rounded w-40" />
+                  <div className="h-5 bg-amber-100 rounded w-20 ml-auto" />
+                </div>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-40 bg-amber-50 rounded-lg" />
+                  ))}
+                </div>
+              </div>
+              {/* 관심사 섹션 스켈레톤 */}
+              <div className="bg-white rounded-xl p-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-amber-200 rounded-lg" />
+                  <div className="h-5 bg-amber-200 rounded w-32" />
+                </div>
+                <div className="grid lg:grid-cols-2 gap-8">
+                  <div className="h-48 bg-amber-50 rounded-lg" />
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {[...Array(6)].map((_, i) => (
+                      <div key={i} className="h-24 bg-amber-100/60 rounded-lg" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              {/* 인기 키워드 스켈레톤 */}
+              <div className="bg-white rounded-xl p-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-amber-200 rounded-lg" />
+                  <div className="h-5 bg-amber-200 rounded w-28" />
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="h-32 bg-amber-100/60 rounded-lg" />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* 코르크 보드 영역 */}
-        <div className="cork-board-light p-6 md:p-8">
+        {!loading && <div className="cork-board-light p-6 md:p-8">
 
         {/* 설문 섹션 */}
         {surveys.length > 0 && (
@@ -239,7 +287,7 @@ export function BulletinBoard({ className }: BulletinBoardProps) {
           <NetworkGraph key={`network-${refreshKey}`} onNodeClick={handleNetworkNodeClick} />
         </CollapsibleSection>
 
-        </div> {/* cork-board-light 닫기 */}
+        </div>} {/* cork-board-light 닫기 */}
 
         {/* 안내 문구 */}
         <div className="mt-10 text-center text-sm text-gray-500">

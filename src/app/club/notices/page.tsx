@@ -10,11 +10,11 @@ export default async function NoticesPage() {
   const { notices } = await getClubNotices({ limit: 50 })
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6">
-      <h1 className="text-xl font-bold text-gray-900 mb-6">공지사항</h1>
+    <div className="max-w-3xl mx-auto">
+      <h1 className="text-xl font-bold text-zinc-900 tracking-tight mb-6">공지사항</h1>
 
       {notices.length === 0 ? (
-        <div className="bg-white rounded-lg p-12 text-center text-gray-500">
+        <div className="club-card p-12 text-center text-zinc-500">
           등록된 공지사항이 없습니다.
         </div>
       ) : (
@@ -23,19 +23,19 @@ export default async function NoticesPage() {
             <Link
               key={notice.id}
               href={`/club/notices/${notice.id}`}
-              className="block bg-white rounded-lg border border-gray-100 p-4 hover:bg-gray-50 transition-colors"
+              className="block club-card p-4 hover:bg-zinc-50 transition-colors duration-200"
             >
               <div className="flex items-start gap-3">
                 {notice.isPinned && (
-                  <Pin className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+                  <Pin className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                 )}
                 <div className="flex-1 min-w-0">
                   <h2
-                    className={`text-sm ${notice.isPinned ? 'font-bold' : 'font-medium'} text-gray-900 truncate`}
+                    className={`text-sm ${notice.isPinned ? 'font-bold' : 'font-medium'} text-zinc-900 truncate`}
                   >
                     {notice.title}
                   </h2>
-                  <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-500">
+                  <div className="flex items-center gap-3 mt-1.5 text-xs text-zinc-500">
                     <span>{notice.author.name}</span>
                     <span>
                       {new Date(notice.createdAt).toLocaleDateString('ko-KR')}

@@ -31,25 +31,25 @@ export default function AccountForm({ email }: Props) {
   return (
     <div className="space-y-8">
       {/* 이메일 섹션 */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">이메일</h2>
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-zinc-900 mb-4">이메일</h2>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-zinc-700 mb-1">
             현재 이메일
           </label>
           <input
             type="email"
             value={email}
             readOnly
-            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-500"
+            className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-500"
           />
-          <p className="text-xs text-gray-400 mt-1">이메일은 변경할 수 없습니다.</p>
+          <p className="text-xs text-zinc-400 mt-1">이메일은 변경할 수 없습니다.</p>
         </div>
       </div>
 
       {/* 비밀번호 변경 */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">비밀번호 변경</h2>
+      <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-zinc-900 mb-4">비밀번호 변경</h2>
 
         {message && (
           <div
@@ -65,7 +65,7 @@ export default function AccountForm({ email }: Props) {
 
         <div className="space-y-4">
           <div>
-            <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="currentPassword" className="block text-sm font-medium text-zinc-700 mb-1">
               현재 비밀번호
             </label>
             <input
@@ -73,12 +73,12 @@ export default function AccountForm({ email }: Props) {
               name="currentPassword"
               type="password"
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
           <div>
-            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="newPassword" className="block text-sm font-medium text-zinc-700 mb-1">
               새 비밀번호
             </label>
             <input
@@ -87,13 +87,13 @@ export default function AccountForm({ email }: Props) {
               type="password"
               required
               minLength={8}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            <p className="text-xs text-gray-400 mt-1">8자 이상 입력해주세요.</p>
+            <p className="text-xs text-zinc-400 mt-1">8자 이상 입력해주세요.</p>
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-zinc-700 mb-1">
               새 비밀번호 확인
             </label>
             <input
@@ -102,7 +102,7 @@ export default function AccountForm({ email }: Props) {
               type="password"
               required
               minLength={8}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
         </div>

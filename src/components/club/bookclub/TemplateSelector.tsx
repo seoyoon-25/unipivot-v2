@@ -16,7 +16,7 @@ export default function TemplateSelector({
 }: TemplateSelectorProps) {
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-medium text-gray-700">독후감 형식 선택</h3>
+      <h3 className="text-sm font-medium text-zinc-700">독후감 형식 선택</h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
         {templates.map((template) => {
           const structureInfo = REPORT_STRUCTURES[template.code]
@@ -29,13 +29,13 @@ export default function TemplateSelector({
               className={`p-3 rounded-lg border-2 text-left transition-all ${
                 isSelected
                   ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300 bg-white'
+                  : 'border-zinc-200 hover:border-zinc-300 bg-white'
               }`}
             >
               <div className="text-lg mb-1">{structureInfo?.icon || '📝'}</div>
-              <div className="font-medium text-sm text-gray-900">{template.name}</div>
+              <div className="font-medium text-sm text-zinc-900">{template.name}</div>
               {template.description && (
-                <div className="text-xs text-gray-500 mt-0.5 line-clamp-2">
+                <div className="text-xs text-zinc-500 mt-0.5 line-clamp-2">
                   {template.description}
                 </div>
               )}

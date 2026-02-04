@@ -65,16 +65,16 @@ export default function ScanPageClient({ initialToken }: ScanPageClientProps) {
         {result.success ? (
           <>
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-            <h2 className="text-lg font-bold text-gray-900 mb-2">
+            <h2 className="text-lg font-bold text-zinc-900 mb-2">
               {result.status === 'LATE' ? '지각 처리되었습니다' : '출석 완료!'}
             </h2>
-            <p className="text-gray-600 mb-6">{result.message}</p>
+            <p className="text-zinc-600 mb-6">{result.message}</p>
           </>
         ) : (
           <>
             <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-lg font-bold text-gray-900 mb-2">출석 실패</h2>
-            <p className="text-gray-600 mb-6">{result.message}</p>
+            <h2 className="text-lg font-bold text-zinc-900 mb-2">출석 실패</h2>
+            <p className="text-zinc-600 mb-6">{result.message}</p>
           </>
         )}
         <div className="space-y-2">
@@ -86,7 +86,7 @@ export default function ScanPageClient({ initialToken }: ScanPageClientProps) {
           </button>
           <Link
             href="/club/attendance"
-            className="w-full inline-flex items-center justify-center gap-2 text-gray-600 py-2.5 rounded-lg hover:bg-gray-50 transition-colors"
+            className="w-full inline-flex items-center justify-center gap-2 text-zinc-600 py-2.5 rounded-lg hover:bg-zinc-50 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             출석 현황으로 돌아가기
@@ -101,7 +101,7 @@ export default function ScanPageClient({ initialToken }: ScanPageClientProps) {
       {processing ? (
         <div className="text-center py-12">
           <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
-          <p className="text-gray-600">출석 처리 중...</p>
+          <p className="text-zinc-600">출석 처리 중...</p>
         </div>
       ) : (
         <QRScanner onScan={handleScan} />

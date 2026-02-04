@@ -17,12 +17,12 @@ export default async function FeedPage() {
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">활동 피드</h1>
-          <p className="text-sm text-gray-500 mt-1">팔로잉한 사람들의 최근 활동</p>
+          <h1 className="text-2xl font-bold text-zinc-900">활동 피드</h1>
+          <p className="text-sm text-zinc-500 mt-1">팔로잉한 사람들의 최근 활동</p>
         </div>
         <Link
           href="/club/social/discover"
-          className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-2 text-sm text-zinc-700 bg-zinc-100 rounded-lg hover:bg-zinc-200 transition-colors"
         >
           <Users className="w-4 h-4" />
           친구 찾기
@@ -32,8 +32,8 @@ export default async function FeedPage() {
       {activities.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-4xl mb-4">👀</div>
-          <p className="text-gray-500 mb-2">아직 피드가 비어있습니다.</p>
-          <p className="text-sm text-gray-400 mb-4">
+          <p className="text-zinc-500 mb-2">아직 피드가 비어있습니다.</p>
+          <p className="text-sm text-zinc-400 mb-4">
             다른 회원을 팔로우하면 활동을 볼 수 있어요.
           </p>
           <Link

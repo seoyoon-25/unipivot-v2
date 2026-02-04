@@ -47,16 +47,16 @@ export default function NotificationSettingsForm({ initialSettings }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="px-4 py-3 border-b border-gray-100">
-          <h3 className="font-semibold text-sm text-gray-900">알림 유형</h3>
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm">
+        <div className="px-4 py-3 border-b border-zinc-100">
+          <h3 className="font-semibold text-sm text-zinc-900">알림 유형</h3>
         </div>
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-zinc-100">
           {toggleItems.map((item) => (
             <div key={item.key} className="flex items-center justify-between px-4 py-3">
               <div>
-                <p className="text-sm font-medium text-gray-900">{item.label}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+                <p className="text-sm font-medium text-zinc-900">{item.label}</p>
+                <p className="text-xs text-zinc-500 mt-0.5">{item.desc}</p>
               </div>
               <button
                 type="button"
@@ -64,7 +64,7 @@ export default function NotificationSettingsForm({ initialSettings }: Props) {
                 aria-checked={settings[item.key] as boolean}
                 onClick={() => toggleSetting(item.key)}
                 className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
-                  settings[item.key] ? 'bg-blue-600' : 'bg-gray-200'
+                  settings[item.key] ? 'bg-blue-600' : 'bg-zinc-200'
                 }`}
               >
                 <span
@@ -78,18 +78,18 @@ export default function NotificationSettingsForm({ initialSettings }: Props) {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="px-4 py-3 border-b border-gray-100">
-          <h3 className="font-semibold text-sm text-gray-900">리마인더 설정</h3>
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm">
+        <div className="px-4 py-3 border-b border-zinc-100">
+          <h3 className="font-semibold text-sm text-zinc-900">리마인더 설정</h3>
         </div>
         <div className="px-4 py-3">
-          <label className="text-sm font-medium text-gray-700">세션 시작 전 알림 시간</label>
+          <label className="text-sm font-medium text-zinc-700">세션 시작 전 알림 시간</label>
           <select
             value={settings.reminderHoursBefore}
             onChange={(e) =>
               setSettings((prev) => ({ ...prev, reminderHoursBefore: parseInt(e.target.value) }))
             }
-            className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="mt-1 block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
           >
             <option value={1}>1시간 전</option>
             <option value={3}>3시간 전</option>
@@ -101,19 +101,19 @@ export default function NotificationSettingsForm({ initialSettings }: Props) {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="px-4 py-3 border-b border-gray-100">
-          <h3 className="font-semibold text-sm text-gray-900">방해 금지 시간</h3>
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm">
+        <div className="px-4 py-3 border-b border-zinc-100">
+          <h3 className="font-semibold text-sm text-zinc-900">방해 금지 시간</h3>
         </div>
         <div className="px-4 py-3 flex items-center gap-3">
           <div className="flex-1">
-            <label className="text-xs text-gray-500">시작</label>
+            <label className="text-xs text-zinc-500">시작</label>
             <select
               value={settings.quietHoursStart}
               onChange={(e) =>
                 setSettings((prev) => ({ ...prev, quietHoursStart: parseInt(e.target.value) }))
               }
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="mt-1 block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
             >
               {Array.from({ length: 24 }, (_, i) => (
                 <option key={i} value={i}>
@@ -122,15 +122,15 @@ export default function NotificationSettingsForm({ initialSettings }: Props) {
               ))}
             </select>
           </div>
-          <span className="text-gray-400 mt-5">~</span>
+          <span className="text-zinc-400 mt-5">~</span>
           <div className="flex-1">
-            <label className="text-xs text-gray-500">종료</label>
+            <label className="text-xs text-zinc-500">종료</label>
             <select
               value={settings.quietHoursEnd}
               onChange={(e) =>
                 setSettings((prev) => ({ ...prev, quietHoursEnd: parseInt(e.target.value) }))
               }
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="mt-1 block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
             >
               {Array.from({ length: 24 }, (_, i) => (
                 <option key={i} value={i}>
@@ -157,7 +157,7 @@ export default function NotificationSettingsForm({ initialSettings }: Props) {
       <button
         onClick={handleSave}
         disabled={isPending}
-        className="w-full py-2.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 disabled:opacity-50"
+        className="w-full py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-800 disabled:opacity-50"
       >
         {isPending ? '저장 중...' : '설정 저장'}
       </button>

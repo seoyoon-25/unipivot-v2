@@ -203,7 +203,7 @@ export function RSVPResponseForm({
             응답은 언제든 수정할 수 있습니다.
           </p>
           <div className="space-y-2">
-            <Button onClick={() => router.push('/mypage')} className="w-full">
+            <Button onClick={() => router.push('/my')} className="w-full">
               마이페이지로 이동
             </Button>
             <Button

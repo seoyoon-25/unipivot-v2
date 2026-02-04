@@ -8,7 +8,7 @@ const RichTextEditor = dynamic(
   () => import('@/components/editor/RichTextEditor').then((mod) => mod.RichTextEditor),
   {
     ssr: false,
-    loading: () => <div className="h-64 bg-gray-50 rounded-lg animate-pulse" />,
+    loading: () => <div className="h-64 bg-zinc-50 rounded-lg animate-pulse" />,
   }
 )
 
@@ -59,19 +59,19 @@ export default function NoticeForm({ mode, initialData, onSubmit }: Props) {
       )}
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">제목</label>
+        <label className="block text-sm font-medium text-zinc-700 mb-1">제목</label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="공지사항 제목을 입력하세요"
-          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full rounded-lg border border-zinc-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">내용</label>
+        <label className="block text-sm font-medium text-zinc-700 mb-1">내용</label>
         <RichTextEditor content={content} onChange={setContent} minHeight="300px" />
       </div>
 
@@ -81,18 +81,18 @@ export default function NoticeForm({ mode, initialData, onSubmit }: Props) {
             type="checkbox"
             checked={isPinned}
             onChange={(e) => setIsPinned(e.target.checked)}
-            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            className="rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
           />
-          <span className="text-sm text-gray-700">상단 고정</span>
+          <span className="text-sm text-zinc-700">상단 고정</span>
         </label>
         <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
             checked={isPublished}
             onChange={(e) => setIsPublished(e.target.checked)}
-            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            className="rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
           />
-          <span className="text-sm text-gray-700">즉시 발행</span>
+          <span className="text-sm text-zinc-700">즉시 발행</span>
         </label>
       </div>
 
@@ -100,7 +100,7 @@ export default function NoticeForm({ mode, initialData, onSubmit }: Props) {
         <button
           type="submit"
           disabled={isPending}
-          className="flex-1 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 disabled:opacity-50"
+          className="flex-1 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-800 disabled:opacity-50"
         >
           {isPending
             ? '저장 중...'
@@ -111,7 +111,7 @@ export default function NoticeForm({ mode, initialData, onSubmit }: Props) {
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50"
+          className="px-6 py-2.5 border border-zinc-300 text-zinc-700 rounded-lg text-sm font-medium hover:bg-zinc-50"
         >
           취소
         </button>

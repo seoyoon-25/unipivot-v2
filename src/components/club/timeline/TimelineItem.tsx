@@ -44,8 +44,8 @@ export default function TimelineItemComponent({ item }: Props) {
         className={`absolute -left-[41px] w-4 h-4 rounded-full ${config.dotColor} border-4 border-white`}
       />
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4 hover:border-gray-300 transition-colors">
-        <p className="text-sm text-gray-500 mb-2">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 hover:border-zinc-300 transition-colors">
+        <p className="text-sm text-zinc-500 mb-2">
           {format(new Date(item.createdAt), 'M월 d일 (EEE)', { locale: ko })}
         </p>
 
@@ -54,9 +54,9 @@ export default function TimelineItemComponent({ item }: Props) {
             <Icon className="w-4 h-4" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-gray-900">{item.title}</p>
+            <p className="font-medium text-zinc-900">{item.title}</p>
             {item.description && (
-              <p className="text-sm text-gray-500 mt-1 line-clamp-2">{item.description}</p>
+              <p className="text-sm text-zinc-500 mt-1 line-clamp-2">{item.description}</p>
             )}
           </div>
         </div>

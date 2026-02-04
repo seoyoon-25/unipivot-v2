@@ -32,14 +32,14 @@ export default async function BookDetailPage({ params }: Props) {
       {/* 뒤로가기 */}
       <Link
         href="/club/bookclub/bookshelf"
-        className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-700 mb-6"
+        className="inline-flex items-center gap-1 text-zinc-500 hover:text-zinc-700 mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
         책장으로
       </Link>
 
       {/* 책 정보 */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6 mb-6">
         <div className="flex flex-col md:flex-row gap-6">
           {/* 표지 */}
           <div className="w-full md:w-48 flex-shrink-0">
@@ -52,25 +52,25 @@ export default async function BookDetailPage({ params }: Props) {
                 className="w-full aspect-[3/4] object-cover rounded-lg shadow-md"
               />
             ) : (
-              <div className="w-full aspect-[3/4] bg-gray-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-16 h-16 text-gray-300" />
+              <div className="w-full aspect-[3/4] bg-zinc-100 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-16 h-16 text-zinc-300" />
               </div>
             )}
           </div>
 
           {/* 상세 정보 */}
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-zinc-900 mb-2">
               {book.title}
             </h1>
             {book.author && (
-              <p className="text-lg text-gray-600 mb-4">{book.author}</p>
+              <p className="text-lg text-zinc-600 mb-4">{book.author}</p>
             )}
 
-            <div className="space-y-2 text-sm text-gray-500 mb-6">
+            <div className="space-y-2 text-sm text-zinc-500 mb-6">
               {book.publisher && (
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-400">출판사</span>
+                  <span className="text-zinc-400">출판사</span>
                   {book.publisher}
                 </div>
               )}
@@ -85,7 +85,7 @@ export default async function BookDetailPage({ params }: Props) {
                   {book.season}
                 </span>
                 {book.category && (
-                  <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+                  <span className="px-2 py-0.5 bg-zinc-100 text-zinc-600 text-xs rounded-full">
                     {book.category}
                   </span>
                 )}
@@ -93,21 +93,21 @@ export default async function BookDetailPage({ params }: Props) {
             </div>
 
             {/* 통계 */}
-            <div className="flex gap-6 pt-6 border-t border-gray-100">
+            <div className="flex gap-6 pt-6 border-t border-zinc-100">
               <div className="text-center">
                 <p className="text-2xl font-bold text-blue-600">{book._count.bookReports}</p>
-                <p className="text-xs text-gray-500">독후감</p>
+                <p className="text-xs text-zinc-500">독후감</p>
               </div>
               {book.sessionCount && (
                 <div className="text-center">
                   <p className="text-2xl font-bold text-green-600">{book.sessionCount}</p>
-                  <p className="text-xs text-gray-500">모임 회차</p>
+                  <p className="text-xs text-zinc-500">모임 회차</p>
                 </div>
               )}
               {book.participants && (
                 <div className="text-center">
                   <p className="text-2xl font-bold text-purple-600">{book.participants}</p>
-                  <p className="text-xs text-gray-500">참가자</p>
+                  <p className="text-xs text-zinc-500">참가자</p>
                 </div>
               )}
             </div>
@@ -117,9 +117,9 @@ export default async function BookDetailPage({ params }: Props) {
 
       {/* 최근 독후감 */}
       {book.bookReports.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">최근 독후감</h2>
+            <h2 className="text-lg font-semibold text-zinc-900">최근 독후감</h2>
             <Link
               href={`/club/bookclub/reviews?book=${book.id}`}
               className="text-sm text-blue-600 hover:underline"
@@ -129,18 +129,18 @@ export default async function BookDetailPage({ params }: Props) {
           </div>
           <div className="space-y-4">
             {book.bookReports.map((report) => (
-              <div key={report.id} className="p-4 bg-gray-50 rounded-lg">
+              <div key={report.id} className="p-4 bg-zinc-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 rounded-full bg-gray-200" />
-                  <span className="text-sm font-medium text-gray-700">
+                  <div className="w-6 h-6 rounded-full bg-zinc-200" />
+                  <span className="text-sm font-medium text-zinc-700">
                     {report.author.name}
                   </span>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-zinc-400">
                     {format(new Date(report.createdAt), 'M.d', { locale: ko })}
                   </span>
                 </div>
-                <h3 className="text-sm font-medium text-gray-800 mb-1">{report.title}</h3>
-                <p className="text-sm text-gray-600 line-clamp-3">
+                <h3 className="text-sm font-medium text-zinc-800 mb-1">{report.title}</h3>
+                <p className="text-sm text-zinc-600 line-clamp-3">
                   {report.content}
                 </p>
               </div>

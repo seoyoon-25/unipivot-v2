@@ -16,7 +16,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">대시보드</h1>
+      <h1 className="text-2xl font-bold text-zinc-900">대시보드</h1>
 
       {/* 통계 카드 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -44,8 +44,8 @@ export default async function AdminDashboardPage() {
       {/* 최근 활동 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 최근 가입 회원 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="font-semibold text-gray-900 mb-4">최근 가입 회원</h2>
+        <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+          <h2 className="font-semibold text-zinc-900 mb-4">최근 가입 회원</h2>
           <div className="space-y-3">
             {activity.recentMembers.map((member) => (
               <div key={member.id} className="flex items-center gap-3">
@@ -58,20 +58,20 @@ export default async function AdminDashboardPage() {
                     className="w-8 h-8 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-xs font-medium text-gray-500">
+                  <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center">
+                    <span className="text-xs font-medium text-zinc-500">
                       {(member.name || '?').charAt(0)}
                     </span>
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{member.name || '(이름 없음)'}</p>
-                  <p className="text-xs text-gray-500">{member.email}</p>
+                  <p className="text-xs text-zinc-500">{member.email}</p>
                 </div>
               </div>
             ))}
             {activity.recentMembers.length === 0 && (
-              <p className="text-sm text-gray-400">최근 가입 회원이 없습니다.</p>
+              <p className="text-sm text-zinc-400">최근 가입 회원이 없습니다.</p>
             )}
           </div>
           <Link
@@ -83,8 +83,8 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* 최근 생성 프로그램 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="font-semibold text-gray-900 mb-4">최근 프로그램</h2>
+        <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+          <h2 className="font-semibold text-zinc-900 mb-4">최근 프로그램</h2>
           <div className="space-y-3">
             {activity.recentPrograms.map((program) => (
               <div key={program.id} className="flex items-center justify-between">
@@ -95,7 +95,7 @@ export default async function AdminDashboardPage() {
                       ? 'bg-blue-100 text-blue-700'
                       : program.status === 'RECRUITING'
                         ? 'bg-green-100 text-green-700'
-                        : 'bg-gray-100 text-gray-700'
+                        : 'bg-zinc-100 text-zinc-700'
                   }`}
                 >
                   {program.status === 'ONGOING'
@@ -107,7 +107,7 @@ export default async function AdminDashboardPage() {
               </div>
             ))}
             {activity.recentPrograms.length === 0 && (
-              <p className="text-sm text-gray-400">프로그램이 없습니다.</p>
+              <p className="text-sm text-zinc-400">프로그램이 없습니다.</p>
             )}
           </div>
           <Link
@@ -119,8 +119,8 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* 다가오는 세션 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="font-semibold text-gray-900 mb-4">다가오는 모임</h2>
+        <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+          <h2 className="font-semibold text-zinc-900 mb-4">다가오는 모임</h2>
           <div className="space-y-3">
             {activity.upcomingSessions.map((session) => (
               <div key={session.id} className="flex items-center gap-3">
@@ -129,14 +129,14 @@ export default async function AdminDashboardPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{session.program.title}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-zinc-500">
                     {format(new Date(session.date), 'M월 d일 (EEE) HH:mm', { locale: ko })}
                   </p>
                 </div>
               </div>
             ))}
             {activity.upcomingSessions.length === 0 && (
-              <p className="text-sm text-gray-400">예정된 모임이 없습니다.</p>
+              <p className="text-sm text-zinc-400">예정된 모임이 없습니다.</p>
             )}
           </div>
         </div>

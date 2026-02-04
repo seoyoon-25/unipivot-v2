@@ -57,6 +57,15 @@ const defaultFooterLinks: FooterSection[] = [
     ],
   },
   {
+    title: '유니클럽',
+    links: [
+      { label: '클럽 홈', href: '/club' },
+      { label: '독서모임', href: '/club/bookclub' },
+      { label: '커뮤니티', href: '/club/community' },
+      { label: '독서 챌린지', href: '/club/challenges' },
+    ],
+  },
+  {
     title: '함께하기',
     links: [
       { label: '후원하기', href: '/donate' },
@@ -92,6 +101,17 @@ function convertMenuToFooterLinks(menuItems: Awaited<ReturnType<typeof getFooter
       })
     }
   }
+
+  // 유니클럽 섹션 추가
+  footerSections.push({
+    title: '유니클럽',
+    links: [
+      { label: '클럽 홈', href: '/club' },
+      { label: '독서모임', href: '/club/bookclub' },
+      { label: '커뮤니티', href: '/club/community' },
+      { label: '독서 챌린지', href: '/club/challenges' },
+    ],
+  })
 
   // 단체 섹션 추가
   footerSections.push({
@@ -132,6 +152,7 @@ export async function Footer() {
                 alt="유니피벗"
                 width={120}
                 height={40}
+                loading="lazy"
                 className="h-8 w-auto"
               />
             </Link>

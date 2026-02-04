@@ -9,7 +9,7 @@ import PeriodFilter from '@/components/club/admin/analytics/PeriodFilter'
 
 const UserActivityChart = dynamic(
   () => import('@/components/club/admin/analytics/UserActivityChart'),
-  { ssr: false, loading: () => <div className="h-80 bg-gray-50 rounded-lg animate-pulse" /> }
+  { ssr: false, loading: () => <div className="h-80 bg-zinc-50 rounded-lg animate-pulse" /> }
 )
 
 export const metadata = { title: '사용자 분석 | 유니클럽 관리자' }
@@ -36,17 +36,17 @@ export default async function UserAnalyticsPage({ searchParams }: Props) {
         <div>
           <Link
             href="/club/admin/analytics"
-            className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-2"
+            className="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-700 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             대시보드
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">사용자 분석</h1>
+          <h1 className="text-2xl font-bold text-zinc-900">사용자 분석</h1>
         </div>
         <PeriodFilter currentPeriod={period} />
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
         <UserActivityChart
           roleDistribution={data.roleDistribution}
           totalUsers={data.totalUsers}
@@ -55,10 +55,10 @@ export default async function UserAnalyticsPage({ searchParams }: Props) {
         />
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">기간 내 신규 가입</h2>
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-zinc-900 mb-4">기간 내 신규 가입</h2>
         <p className="text-3xl font-bold text-blue-600">{data.newUsers.toLocaleString()}</p>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-zinc-500 mt-1">
           전체 {data.totalUsers.toLocaleString()}명 중 {data.retentionRate}%가 활성 사용자
         </p>
       </div>

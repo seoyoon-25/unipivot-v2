@@ -110,7 +110,7 @@ export default function ProgramForm({ mode, initialData, programId }: ProgramFor
 
       {/* 제목 */}
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="title" className="block text-sm font-medium text-zinc-700 mb-1">
           제목 <span className="text-red-500">*</span>
         </label>
         <input
@@ -119,14 +119,14 @@ export default function ProgramForm({ mode, initialData, programId }: ProgramFor
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
           placeholder="프로그램 제목"
         />
       </div>
 
       {/* 타입 */}
       <div>
-        <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="type" className="block text-sm font-medium text-zinc-700 mb-1">
           타입 <span className="text-red-500">*</span>
         </label>
         <select
@@ -134,7 +134,7 @@ export default function ProgramForm({ mode, initialData, programId }: ProgramFor
           value={type}
           onChange={(e) => setType(e.target.value)}
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
         >
           {TYPE_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -146,7 +146,7 @@ export default function ProgramForm({ mode, initialData, programId }: ProgramFor
 
       {/* 설명 */}
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="description" className="block text-sm font-medium text-zinc-700 mb-1">
           설명
         </label>
         <textarea
@@ -154,21 +154,21 @@ export default function ProgramForm({ mode, initialData, programId }: ProgramFor
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-vertical"
+          className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-vertical"
           placeholder="프로그램 설명"
         />
       </div>
 
       {/* 상태 */}
       <div>
-        <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="status" className="block text-sm font-medium text-zinc-700 mb-1">
           상태
         </label>
         <select
           id="status"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
         >
           {STATUS_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -181,7 +181,7 @@ export default function ProgramForm({ mode, initialData, programId }: ProgramFor
       {/* 날짜 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="startDate" className="block text-sm font-medium text-zinc-700 mb-1">
             시작일
           </label>
           <input
@@ -189,11 +189,11 @@ export default function ProgramForm({ mode, initialData, programId }: ProgramFor
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
           />
         </div>
         <div>
-          <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="endDate" className="block text-sm font-medium text-zinc-700 mb-1">
             종료일
           </label>
           <input
@@ -201,13 +201,13 @@ export default function ProgramForm({ mode, initialData, programId }: ProgramFor
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
           />
         </div>
       </div>
 
       {/* 버튼 */}
-      <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
+      <div className="flex items-center gap-3 pt-4 border-t border-zinc-200">
         <button
           type="submit"
           disabled={isPending}
@@ -219,7 +219,7 @@ export default function ProgramForm({ mode, initialData, programId }: ProgramFor
           type="button"
           onClick={() => router.push('/club/admin/programs')}
           disabled={isPending}
-          className="px-6 py-2 bg-white text-gray-700 text-sm font-medium border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          className="px-6 py-2 bg-white text-zinc-700 text-sm font-medium border border-zinc-300 rounded-lg hover:bg-zinc-50 transition-colors disabled:opacity-50"
         >
           취소
         </button>

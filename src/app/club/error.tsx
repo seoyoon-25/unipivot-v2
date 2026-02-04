@@ -17,9 +17,9 @@ export default function ClubError({
   return (
     <div className="flex items-center justify-center min-h-[60vh] px-4">
       <div className="max-w-md w-full text-center">
-        <div className="w-14 h-14 mx-auto mb-5 rounded-xl bg-orange-50 flex items-center justify-center">
+        <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-amber-50 flex items-center justify-center">
           <svg
-            className="w-7 h-7 text-orange-500"
+            className="w-8 h-8 text-amber-500"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
@@ -33,17 +33,17 @@ export default function ClubError({
           </svg>
         </div>
 
-        <h1 className="text-xl font-bold text-gray-900 mb-2">
+        <h1 className="text-xl font-bold text-zinc-900 mb-2">
           페이지를 불러올 수 없습니다
         </h1>
-        <p className="text-gray-500 text-sm mb-6">
+        <p className="text-sm text-zinc-500 mb-6 leading-relaxed">
           유니클럽 페이지에서 오류가 발생했습니다.
           <br />
           다시 시도하거나 클럽 메인으로 돌아가 주세요.
         </p>
 
         {error.digest && (
-          <p className="text-xs text-gray-400 mb-5">
+          <p className="text-xs text-zinc-400 mb-5">
             오류 코드: {error.digest}
           </p>
         )}
@@ -51,13 +51,13 @@ export default function ClubError({
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
             onClick={reset}
-            className="px-5 py-2.5 bg-[#FF6B35] text-white rounded-xl text-sm font-semibold hover:bg-[#E55A2B] transition-colors"
+            className="club-btn-primary"
           >
             다시 시도
           </button>
           <Link
             href="/club"
-            className="px-5 py-2.5 border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors"
+            className="club-btn-secondary"
           >
             클럽 메인으로 이동
           </Link>

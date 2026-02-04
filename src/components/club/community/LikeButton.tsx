@@ -40,7 +40,7 @@ export default function LikeButton({ postId, initialLiked, initialCount, isLogge
       className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-colors ${
         liked
           ? 'bg-red-50 text-red-600'
-          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
       } disabled:opacity-50`}
     >
       <Heart className={`w-4 h-4 ${liked ? 'fill-current' : ''}`} />

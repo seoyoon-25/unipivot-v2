@@ -20,15 +20,15 @@ export default async function ClubHomePage() {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          <h1 className="text-3xl font-bold text-zinc-900 tracking-tight mb-4">
             유니클럽에 오신 것을 환영합니다
           </h1>
-          <p className="text-gray-600 mb-8">
+          <p className="text-sm text-zinc-500 leading-relaxed mb-8">
             독서모임에 참여하고, 함께 성장해요.
           </p>
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="club-btn-primary gap-2"
           >
             로그인하고 시작하기
             <ArrowRight className="w-4 h-4" />
@@ -48,13 +48,13 @@ export default async function ClubHomePage() {
   ]);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
+    <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
       {/* 인사 */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
+      <div>
+        <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">
           안녕하세요, {session.user?.name || '회원'}님!
         </h1>
-        <p className="text-gray-500 mt-1">
+        <p className="text-sm text-zinc-500 mt-1">
           {todayMeeting
             ? `오늘 "${todayMeeting.program.title}" 모임이 있어요!`
             : '오늘도 좋은 하루 되세요.'
@@ -63,14 +63,10 @@ export default async function ClubHomePage() {
       </div>
 
       {/* 통계 */}
-      <div className="mb-6">
-        <StatsCard stats={stats} />
-      </div>
+      <StatsCard stats={stats} />
 
       {/* 빠른 액션 */}
-      <div className="mb-6">
-        <QuickActionsCard hasTodayMeeting={!!todayMeeting} />
-      </div>
+      <QuickActionsCard hasTodayMeeting={!!todayMeeting} />
 
       {/* 프로그램 & 다음 모임 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

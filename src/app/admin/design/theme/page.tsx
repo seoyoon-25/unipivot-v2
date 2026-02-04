@@ -19,6 +19,8 @@ const DEFAULT_SETTINGS = {
   'theme.darkPrimaryColor': '#60a5fa',
   'theme.darkSecondaryColor': '#34d399',
   'theme.darkCardBgColor': '#16213e',
+  // Portal settings
+  'theme.portalHeroImage': '/images/hero-bg.webp',
 }
 
 async function getThemeSettings() {

@@ -34,8 +34,8 @@ export default function TimerPageClient({ programs }: TimerPageClientProps) {
   if (programs.length === 0) {
     return (
       <div className="text-center py-12">
-        <Timer className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-        <p className="text-gray-500">관리하는 프로그램이 없습니다</p>
+        <Timer className="w-12 h-12 text-zinc-300 mx-auto mb-3" />
+        <p className="text-zinc-500">관리하는 프로그램이 없습니다</p>
       </div>
     )
   }
@@ -49,7 +49,7 @@ export default function TimerPageClient({ programs }: TimerPageClientProps) {
         >
           ← 세션 다시 선택
         </button>
-        <div className="text-sm text-gray-500 mb-4">
+        <div className="text-sm text-zinc-500 mb-4">
           {selectedSession.programTitle} · {selectedSession.sessionNo}회차
         </div>
         <SpeakingTimer
@@ -64,7 +64,7 @@ export default function TimerPageClient({ programs }: TimerPageClientProps) {
     <div className="space-y-4">
       {programs.map((prog) => (
         <div key={prog.programId}>
-          <h3 className="text-sm font-medium text-gray-700 mb-2">{prog.programTitle}</h3>
+          <h3 className="text-sm font-medium text-zinc-700 mb-2">{prog.programTitle}</h3>
           <div className="space-y-2">
             {prog.sessions.map((sess) => (
               <button
@@ -77,17 +77,17 @@ export default function TimerPageClient({ programs }: TimerPageClientProps) {
                     participants: prog.participants,
                   })
                 }
-                className="w-full bg-white rounded-xl border border-gray-200 p-4 text-left hover:border-green-300 hover:shadow-sm transition-all flex items-center justify-between"
+                className="w-full bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 text-left hover:border-green-300 hover:shadow-sm transition-all flex items-center justify-between"
               >
                 <div>
-                  <div className="font-medium text-gray-900">
+                  <div className="font-medium text-zinc-900">
                     {sess.sessionNo}회차{sess.title ? ` - ${sess.title}` : ''}
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-xs text-zinc-500 mt-1">
                     {new Date(sess.date).toLocaleDateString('ko-KR')} · {prog.participants.length}명
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-zinc-400" />
               </button>
             ))}
           </div>

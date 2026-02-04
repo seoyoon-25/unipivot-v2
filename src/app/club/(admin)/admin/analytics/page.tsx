@@ -10,7 +10,7 @@ import PeriodFilter from '@/components/club/admin/analytics/PeriodFilter'
 
 const GrowthChart = dynamic(
   () => import('@/components/club/admin/analytics/GrowthChart'),
-  { ssr: false, loading: () => <div className="h-80 bg-gray-50 rounded-lg animate-pulse" /> }
+  { ssr: false, loading: () => <div className="h-80 bg-zinc-50 rounded-lg animate-pulse" /> }
 )
 
 export const metadata = { title: '분석 대시보드 | 유니클럽 관리자' }
@@ -43,14 +43,14 @@ export default async function AnalyticsDashboardPage({ searchParams }: Props) {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">분석 대시보드</h1>
+        <h1 className="text-2xl font-bold text-zinc-900">분석 대시보드</h1>
         <PeriodFilter currentPeriod={period} />
       </div>
 
       <OverviewCards data={overview} />
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">성장 추이</h2>
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-zinc-900 mb-4">성장 추이</h2>
         <GrowthChart data={dailyGrowth} />
       </div>
 
@@ -61,11 +61,11 @@ export default async function AnalyticsDashboardPage({ searchParams }: Props) {
             <Link
               key={page.href}
               href={page.href}
-              className="p-6 bg-white rounded-xl border border-gray-200 hover:border-blue-200 transition-colors"
+              className="p-6 bg-white rounded-2xl border border-zinc-100 shadow-sm hover:border-blue-200 transition-colors"
             >
-              <Icon className="w-5 h-5 text-gray-400 mb-3" />
-              <h3 className="font-semibold text-gray-900">{page.title}</h3>
-              <p className="text-sm text-gray-500 mt-1">{page.desc}</p>
+              <Icon className="w-5 h-5 text-zinc-400 mb-3" />
+              <h3 className="font-semibold text-zinc-900">{page.title}</h3>
+              <p className="text-sm text-zinc-500 mt-1">{page.desc}</p>
             </Link>
           )
         })}

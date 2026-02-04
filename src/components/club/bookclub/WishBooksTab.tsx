@@ -44,7 +44,7 @@ export default function WishBooksTab({ wishBooks, availableBooks }: WishBooksTab
       {/* 추가 버튼 */}
       <button
         onClick={() => setIsModalOpen(true)}
-        className="w-full mb-4 py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:border-blue-400 hover:text-blue-600 transition-colors flex items-center justify-center gap-2"
+        className="w-full mb-4 py-3 border-2 border-dashed border-zinc-300 rounded-xl text-zinc-500 hover:border-blue-400 hover:text-blue-600 transition-colors flex items-center justify-center gap-2"
       >
         <Plus className="w-5 h-5" />
         읽고 싶은 책 추가

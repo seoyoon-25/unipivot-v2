@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export function StorySection() {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-white min-h-[500px]">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Image */}

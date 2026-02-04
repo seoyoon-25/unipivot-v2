@@ -32,8 +32,8 @@ const programTypeLabels: Record<string, string> = {
 export default function MyProgramsCard({ programs }: MyProgramsCardProps) {
   if (programs.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">참여 중인 프로그램</h2>
+      <div className="club-card p-5">
+        <h2 className="club-section-title mb-4">참여 중인 프로그램</h2>
         <EmptyState
           icon={BookOpen}
           title="참여 중인 프로그램이 없습니다"
@@ -46,23 +46,23 @@ export default function MyProgramsCard({ programs }: MyProgramsCardProps) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
+    <div className="club-card p-5">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">참여 중인 프로그램</h2>
+        <h2 className="club-section-title">참여 중인 프로그램</h2>
         <Link
           href="/club/programs"
-          className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+          className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition-colors duration-200"
         >
           전체보기 <ChevronRight className="w-4 h-4" />
         </Link>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-1">
         {programs.slice(0, 3).map((program) => (
           <Link
             key={program.id}
             href={`/club/programs/${program.id}`}
-            className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-50 transition-colors duration-200"
           >
             {program.image ? (
               <Image
@@ -70,32 +70,32 @@ export default function MyProgramsCard({ programs }: MyProgramsCardProps) {
                 alt={program.title}
                 width={56}
                 height={56}
-                className="w-14 h-14 rounded-lg object-cover"
+                className="w-14 h-14 rounded-xl object-cover"
               />
             ) : (
-              <div className="w-14 h-14 rounded-lg bg-gray-100 flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-gray-400" />
+              <div className="w-14 h-14 rounded-xl bg-zinc-100 flex items-center justify-center">
+                <BookOpen className="w-6 h-6 text-zinc-400" />
               </div>
             )}
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
+                <span className="px-2 py-0.5 bg-zinc-100 text-zinc-600 text-xs font-medium rounded-full">
                   {programTypeLabels[program.type] || program.type}
                 </span>
               </div>
-              <h3 className="font-medium text-gray-900 truncate">
+              <h3 className="font-medium text-zinc-900 truncate">
                 {program.title}
               </h3>
               {program.nextSession && (
-                <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                <p className="text-xs text-zinc-500 flex items-center gap-1 mt-1">
                   <Calendar className="w-3.5 h-3.5" />
                   다음 모임: {format(program.nextSession.date, 'M/d (EEE)', { locale: ko })}
                 </p>
               )}
             </div>
 
-            <ChevronRight className="w-5 h-5 text-gray-400" />
+            <ChevronRight className="w-5 h-5 text-zinc-400" />
           </Link>
         ))}
       </div>

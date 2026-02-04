@@ -14,13 +14,13 @@ export default async function DeleteAccountPage() {
     <div className="max-w-2xl mx-auto px-4 py-8">
       <Link
         href="/club/settings"
-        className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-6"
+        className="inline-flex items-center gap-2 text-zinc-500 hover:text-zinc-700 mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
         설정
       </Link>
 
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">계정 탈퇴</h1>
+      <h1 className="text-2xl font-bold text-zinc-900 mb-6">계정 탈퇴</h1>
 
       <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
         <div className="flex items-start gap-3">

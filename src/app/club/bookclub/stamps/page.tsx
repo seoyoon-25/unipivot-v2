@@ -23,7 +23,7 @@ export default async function StampsPage() {
         </div>
         <div>
           <h1 className="text-2xl font-bold">스탬프</h1>
-          <p className="text-gray-500">총 {stamps.total}개 적립</p>
+          <p className="text-zinc-500">총 {stamps.total}개 적립</p>
         </div>
       </div>
 
@@ -43,20 +43,20 @@ export default async function StampsPage() {
       )}
 
       <div className="mt-8">
-        <h2 className="font-semibold text-gray-900 mb-4">적립 내역</h2>
+        <h2 className="font-semibold text-zinc-900 mb-4">적립 내역</h2>
         <div className="bg-white rounded-xl border divide-y">
           {stamps.history.length === 0 ? (
-            <p className="p-8 text-center text-gray-500">적립 내역이 없습니다.</p>
+            <p className="p-8 text-center text-zinc-500">적립 내역이 없습니다.</p>
           ) : (
             stamps.history.slice(0, 20).map((item) => (
               <div key={item.id} className="flex items-center justify-between p-4">
                 <div>
-                  <p className="font-medium text-gray-900">{item.programTitle}</p>
-                  <p className="text-sm text-gray-500">{item.sessionNo}회차 출석</p>
+                  <p className="font-medium text-zinc-900">{item.programTitle}</p>
+                  <p className="text-sm text-zinc-500">{item.sessionNo}회차 출석</p>
                 </div>
                 <div className="text-right">
                   <span className="text-amber-600 font-medium">+1</span>
-                  <p className="text-xs text-gray-400">{format(new Date(item.date), 'M.d', { locale: ko })}</p>
+                  <p className="text-xs text-zinc-400">{format(new Date(item.date), 'M.d', { locale: ko })}</p>
                 </div>
               </div>
             ))

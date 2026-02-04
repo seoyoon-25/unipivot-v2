@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 // PUT /api/admin/programs/reorder - 프로그램 순서 변경 및 필드 수정
 export async function PUT(request: NextRequest) {
   try {

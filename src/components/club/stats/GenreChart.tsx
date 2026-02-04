@@ -23,7 +23,7 @@ const genreLabels: Record<string, string> = {
 export default function GenreChart({ data }: Props) {
   if (data.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-gray-500 text-sm">
+      <div className="h-64 flex items-center justify-center text-zinc-500 text-sm">
         데이터가 없습니다.
       </div>
     )
@@ -62,8 +62,8 @@ export default function GenreChart({ data }: Props) {
               className="w-3 h-3 rounded-full shrink-0"
               style={{ backgroundColor: COLORS[index % COLORS.length] }}
             />
-            <span className="text-sm text-gray-700 truncate">{entry.name}</span>
-            <span className="text-sm text-gray-500 ml-auto shrink-0">{entry.percentage}%</span>
+            <span className="text-sm text-zinc-700 truncate">{entry.name}</span>
+            <span className="text-sm text-zinc-500 ml-auto shrink-0">{entry.percentage}%</span>
           </div>
         ))}
       </div>

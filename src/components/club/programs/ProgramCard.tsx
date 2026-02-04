@@ -28,9 +28,9 @@ interface ProgramCardProps {
 }
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
-  RECRUITING: { label: '모집중', color: 'bg-green-100 text-green-700' },
-  ONGOING: { label: '진행중', color: 'bg-blue-100 text-blue-700' },
-  COMPLETED: { label: '완료', color: 'bg-gray-100 text-gray-500' },
+  RECRUITING: { label: '모집중', color: 'bg-blue-50 text-blue-700' },
+  ONGOING: { label: '진행중', color: 'bg-emerald-50 text-emerald-700' },
+  COMPLETED: { label: '완료', color: 'bg-zinc-100 text-zinc-500' },
 };
 
 const TYPE_MAP: Record<string, string> = {
@@ -50,7 +50,7 @@ function getNextSession(sessions: ProgramSession[]): ProgramSession | null {
 export default function ProgramCard({ program }: ProgramCardProps) {
   const statusInfo = STATUS_MAP[program.status] ?? {
     label: program.status,
-    color: 'bg-gray-100 text-gray-500',
+    color: 'bg-zinc-100 text-zinc-500',
   };
   const typeLabel = TYPE_MAP[program.type] ?? program.type;
   const thumbnail = program.thumbnailSquare || program.image;
@@ -59,10 +59,10 @@ export default function ProgramCard({ program }: ProgramCardProps) {
   return (
     <Link
       href={`/club/programs/${program.id}`}
-      className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all"
+      className="group club-card club-card-hover overflow-hidden"
     >
       {/* Thumbnail */}
-      <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
+      <div className="aspect-[16/10] bg-zinc-100 relative overflow-hidden rounded-t-2xl">
         {thumbnail ? (
           <Image
             src={thumbnail}
@@ -72,14 +72,14 @@ export default function ProgramCard({ program }: ProgramCardProps) {
             sizes="(max-width: 768px) 100vw, 50vw"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-            <BookOpen className="w-12 h-12 text-gray-300" />
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-100 to-zinc-200">
+            <BookOpen className="w-12 h-12 text-zinc-300" />
           </div>
         )}
 
         {/* Status badge */}
         <span
-          className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-xs font-medium ${statusInfo.color}`}
+          className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-semibold ${statusInfo.color}`}
         >
           {statusInfo.label}
         </span>
@@ -88,15 +88,15 @@ export default function ProgramCard({ program }: ProgramCardProps) {
       {/* Info */}
       <div className="p-4">
         {/* Type label */}
-        <span className="text-xs text-gray-400 font-medium">{typeLabel}</span>
+        <span className="text-xs text-zinc-400 font-medium">{typeLabel}</span>
 
         {/* Title */}
-        <h3 className="font-semibold text-gray-900 line-clamp-2 mt-1 group-hover:text-blue-600 transition-colors">
+        <h3 className="text-base font-bold text-zinc-900 line-clamp-2 mt-1 group-hover:text-blue-600 transition-colors duration-200">
           {program.title}
         </h3>
 
         {/* Meta */}
-        <div className="flex items-center gap-3 mt-3 text-sm text-gray-500">
+        <div className="flex items-center gap-3 mt-3 text-xs text-zinc-500">
           <span className="flex items-center gap-1">
             <Users className="w-3.5 h-3.5" />
             {program.participantCount}명

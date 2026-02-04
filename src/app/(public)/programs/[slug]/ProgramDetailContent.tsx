@@ -330,7 +330,7 @@ export function ProgramDetailContent({
                         {program.type === 'BOOKCLUB' && isLoggedIn && (
                           <div className="flex-shrink-0 self-center">
                             <Link
-                              href={`/my/reports/new?programId=${program.id}&sessionId=${session.id}`}
+                              href={`/my/reports/new?programId=${program.id}&sessionId=${session.id}${session.bookTitle ? `&bookTitle=${encodeURIComponent(session.bookTitle)}` : ''}`}
                               className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm font-medium"
                             >
                               <FileText className="w-4 h-4" />

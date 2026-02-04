@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/reports/session - 세션 정보 조회
 export async function GET(request: NextRequest) {
   try {

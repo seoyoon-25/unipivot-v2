@@ -36,12 +36,12 @@ export default function GoalSettingForm({ currentYearly, currentMonthly }: Props
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
         <div className="flex items-center gap-2 mb-4">
           <BookOpen className="w-5 h-5 text-blue-600" />
-          <h2 className="font-semibold text-gray-900">연간 목표</h2>
+          <h2 className="font-semibold text-zinc-900">연간 목표</h2>
         </div>
-        <p className="text-sm text-gray-500 mb-3">
+        <p className="text-sm text-zinc-500 mb-3">
           올해 읽을 책 권수를 설정하세요 (1-365권)
         </p>
         <div className="flex items-center gap-3">
@@ -51,18 +51,18 @@ export default function GoalSettingForm({ currentYearly, currentMonthly }: Props
             max={365}
             value={yearly}
             onChange={(e) => setYearly(Number(e.target.value))}
-            className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-center text-lg font-medium focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
+            className="w-24 px-3 py-2 border border-zinc-200 rounded-lg text-center text-lg font-medium focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
           />
-          <span className="text-gray-600">권</span>
+          <span className="text-zinc-600">권</span>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
         <div className="flex items-center gap-2 mb-4">
           <Target className="w-5 h-5 text-green-600" />
-          <h2 className="font-semibold text-gray-900">월간 목표</h2>
+          <h2 className="font-semibold text-zinc-900">월간 목표</h2>
         </div>
-        <p className="text-sm text-gray-500 mb-3">
+        <p className="text-sm text-zinc-500 mb-3">
           이번 달 읽을 책 권수를 설정하세요 (1-31권)
         </p>
         <div className="flex items-center gap-3">
@@ -72,9 +72,9 @@ export default function GoalSettingForm({ currentYearly, currentMonthly }: Props
             max={31}
             value={monthly}
             onChange={(e) => setMonthly(Number(e.target.value))}
-            className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-center text-lg font-medium focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
+            className="w-24 px-3 py-2 border border-zinc-200 rounded-lg text-center text-lg font-medium focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
           />
-          <span className="text-gray-600">권</span>
+          <span className="text-zinc-600">권</span>
         </div>
       </div>
 

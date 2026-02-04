@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 // GET - 인기 키워드 TOP N
 export async function GET(request: NextRequest) {
   try {

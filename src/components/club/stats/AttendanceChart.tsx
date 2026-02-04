@@ -18,7 +18,7 @@ interface Props {
 export default function AttendanceChart({ data }: Props) {
   if (data.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-gray-500 text-sm">
+      <div className="h-64 flex items-center justify-center text-zinc-500 text-sm">
         데이터가 없습니다.
       </div>
     )

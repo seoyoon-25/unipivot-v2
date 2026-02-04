@@ -22,7 +22,7 @@ export default function AutoSaveIndicator({ status, lastSavedAt }: AutoSaveIndic
           <span className="text-green-600">
             자동 저장됨
             {lastSavedAt && (
-              <span className="text-gray-400 ml-1">
+              <span className="text-zinc-400 ml-1">
                 {new Date(lastSavedAt).toLocaleTimeString('ko-KR', {
                   hour: '2-digit',
                   minute: '2-digit',

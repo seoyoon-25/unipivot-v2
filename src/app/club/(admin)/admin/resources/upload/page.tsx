@@ -52,24 +52,24 @@ export default async function ResourceUploadPage() {
       <div className="flex items-center gap-3">
         <Link
           href="/club/admin/resources"
-          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-lg transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">자료 업로드</h1>
-          <p className="text-gray-500 mt-1">새로운 자료를 등록합니다.</p>
+          <h1 className="text-2xl font-bold text-zinc-900">자료 업로드</h1>
+          <p className="text-zinc-500 mt-1">새로운 자료를 등록합니다.</p>
         </div>
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 max-w-2xl">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6 max-w-2xl">
         <form action={handleSubmit} className="space-y-5">
           {/* Session Selector */}
           <div>
             <label
               htmlFor="sessionId"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
+              className="block text-sm font-medium text-zinc-700 mb-1.5"
             >
               세션 선택 <span className="text-red-500">*</span>
             </label>
@@ -77,7 +77,7 @@ export default async function ResourceUploadPage() {
               id="sessionId"
               name="sessionId"
               required
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              className="w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             >
               <option value="">세션을 선택하세요</option>
               {programs.map((program) => (
@@ -97,7 +97,7 @@ export default async function ResourceUploadPage() {
           <div>
             <label
               htmlFor="title"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
+              className="block text-sm font-medium text-zinc-700 mb-1.5"
             >
               제목 <span className="text-red-500">*</span>
             </label>
@@ -107,7 +107,7 @@ export default async function ResourceUploadPage() {
               type="text"
               required
               placeholder="자료 제목을 입력하세요"
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              className="w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
           </div>
 
@@ -115,7 +115,7 @@ export default async function ResourceUploadPage() {
           <div>
             <label
               htmlFor="description"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
+              className="block text-sm font-medium text-zinc-700 mb-1.5"
             >
               설명
             </label>
@@ -124,7 +124,7 @@ export default async function ResourceUploadPage() {
               name="description"
               rows={3}
               placeholder="자료에 대한 설명을 입력하세요 (선택)"
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
+              className="w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
             />
           </div>
 
@@ -132,7 +132,7 @@ export default async function ResourceUploadPage() {
           <div>
             <label
               htmlFor="type"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
+              className="block text-sm font-medium text-zinc-700 mb-1.5"
             >
               유형 <span className="text-red-500">*</span>
             </label>
@@ -140,7 +140,7 @@ export default async function ResourceUploadPage() {
               id="type"
               name="type"
               required
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              className="w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             >
               <option value="NOTE">노트</option>
               <option value="FILE">파일</option>
@@ -152,7 +152,7 @@ export default async function ResourceUploadPage() {
           <div>
             <label
               htmlFor="url"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
+              className="block text-sm font-medium text-zinc-700 mb-1.5"
             >
               URL
             </label>
@@ -161,9 +161,9 @@ export default async function ResourceUploadPage() {
               name="url"
               type="url"
               placeholder="https://example.com (링크 유형인 경우 입력)"
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              className="w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-zinc-400 mt-1">
               유형이 &quot;링크&quot;인 경우 URL을 입력해주세요.
             </p>
           </div>
@@ -178,7 +178,7 @@ export default async function ResourceUploadPage() {
             </button>
             <Link
               href="/club/admin/resources"
-              className="px-6 py-2.5 text-gray-600 text-sm font-medium bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-6 py-2.5 text-zinc-600 text-sm font-medium bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
             >
               취소
             </Link>

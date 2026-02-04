@@ -31,13 +31,13 @@ export default async function CommunityPage({ searchParams }: PageProps) {
   })
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">커뮤니티</h1>
+        <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">커뮤니티</h1>
         {user && (
           <Link
             href="/club/community/new"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+            className="club-btn-primary gap-2"
           >
             <Plus className="w-4 h-4" />
             글쓰기
@@ -50,10 +50,10 @@ export default async function CommunityPage({ searchParams }: PageProps) {
           <Link
             key={cat.value}
             href={`/club/community${cat.value === 'all' ? '' : `?category=${cat.value}`}`}
-            className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+            className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors duration-200 ${
               category === cat.value
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
             }`}
           >
             {cat.label}

@@ -3,7 +3,7 @@ import { Heart } from 'lucide-react'
 
 export function DonationBanner() {
   return (
-    <section className="py-16 bg-gradient-to-r from-primary to-primary-dark">
+    <section className="py-16 bg-gradient-to-r from-primary to-primary-dark min-h-[140px]">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 animate-on-scroll">
           <div className="flex items-center gap-4">

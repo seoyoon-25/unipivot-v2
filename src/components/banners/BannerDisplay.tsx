@@ -276,15 +276,11 @@ export function BannerDisplay({ position = 'TOP', currentPage = '/', className }
     )
   }
 
-  // 로딩 상태
-  if (loading) {
-    return null // 또는 로딩 스피너
-  }
-
   // 표시할 배너 필터링
   const visibleBanners = banners.filter(banner => !dismissedBanners.has(banner.id))
 
-  if (visibleBanners.length === 0) {
+  // 로딩 중이거나 표시할 배너 없으면 null (CLS 방지: h-0 → 배너 전환 제거)
+  if (loading || visibleBanners.length === 0) {
     return null
   }
 

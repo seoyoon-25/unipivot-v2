@@ -31,10 +31,10 @@ export default async function ReviewWritePage({ searchParams }: PageProps) {
 
     return (
       <div className="max-w-3xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">
+        <h1 className="text-2xl font-bold text-zinc-900 mb-1">
           {sessionData.existingReview ? '소감 수정' : '소감 작성'}
         </h1>
-        <p className="text-sm text-gray-500 mb-6">
+        <p className="text-sm text-zinc-500 mb-6">
           {sessionData.program.title} · {sessionData.session.sessionNo}회차
         </p>
         <ReviewEditor
@@ -51,8 +51,8 @@ export default async function ReviewWritePage({ searchParams }: PageProps) {
   // Otherwise, show program/session selector
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-1">소감 작성</h1>
-      <p className="text-sm text-gray-500 mb-6">프로그램과 회차를 선택해주세요</p>
+      <h1 className="text-2xl font-bold text-zinc-900 mb-1">소감 작성</h1>
+      <p className="text-sm text-zinc-500 mb-6">프로그램과 회차를 선택해주세요</p>
       <WritePageClient programs={programs} />
     </div>
   )

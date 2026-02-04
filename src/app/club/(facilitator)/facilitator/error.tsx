@@ -20,10 +20,10 @@ export default function FacilitatorError({
       <div className="p-4 bg-red-50 rounded-full mb-6">
         <AlertTriangle className="w-10 h-10 text-red-500" />
       </div>
-      <h2 className="text-xl font-bold text-gray-900 mb-2">
+      <h2 className="text-xl font-bold text-zinc-900 mb-2">
         진행자 페이지 오류
       </h2>
-      <p className="text-gray-500 mb-6 max-w-md">
+      <p className="text-zinc-500 mb-6 max-w-md">
         페이지를 불러오는 중 문제가 발생했습니다.
       </p>
       <div className="flex gap-3">
@@ -35,7 +35,7 @@ export default function FacilitatorError({
         </button>
         <Link
           href="/club"
-          className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium"
+          className="px-4 py-2 border border-zinc-200 rounded-lg text-zinc-700 hover:bg-zinc-50 transition-colors text-sm font-medium"
         >
           클럽 홈으로
         </Link>

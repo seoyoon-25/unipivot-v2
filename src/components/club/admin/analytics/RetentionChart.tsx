@@ -48,25 +48,25 @@ export default function RetentionChart({
     <div className="space-y-6">
       {/* 요약 */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-sm text-gray-500">출석률</p>
+        <div className="bg-zinc-50 rounded-lg p-4">
+          <p className="text-sm text-zinc-500">출석률</p>
           <p className="text-3xl font-bold text-green-600">{attendanceRate}%</p>
         </div>
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-sm text-gray-500">진행 세션</p>
-          <p className="text-3xl font-bold text-gray-900">{totalSessions}</p>
+        <div className="bg-zinc-50 rounded-lg p-4">
+          <p className="text-sm text-zinc-500">진행 세션</p>
+          <p className="text-3xl font-bold text-zinc-900">{totalSessions}</p>
         </div>
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-sm text-gray-500">진행 중 프로그램</p>
+        <div className="bg-zinc-50 rounded-lg p-4">
+          <p className="text-sm text-zinc-500">진행 중 프로그램</p>
           <p className="text-3xl font-bold text-blue-600">{activePrograms.length}</p>
         </div>
       </div>
 
       {/* 출석 현황 차트 */}
       <div>
-        <h3 className="text-sm font-medium text-gray-700 mb-3">출석 현황</h3>
+        <h3 className="text-sm font-medium text-zinc-700 mb-3">출석 현황</h3>
         {breakdownData.length === 0 ? (
-          <div className="h-48 flex items-center justify-center text-gray-400 text-sm">
+          <div className="h-48 flex items-center justify-center text-zinc-400 text-sm">
             데이터가 없습니다.
           </div>
         ) : (
@@ -92,22 +92,22 @@ export default function RetentionChart({
       {/* 프로그램 현황 */}
       {activePrograms.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-gray-700 mb-3">진행 중 프로그램</h3>
-          <div className="border border-gray-200 rounded-lg overflow-hidden">
+          <h3 className="text-sm font-medium text-zinc-700 mb-3">진행 중 프로그램</h3>
+          <div className="border border-zinc-200 rounded-lg overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 text-left">
-                  <th className="px-4 py-3 font-medium text-gray-600">프로그램</th>
-                  <th className="px-4 py-3 font-medium text-gray-600 text-right">참가자</th>
-                  <th className="px-4 py-3 font-medium text-gray-600 text-right">세션 수</th>
+                <tr className="bg-zinc-50 text-left">
+                  <th className="px-4 py-3 font-medium text-zinc-600">프로그램</th>
+                  <th className="px-4 py-3 font-medium text-zinc-600 text-right">참가자</th>
+                  <th className="px-4 py-3 font-medium text-zinc-600 text-right">세션 수</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-zinc-100">
                 {activePrograms.map((p) => (
-                  <tr key={p.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-gray-900">{p.title}</td>
-                    <td className="px-4 py-3 text-right text-gray-600">{p.participants}</td>
-                    <td className="px-4 py-3 text-right text-gray-600">{p.sessions}</td>
+                  <tr key={p.id} className="hover:bg-zinc-50">
+                    <td className="px-4 py-3 text-zinc-900">{p.title}</td>
+                    <td className="px-4 py-3 text-right text-zinc-600">{p.participants}</td>
+                    <td className="px-4 py-3 text-right text-zinc-600">{p.sessions}</td>
                   </tr>
                 ))}
               </tbody>

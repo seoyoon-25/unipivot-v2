@@ -22,7 +22,7 @@ const features = [
 
 export function ResearchLabSection() {
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white relative overflow-hidden min-h-[500px]">
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 left-0 w-72 h-72 bg-primary rounded-full blur-3xl" />

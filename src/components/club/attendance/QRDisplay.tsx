@@ -58,19 +58,19 @@ export default function QRDisplay({ sessionId, initialToken, initialValidUntil }
     <div className="flex flex-col items-center space-y-4">
       {token && remaining > 0 ? (
         <>
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-zinc-200">
             <QRCode value={attendanceUrl} size={256} level="H" />
           </div>
           <div className="flex items-center gap-2 text-sm">
             <Clock className={`w-4 h-4 ${remaining < 60 ? 'text-red-500' : 'text-blue-500'}`} />
-            <span className={remaining < 60 ? 'text-red-600 font-medium' : 'text-gray-600'}>
+            <span className={remaining < 60 ? 'text-red-600 font-medium' : 'text-zinc-600'}>
               남은 시간: {formatTime(remaining)}
             </span>
           </div>
         </>
       ) : (
-        <div className="bg-gray-100 rounded-2xl p-12 flex flex-col items-center gap-3">
-          <div className="text-gray-400 text-sm">
+        <div className="bg-zinc-100 rounded-2xl p-12 flex flex-col items-center gap-3">
+          <div className="text-zinc-400 text-sm">
             {token ? 'QR 코드가 만료되었습니다' : 'QR 코드를 생성해주세요'}
           </div>
         </div>

@@ -38,19 +38,19 @@ export default function ProfileHeader({ profile, showEmail = true }: Props) {
           className="w-24 h-24 rounded-full object-cover shrink-0"
         />
       ) : (
-        <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-3xl text-gray-400 shrink-0">
+        <div className="w-24 h-24 rounded-full bg-zinc-200 flex items-center justify-center text-3xl text-zinc-400 shrink-0">
           {profile.name?.[0] || '?'}
         </div>
       )}
 
       <div className="flex-1 min-w-0">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-zinc-900">
           {profile.name || '(이름 없음)'}
         </h1>
 
-        {showEmail && <p className="text-gray-500 mt-1">{profile.email}</p>}
+        {showEmail && <p className="text-zinc-500 mt-1">{profile.email}</p>}
 
-        {profile.bio && <p className="text-gray-700 mt-3">{profile.bio}</p>}
+        {profile.bio && <p className="text-zinc-700 mt-3">{profile.bio}</p>}
 
         <div className="flex items-center gap-3 mt-3">
           {profile.favoriteGenre && (
@@ -58,7 +58,7 @@ export default function ProfileHeader({ profile, showEmail = true }: Props) {
               {genreLabels[profile.favoriteGenre] || profile.favoriteGenre}
             </span>
           )}
-          <span className="text-sm text-gray-400">
+          <span className="text-sm text-zinc-400">
             {format(new Date(profile.createdAt), 'yyyy년 M월', { locale: ko })} 가입
           </span>
         </div>

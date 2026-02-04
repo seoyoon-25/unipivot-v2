@@ -71,11 +71,11 @@ export default function RoleChangeModal({ user, onClose }: Props) {
       <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
       <div ref={modalRef} className="relative w-full max-w-md bg-white rounded-2xl shadow-xl">
         {/* 헤더 */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between p-4 border-b border-zinc-200">
           <h2 id="role-modal-title" className="text-lg font-semibold">역할 변경</h2>
           <button
             onClick={onClose}
-            className="p-1 text-gray-400 hover:text-gray-600"
+            className="p-1 text-zinc-400 hover:text-zinc-600"
             aria-label="닫기"
           >
             <X className="w-5 h-5" />
@@ -85,11 +85,11 @@ export default function RoleChangeModal({ user, onClose }: Props) {
         {/* 내용 */}
         <div className="p-4">
           {/* 대상 회원 정보 */}
-          <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-            <p className="font-medium text-gray-900">
+          <div className="mb-4 p-3 bg-zinc-50 rounded-lg">
+            <p className="font-medium text-zinc-900">
               {user.name || '(이름 없음)'}
             </p>
-            <p className="text-sm text-gray-500">{user.email}</p>
+            <p className="text-sm text-zinc-500">{user.email}</p>
           </div>
 
           {/* 역할 선택 */}
@@ -100,7 +100,7 @@ export default function RoleChangeModal({ user, onClose }: Props) {
                 className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
                   selectedRole === role.value
                     ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    : 'border-zinc-200 hover:border-zinc-300'
                 }`}
               >
                 <input
@@ -112,8 +112,8 @@ export default function RoleChangeModal({ user, onClose }: Props) {
                   className="mt-1"
                 />
                 <div>
-                  <p className="font-medium text-gray-900">{role.label}</p>
-                  <p className="text-sm text-gray-500">{role.description}</p>
+                  <p className="font-medium text-zinc-900">{role.label}</p>
+                  <p className="text-sm text-zinc-500">{role.description}</p>
                 </div>
               </label>
             ))}
@@ -138,17 +138,17 @@ export default function RoleChangeModal({ user, onClose }: Props) {
         </div>
 
         {/* 버튼 */}
-        <div className="flex gap-3 p-4 border-t border-gray-200">
+        <div className="flex gap-3 p-4 border-t border-zinc-200">
           <button
             onClick={onClose}
-            className="flex-1 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50"
+            className="flex-1 py-2 border border-zinc-200 rounded-lg text-zinc-700 hover:bg-zinc-50"
           >
             취소
           </button>
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300"
+            className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-zinc-300"
           >
             {isSubmitting ? '변경 중...' : '변경하기'}
           </button>

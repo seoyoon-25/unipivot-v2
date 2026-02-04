@@ -1,4 +1,4 @@
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+/* Pretendard font loaded via <link> in layout.tsx head for non-blocking load */
 
 @import '../styles/accessibility.css';
 
@@ -6,10 +6,42 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Size-adjusted fallback fonts to minimize CLS during Pretendard font swap.
+   Metrics tuned to match Pretendard Variable glyph sizes.
+   Pretendard uses Noto Sans CJK (Source Han Sans) glyphs for Korean,
+   so Noto Sans CJK KR is the closest fallback (~identical metrics). */
+@font-face {
+  font-family: 'Pretendard Fallback';
+  src: local('Noto Sans CJK KR');
+  font-display: swap;
+  size-adjust: 100%;
+  ascent-override: 105%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Pretendard Fallback';
+  src: local('Apple SD Gothic Neo');
+  font-display: swap;
+  size-adjust: 99%;
+  ascent-override: 105%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Pretendard Fallback';
+  src: local('Malgun Gothic');
+  font-display: swap;
+  size-adjust: 102%;
+  ascent-override: 105%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
 /* CSS Variables for Dynamic Fonts */
 :root {
-  --font-primary: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
-  --font-heading: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --font-primary: 'Pretendard Variable', 'Pretendard', 'Pretendard Fallback', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  --font-heading: 'Pretendard Variable', 'Pretendard', 'Pretendard Fallback', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
   --font-accent: inherit;
   --font-size-base: 16px;
   --font-heading-scale: 1.25;
@@ -166,6 +198,26 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  /* Club member area design system */
+  .club-card {
+    @apply bg-white rounded-2xl border border-zinc-100 shadow-sm;
+  }
+  .club-card-hover {
+    @apply hover:shadow-md hover:-translate-y-0.5 transition-all duration-200;
+  }
+  .club-btn-primary {
+    @apply inline-flex items-center justify-center h-11 px-5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-all duration-200;
+  }
+  .club-btn-secondary {
+    @apply inline-flex items-center justify-center h-11 px-5 rounded-xl bg-zinc-100 text-zinc-700 text-sm font-medium hover:bg-zinc-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 transition-all duration-200;
+  }
+  .club-section-title {
+    @apply text-lg font-bold text-zinc-900 tracking-tight;
+  }
+  .club-section-subtitle {
+    @apply text-xs font-medium text-zinc-400 uppercase tracking-wider;
+  }
 }
 
 /* Custom Cursor Styles (Baunfire style) */
@@ -241,6 +293,56 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+}
+
+/* Hero section CSS animations (replaces framer-motion for server-side rendering) */
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroGlow {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes heroBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+.hero-fade-up {
+  opacity: 0;
+  animation: heroFadeUp 0.8s cubic-bezier(0.25, 0.4, 0.25, 1) forwards;
+}
+
+.hero-glow {
+  opacity: 0;
+  animation: heroGlow 1.5s ease-out forwards;
+}
+
+.hero-glow-delay-1 {
+  animation-delay: 0.2s;
+}
+
+.hero-glow-delay-2 {
+  animation-delay: 0.4s;
+}
+
+.hero-bounce {
+  animation: heroBounce 1.5s ease-in-out infinite;
 }
 
 /* Dropdown menu */
@@ -568,7 +670,7 @@ input:focus, textarea:focus, select:focus {
   }
 }
 
-/* 애니메이션 비활성화 (접근성) */
+/* 애니메이션 비활성화 (접근성) — 모든 CLS 유발 가능 애니메이션 포함 */
 @media (prefers-reduced-motion: reduce) {
   .animate-on-scroll,
   .slide-from-left,
@@ -578,6 +680,15 @@ input:focus, textarea:focus, select:focus {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+
+  .hero-fade-up,
+  .hero-glow,
+  .hero-bounce,
+  .poster-grid-item {
+    opacity: 1;
+    transform: none;
+    animation: none;
   }
 }
 

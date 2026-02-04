@@ -26,12 +26,12 @@ export default async function MyProfilePage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
         <div className="flex justify-between items-start">
           <ProfileHeader profile={profile} />
           <Link
             href="/club/profile/edit"
-            className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 shrink-0"
+            className="flex items-center gap-2 px-4 py-2 border border-zinc-200 rounded-lg text-sm hover:bg-zinc-50 shrink-0"
           >
             <Pencil className="w-4 h-4" />
             수정
@@ -39,18 +39,18 @@ export default async function MyProfilePage() {
         </div>
 
         {/* 팔로워/팔로잉 */}
-        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100">
+        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-zinc-100">
           <Link
             href="/club/social/followers"
-            className="text-sm text-gray-600 hover:text-blue-600"
+            className="text-sm text-zinc-600 hover:text-blue-600"
           >
-            팔로워 <span className="font-semibold text-gray-900">{counts.followers}</span>
+            팔로워 <span className="font-semibold text-zinc-900">{counts.followers}</span>
           </Link>
           <Link
             href="/club/social/following"
-            className="text-sm text-gray-600 hover:text-blue-600"
+            className="text-sm text-zinc-600 hover:text-blue-600"
           >
-            팔로잉 <span className="font-semibold text-gray-900">{counts.following}</span>
+            팔로잉 <span className="font-semibold text-zinc-900">{counts.following}</span>
           </Link>
         </div>
       </div>

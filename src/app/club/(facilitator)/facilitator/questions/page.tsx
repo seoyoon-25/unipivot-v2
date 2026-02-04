@@ -10,8 +10,8 @@ export default async function QuestionsPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-1">AI 토론 질문</h1>
-      <p className="text-sm text-gray-500 mb-6">
+      <h1 className="text-2xl font-bold text-zinc-900 mb-1">AI 토론 질문</h1>
+      <p className="text-sm text-zinc-500 mb-6">
         독후감을 분석하여 토론 질문을 생성합니다
       </p>
 

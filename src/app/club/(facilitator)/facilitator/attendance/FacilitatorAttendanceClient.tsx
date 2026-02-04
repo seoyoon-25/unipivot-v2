@@ -30,7 +30,7 @@ export default function FacilitatorAttendanceClient({ programs }: FacilitatorAtt
 
   if (programs.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-400">
+      <div className="text-center py-12 text-zinc-400">
         관리하는 프로그램이 없습니다
       </div>
     )
@@ -43,11 +43,11 @@ export default function FacilitatorAttendanceClient({ programs }: FacilitatorAtt
           <button
             key={prog.id}
             onClick={() => setSelectedProgram(prog)}
-            className="w-full bg-white rounded-xl border border-gray-200 p-4 text-left hover:border-blue-300 hover:shadow-sm transition-all flex items-center justify-between"
+            className="w-full bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 text-left hover:border-blue-300 hover:shadow-sm transition-all flex items-center justify-between"
           >
             <div>
-              <div className="font-medium text-gray-900">{prog.title}</div>
-              <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+              <div className="font-medium text-zinc-900">{prog.title}</div>
+              <div className="text-xs text-zinc-500 mt-1 flex items-center gap-2">
                 <span className="flex items-center gap-1">
                   <Users className="w-3 h-3" />
                   {prog.totalParticipants}명
@@ -55,7 +55,7 @@ export default function FacilitatorAttendanceClient({ programs }: FacilitatorAtt
                 <span>{prog.sessions.length}개 세션</span>
               </div>
             </div>
-            <ChevronRight className="w-5 h-5 text-gray-400" />
+            <ChevronRight className="w-5 h-5 text-zinc-400" />
           </button>
         ))}
       </div>
@@ -77,13 +77,13 @@ export default function FacilitatorAttendanceClient({ programs }: FacilitatorAtt
         {selectedProgram.sessions.map((sess) => (
           <div
             key={sess.id}
-            className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between"
+            className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 flex items-center justify-between"
           >
             <div>
-              <div className="font-medium text-gray-900">
+              <div className="font-medium text-zinc-900">
                 {sess.sessionNo}회차{sess.title ? ` - ${sess.title}` : ''}
               </div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-zinc-500 mt-1">
                 {new Date(sess.date).toLocaleDateString('ko-KR')}
                 {sess.bookTitle && ` · ${sess.bookTitle}`}
                 <span className="ml-2">출석: {sess.attendanceCount}/{selectedProgram.totalParticipants}</span>

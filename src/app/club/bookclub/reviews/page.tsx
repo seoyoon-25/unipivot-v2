@@ -23,8 +23,8 @@ export default async function ReviewsPage() {
     <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">소감나눔</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-zinc-900">소감나눔</h1>
+          <p className="text-sm text-zinc-500 mt-1">
             독서 모임의 감상과 생각을 나눠보세요
           </p>
         </div>

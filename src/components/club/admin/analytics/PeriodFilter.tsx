@@ -25,15 +25,15 @@ export default function PeriodFilter({ currentPeriod }: Props) {
   }
 
   return (
-    <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+    <div className="flex items-center gap-1 bg-zinc-100 rounded-lg p-1">
       {periods.map((p) => (
         <button
           key={p.value}
           onClick={() => handleChange(p.value)}
           className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
             currentPeriod === p.value
-              ? 'bg-white text-gray-900 font-medium shadow-sm'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'bg-white text-zinc-900 font-medium shadow-sm'
+              : 'text-zinc-600 hover:text-zinc-900'
           }`}
         >
           {p.label}

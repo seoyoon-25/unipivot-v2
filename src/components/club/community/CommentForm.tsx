@@ -43,7 +43,7 @@ export default function CommentForm({ postId, parentId, onCancel, placeholder }:
           placeholder={placeholder || '댓글을 입력하세요...'}
           rows={2}
           required
-          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="flex-1 px-3 py-2 border border-zinc-300 rounded-lg text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
         <div className="flex flex-col gap-1">
           <button
@@ -57,7 +57,7 @@ export default function CommentForm({ postId, parentId, onCancel, placeholder }:
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm"
+              className="px-4 py-2 text-zinc-500 hover:text-zinc-700 text-sm"
             >
               취소
             </button>

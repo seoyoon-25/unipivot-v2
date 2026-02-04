@@ -45,17 +45,17 @@ export default function CommentItem({
 
   return (
     <div
-      className={`bg-white rounded-xl border border-gray-200 p-4 ${
-        isReply ? 'border-gray-100' : ''
+      className={`bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 ${
+        isReply ? 'border-zinc-100' : ''
       }`}
     >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2 text-sm">
-          <span className="font-medium text-gray-900">
+          <span className="font-medium text-zinc-900">
             {comment.author.name || '익명'}
           </span>
-          <span className="text-gray-400">·</span>
-          <span className="text-gray-500">
+          <span className="text-zinc-400">·</span>
+          <span className="text-zinc-500">
             {formatDistanceToNow(new Date(comment.createdAt), {
               addSuffix: true,
               locale: ko,
@@ -64,13 +64,13 @@ export default function CommentItem({
         </div>
       </div>
 
-      <p className="text-gray-800 text-sm whitespace-pre-wrap">{comment.content}</p>
+      <p className="text-zinc-800 text-sm whitespace-pre-wrap">{comment.content}</p>
 
       <div className="flex items-center gap-2 mt-2">
         {!isReply && isLoggedIn && onReply && (
           <button
             onClick={onReply}
-            className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
+            className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-700"
           >
             <Reply className="w-3.5 h-3.5" />
             답글

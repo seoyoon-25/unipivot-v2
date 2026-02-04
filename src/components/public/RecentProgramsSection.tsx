@@ -48,7 +48,7 @@ export function RecentProgramsSection({ programs }: Props) {
   }
 
   return (
-    <section className="py-24 bg-gray-50">
+    <section className="py-24 bg-gray-50 min-h-[600px]">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-end justify-between mb-12 animate-on-scroll">
           <div>
@@ -119,6 +119,8 @@ function ProgramCard({ program }: { program: Program }) {
           src={thumbnail}
           alt={program.title}
           fill
+          loading="lazy"
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
           className="object-cover group-hover:scale-105 transition-transform duration-500"
           style={{ objectPosition: `center ${program.imagePosition ?? 0}%` }}
         />

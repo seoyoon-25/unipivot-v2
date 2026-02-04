@@ -8,7 +8,7 @@ interface Props {
 
 export default function HelpBreadcrumb({ current, parentLabel }: Props) {
   return (
-    <nav className="flex items-center gap-1 text-sm text-gray-500 mb-6">
+    <nav className="flex items-center gap-1 text-sm text-zinc-500 mb-6">
       <Link href="/club/help" className="hover:text-blue-600 transition-colors">
         도움말
       </Link>
@@ -19,7 +19,7 @@ export default function HelpBreadcrumb({ current, parentLabel }: Props) {
         </>
       )}
       <ChevronRight className="w-3.5 h-3.5" />
-      <span className="text-gray-900 font-medium">{current}</span>
+      <span className="text-zinc-900 font-medium">{current}</span>
     </nav>
   )
 }

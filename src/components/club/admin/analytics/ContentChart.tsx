@@ -31,33 +31,33 @@ export default function ContentChart({
     <div className="space-y-6">
       {/* 요약 */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-sm text-gray-500">전체 독후감</p>
-          <p className="text-2xl font-bold text-gray-900">{totalReports.toLocaleString()}</p>
+        <div className="bg-zinc-50 rounded-lg p-4">
+          <p className="text-sm text-zinc-500">전체 독후감</p>
+          <p className="text-2xl font-bold text-zinc-900">{totalReports.toLocaleString()}</p>
           <p className="text-xs text-blue-600 mt-1">+{newReports} (기간 내)</p>
         </div>
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-sm text-gray-500">전체 명문장</p>
-          <p className="text-2xl font-bold text-gray-900">{totalQuotes.toLocaleString()}</p>
+        <div className="bg-zinc-50 rounded-lg p-4">
+          <p className="text-sm text-zinc-500">전체 명문장</p>
+          <p className="text-2xl font-bold text-zinc-900">{totalQuotes.toLocaleString()}</p>
           <p className="text-xs text-blue-600 mt-1">+{newQuotes} (기간 내)</p>
         </div>
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-sm text-gray-500">평균 평점</p>
-          <p className="text-2xl font-bold text-gray-900">
+        <div className="bg-zinc-50 rounded-lg p-4">
+          <p className="text-sm text-zinc-500">평균 평점</p>
+          <p className="text-2xl font-bold text-zinc-900">
             {avgRating !== null ? avgRating : '-'}
           </p>
         </div>
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-sm text-gray-500">인기 도서 수</p>
-          <p className="text-2xl font-bold text-gray-900">{topBooks.length}</p>
+        <div className="bg-zinc-50 rounded-lg p-4">
+          <p className="text-sm text-zinc-500">인기 도서 수</p>
+          <p className="text-2xl font-bold text-zinc-900">{topBooks.length}</p>
         </div>
       </div>
 
       {/* 인기 도서 차트 */}
       <div>
-        <h3 className="text-sm font-medium text-gray-700 mb-3">인기 도서 TOP 10</h3>
+        <h3 className="text-sm font-medium text-zinc-700 mb-3">인기 도서 TOP 10</h3>
         {topBooks.length === 0 ? (
-          <div className="h-64 flex items-center justify-center text-gray-400 text-sm">
+          <div className="h-64 flex items-center justify-center text-zinc-400 text-sm">
             데이터가 없습니다.
           </div>
         ) : (

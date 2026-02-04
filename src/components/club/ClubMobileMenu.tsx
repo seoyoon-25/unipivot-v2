@@ -38,7 +38,7 @@ export default function ClubMobileMenu({ isOpen, onClose }: ClubMobileMenuProps)
   return (
     <>
       <div
-        className="fixed inset-0 z-50 bg-black/50 lg:hidden"
+        className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -50,21 +50,21 @@ export default function ClubMobileMenu({ isOpen, onClose }: ClubMobileMenuProps)
         aria-modal="true"
         aria-label="네비게이션 메뉴"
       >
-        <div className="flex items-center justify-between h-14 px-4 border-b border-gray-200">
-          <span className="text-lg font-bold text-gray-900">메뉴</span>
+        <div className="flex items-center justify-between h-16 px-4 border-b border-zinc-100">
+          <span className="text-lg font-bold text-zinc-900">메뉴</span>
           <button
             onClick={onClose}
-            className="p-2 -mr-2 text-gray-500 hover:text-gray-700"
+            className="w-10 h-10 flex items-center justify-center rounded-xl text-zinc-500 hover:bg-zinc-100 transition-colors duration-200"
             aria-label="메뉴 닫기"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="overflow-y-auto h-[calc(100vh-3.5rem)] pb-20">
+        <div className="overflow-y-auto h-[calc(100vh-4rem)] pb-20">
           {menuItems.map((section) => (
             <div key={section.title} className="py-4">
-              <h3 className="px-4 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              <h3 className="px-4 mb-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                 {section.title}
               </h3>
               <ul>
@@ -79,15 +79,18 @@ export default function ClubMobileMenu({ isOpen, onClose }: ClubMobileMenuProps)
                         onClick={onClose}
                         aria-current={isActive ? 'page' : undefined}
                         className={cn(
-                          'flex items-center gap-3 px-4 py-3 text-sm transition-colors',
+                          'relative flex items-center gap-3 px-4 py-3 text-sm transition-colors duration-200',
                           isActive
-                            ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600'
-                            : 'text-gray-700 hover:bg-gray-50'
+                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
                         )}
                       >
+                        {isActive && (
+                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full bg-blue-600" />
+                        )}
                         <Icon className="w-5 h-5" />
                         <span className="flex-1">{item.name}</span>
-                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                        <ChevronRight className="w-4 h-4 text-zinc-400" />
                       </Link>
                     </li>
                   );

@@ -83,8 +83,8 @@ export default function ResourceList({ resources, isAdmin = false }: ResourceLis
   if (items.length === 0) {
     return (
       <div className="text-center py-12">
-        <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-        <p className="text-gray-500">등록된 자료가 없습니다</p>
+        <FileText className="w-12 h-12 text-zinc-300 mx-auto mb-3" />
+        <p className="text-zinc-500">등록된 자료가 없습니다</p>
       </div>
     )
   }
@@ -98,11 +98,11 @@ export default function ResourceList({ resources, isAdmin = false }: ResourceLis
         return (
           <div
             key={resource.id}
-            className="bg-white rounded-xl border border-gray-200 p-4 hover:border-gray-300 transition-colors"
+            className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 hover:border-zinc-300 transition-colors"
           >
             <div className="flex items-start gap-3">
-              <div className="p-2 bg-gray-50 rounded-lg shrink-0">
-                <FileText className="w-5 h-5 text-gray-500" />
+              <div className="p-2 bg-zinc-50 rounded-lg shrink-0">
+                <FileText className="w-5 h-5 text-zinc-500" />
               </div>
 
               <div className="flex-1 min-w-0">
@@ -114,23 +114,23 @@ export default function ResourceList({ resources, isAdmin = false }: ResourceLis
                     {config.label}
                   </span>
                   {resource.fileSize && (
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-zinc-400">
                       {formatFileSize(resource.fileSize)}
                     </span>
                   )}
                 </div>
 
-                <h3 className="font-medium text-gray-900 truncate">
+                <h3 className="font-medium text-zinc-900 truncate">
                   {resource.title}
                 </h3>
 
                 {resource.description && (
-                  <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">
+                  <p className="text-sm text-zinc-500 mt-0.5 line-clamp-2">
                     {resource.description}
                   </p>
                 )}
 
-                <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                <div className="flex items-center gap-2 mt-2 text-xs text-zinc-400">
                   {resource.user.name && <span>{resource.user.name}</span>}
                   <span>
                     {format(new Date(resource.createdAt), 'yyyy.MM.dd', {
@@ -145,7 +145,7 @@ export default function ResourceList({ resources, isAdmin = false }: ResourceLis
                   <a
                     href={resource.filePath}
                     download
-                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="p-2 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                     title="다운로드"
                   >
                     <Download className="w-4 h-4" />
@@ -156,7 +156,7 @@ export default function ResourceList({ resources, isAdmin = false }: ResourceLis
                     href={resource.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                    className="p-2 text-zinc-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                     title="링크 열기"
                   >
                     <Link className="w-4 h-4" />
@@ -166,7 +166,7 @@ export default function ResourceList({ resources, isAdmin = false }: ResourceLis
                   <button
                     onClick={() => handleDelete(resource.id)}
                     disabled={deleting === resource.id}
-                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                    className="p-2 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                     title="삭제"
                   >
                     <Trash2 className="w-4 h-4" />

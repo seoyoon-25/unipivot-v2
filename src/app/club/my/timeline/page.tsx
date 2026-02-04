@@ -25,7 +25,7 @@ export default async function TimelinePage({ searchParams }: PageProps) {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">나의 독서 기록</h1>
+      <h1 className="text-2xl font-bold text-zinc-900 mb-6">나의 독서 기록</h1>
 
       <TimelineFilter currentType={type} />
 

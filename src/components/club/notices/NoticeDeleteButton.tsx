@@ -41,7 +41,7 @@ export default function NoticeDeleteButton({ noticeId, className }: Props) {
         </button>
         <button
           onClick={() => setShowConfirm(false)}
-          className="px-3 py-1 text-sm border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50"
+          className="px-3 py-1 text-sm border border-zinc-300 text-zinc-600 rounded-lg hover:bg-zinc-50"
         >
           취소
         </button>
@@ -52,7 +52,7 @@ export default function NoticeDeleteButton({ noticeId, className }: Props) {
   return (
     <button
       onClick={() => setShowConfirm(true)}
-      className={className || 'p-2 text-gray-400 hover:text-red-500 rounded-lg hover:bg-gray-100'}
+      className={className || 'p-2 text-zinc-400 hover:text-red-500 rounded-lg hover:bg-zinc-100'}
       title="삭제"
     >
       <Trash2 className="w-4 h-4" />

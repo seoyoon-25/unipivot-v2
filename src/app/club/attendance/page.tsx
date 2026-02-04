@@ -24,8 +24,8 @@ export default async function AttendancePage() {
     <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">출석 현황</h1>
-          <p className="text-sm text-gray-500 mt-1">내 출석 기록을 확인하세요</p>
+          <h1 className="text-2xl font-bold text-zinc-900">출석 현황</h1>
+          <p className="text-sm text-zinc-500 mt-1">내 출석 기록을 확인하세요</p>
         </div>
         <Link
           href="/club/attendance/scan"
@@ -42,10 +42,10 @@ export default async function AttendancePage() {
           {summary.map((prog) => (
             <div
               key={prog.programId}
-              className="bg-white rounded-xl border border-gray-200 p-4"
+              className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4"
             >
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-medium text-gray-900">{prog.programTitle}</h3>
+                <h3 className="font-medium text-zinc-900">{prog.programTitle}</h3>
                 <span className="text-sm font-semibold text-blue-600">{prog.rate}%</span>
               </div>
               <div className="flex items-center gap-4 text-xs">
@@ -61,10 +61,10 @@ export default async function AttendancePage() {
                   <X className="w-3.5 h-3.5" />
                   결석 {prog.absent}
                 </span>
-                <span className="text-gray-400">/ 전체 {prog.totalSessions}회</span>
+                <span className="text-zinc-400">/ 전체 {prog.totalSessions}회</span>
               </div>
               {/* Progress bar */}
-              <div className="mt-2 h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className="mt-2 h-2 bg-zinc-100 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-blue-500 rounded-full transition-all"
                   style={{ width: `${prog.rate}%` }}
@@ -76,19 +76,19 @@ export default async function AttendancePage() {
       )}
 
       {/* Attendance History */}
-      <h2 className="font-semibold text-gray-900 mb-3">출석 기록</h2>
+      <h2 className="font-semibold text-zinc-900 mb-3">출석 기록</h2>
       <div className="space-y-2">
         {attendances.length > 0 ? (
           attendances.map((a) => (
             <div
               key={a.id}
-              className="bg-white rounded-lg border border-gray-200 px-4 py-3 flex items-center justify-between"
+              className="bg-white rounded-2xl border border-zinc-100 shadow-sm px-4 py-3 flex items-center justify-between"
             >
               <div>
-                <div className="text-sm font-medium text-gray-900">
+                <div className="text-sm font-medium text-zinc-900">
                   {a.session.programTitle} - {a.session.sessionNo}회차
                 </div>
-                <div className="text-xs text-gray-500 mt-0.5">
+                <div className="text-xs text-zinc-500 mt-0.5">
                   {new Date(a.session.date).toLocaleDateString('ko-KR')}
                   {a.session.bookTitle && ` · ${a.session.bookTitle}`}
                 </div>
@@ -110,7 +110,7 @@ export default async function AttendancePage() {
                   </span>
                 )}
                 {a.checkedAt && (
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-zinc-400">
                     {new Date(a.checkedAt).toLocaleTimeString('ko-KR', {
                       hour: '2-digit',
                       minute: '2-digit',
@@ -121,7 +121,7 @@ export default async function AttendancePage() {
             </div>
           ))
         ) : (
-          <div className="text-center py-12 text-gray-400 text-sm">
+          <div className="text-center py-12 text-zinc-400 text-sm">
             아직 출석 기록이 없습니다
           </div>
         )}

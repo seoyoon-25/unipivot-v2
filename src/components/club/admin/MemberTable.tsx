@@ -37,7 +37,7 @@ const ROLE_COLORS: Record<string, string> = {
   ADMIN: 'bg-purple-100 text-purple-700',
   SUPER_ADMIN: 'bg-red-100 text-red-700',
   FACILITATOR: 'bg-blue-100 text-blue-700',
-  USER: 'bg-gray-100 text-gray-600',
+  USER: 'bg-zinc-100 text-zinc-600',
 };
 
 function formatDate(date: string | Date): string {
@@ -66,34 +66,34 @@ export default function MemberTable({ members, currentPage, totalPages }: Props)
 
   return (
     <>
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="text-left px-4 py-3 font-medium text-gray-500">회원</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">이메일</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">역할</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">가입일</th>
-                <th className="text-center px-4 py-3 font-medium text-gray-500">프로그램</th>
-                <th className="text-center px-4 py-3 font-medium text-gray-500">출석률</th>
-                <th className="text-right px-4 py-3 font-medium text-gray-500">액션</th>
+              <tr className="border-b border-zinc-200 bg-zinc-50">
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">회원</th>
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">이메일</th>
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">역할</th>
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">가입일</th>
+                <th className="text-center px-4 py-3 font-medium text-zinc-500">프로그램</th>
+                <th className="text-center px-4 py-3 font-medium text-zinc-500">출석률</th>
+                <th className="text-right px-4 py-3 font-medium text-zinc-500">액션</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-zinc-100">
               {members.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-gray-400">
+                  <td colSpan={7} className="px-4 py-12 text-center text-zinc-400">
                     회원이 없습니다.
                   </td>
                 </tr>
               ) : (
                 members.map((member) => {
                   const roleLabel = ROLE_LABELS[member.role] ?? member.role;
-                  const roleColor = ROLE_COLORS[member.role] ?? 'bg-gray-100 text-gray-500';
+                  const roleColor = ROLE_COLORS[member.role] ?? 'bg-zinc-100 text-zinc-500';
 
                   return (
-                    <tr key={member.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={member.id} className="hover:bg-zinc-50 transition-colors">
                       {/* 회원 */}
                       <td className="px-4 py-3">
                         <Link
@@ -109,18 +109,18 @@ export default function MemberTable({ members, currentPage, totalPages }: Props)
                               className="w-8 h-8 rounded-full object-cover"
                             />
                           ) : (
-                            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-500">
+                            <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center text-xs font-medium text-zinc-500">
                               {(member.name || '?').charAt(0)}
                             </div>
                           )}
-                          <span className="font-medium text-gray-900">
+                          <span className="font-medium text-zinc-900">
                             {member.name || '(이름 없음)'}
                           </span>
                         </Link>
                       </td>
 
                       {/* 이메일 */}
-                      <td className="px-4 py-3 text-gray-500">{member.email}</td>
+                      <td className="px-4 py-3 text-zinc-500">{member.email}</td>
 
                       {/* 역할 */}
                       <td className="px-4 py-3">
@@ -135,12 +135,12 @@ export default function MemberTable({ members, currentPage, totalPages }: Props)
                       </td>
 
                       {/* 가입일 */}
-                      <td className="px-4 py-3 text-gray-500">
+                      <td className="px-4 py-3 text-zinc-500">
                         {formatDate(member.createdAt)}
                       </td>
 
                       {/* 프로그램 */}
-                      <td className="px-4 py-3 text-center text-gray-500">
+                      <td className="px-4 py-3 text-center text-zinc-500">
                         {member.programCount}개
                       </td>
 
@@ -164,14 +164,14 @@ export default function MemberTable({ members, currentPage, totalPages }: Props)
                         <div className="flex items-center justify-end gap-1">
                           <Link
                             href={`/club/admin/members/${member.id}`}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="상세보기"
                           >
                             <Eye className="w-4 h-4" />
                           </Link>
                           <button
                             onClick={() => setRoleModalUser(member)}
-                            className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                            className="p-1.5 text-zinc-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                             title="역할변경"
                           >
                             <UserCog className="w-4 h-4" />
@@ -193,30 +193,30 @@ export default function MemberTable({ members, currentPage, totalPages }: Props)
           {currentPage > 1 ? (
             <Link
               href={pageUrl(currentPage - 1)}
-              className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center gap-1 px-3 py-2 text-sm text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
               이전
             </Link>
           ) : (
-            <span className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-300 bg-white border border-gray-200 rounded-lg cursor-not-allowed">
+            <span className="inline-flex items-center gap-1 px-3 py-2 text-sm text-zinc-300 bg-white border border-zinc-200 rounded-lg cursor-not-allowed">
               <ChevronLeft className="w-4 h-4" />
               이전
             </span>
           )}
-          <span className="px-3 py-2 text-sm text-gray-500">
+          <span className="px-3 py-2 text-sm text-zinc-500">
             {currentPage} / {totalPages}
           </span>
           {currentPage < totalPages ? (
             <Link
               href={pageUrl(currentPage + 1)}
-              className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center gap-1 px-3 py-2 text-sm text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
             >
               다음
               <ChevronRight className="w-4 h-4" />
             </Link>
           ) : (
-            <span className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-300 bg-white border border-gray-200 rounded-lg cursor-not-allowed">
+            <span className="inline-flex items-center gap-1 px-3 py-2 text-sm text-zinc-300 bg-white border border-zinc-200 rounded-lg cursor-not-allowed">
               다음
               <ChevronRight className="w-4 h-4" />
             </span>

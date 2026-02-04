@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { headers } from 'next/headers'
 
+export const dynamic = 'force-dynamic'
+
 // 현재 활성 배너 목록 조회 (공개 API)
 export async function GET(request: NextRequest) {
   try {

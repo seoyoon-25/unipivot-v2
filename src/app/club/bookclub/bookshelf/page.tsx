@@ -37,7 +37,7 @@ export default async function BookshelfPage({ searchParams }: Props) {
         description="함께 읽은 책들"
       />
 
-      <Suspense fallback={<div className="text-sm text-gray-400">필터 로딩...</div>}>
+      <Suspense fallback={<div className="text-sm text-zinc-400">필터 로딩...</div>}>
         <BookshelfFilter seasons={seasons} years={years} />
       </Suspense>
 

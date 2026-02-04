@@ -23,16 +23,16 @@ export default async function GoalHistoryPage() {
     <div className="max-w-2xl mx-auto px-4 py-8">
       <Link
         href="/club/my/goals"
-        className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-6 text-sm"
+        className="inline-flex items-center gap-2 text-zinc-500 hover:text-zinc-700 mb-6 text-sm"
       >
         <ArrowLeft className="w-4 h-4" />
         목표 현황으로
       </Link>
 
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">과거 목표 기록</h1>
+      <h1 className="text-2xl font-bold text-zinc-900 mb-6">과거 목표 기록</h1>
 
       {Object.keys(grouped).length === 0 ? (
-        <div className="bg-gray-50 rounded-xl border border-gray-200 p-8 text-center text-gray-500">
+        <div className="bg-zinc-50 rounded-2xl border border-zinc-100 shadow-sm p-8 text-center text-zinc-500">
           아직 목표 기록이 없습니다.
         </div>
       ) : (
@@ -41,7 +41,7 @@ export default async function GoalHistoryPage() {
             .sort(([a], [b]) => Number(b) - Number(a))
             .map(([year, yearGoals]) => (
               <div key={year}>
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">{year}년</h2>
+                <h2 className="text-lg font-semibold text-zinc-900 mb-3">{year}년</h2>
                 <div className="space-y-3">
                   {yearGoals.map((goal) => {
                     const pct = goal.targetBooks > 0
@@ -54,7 +54,7 @@ export default async function GoalHistoryPage() {
                         className={`rounded-lg border p-4 ${
                           goal.isCompleted
                             ? 'bg-green-50 border-green-200'
-                            : 'bg-white border-gray-200'
+                            : 'bg-white border-zinc-200'
                         }`}
                       >
                         <div className="flex items-center justify-between mb-2">
@@ -64,7 +64,7 @@ export default async function GoalHistoryPage() {
                             ) : (
                               <Trophy className="w-4 h-4 text-yellow-500" />
                             )}
-                            <span className="font-medium text-gray-900">
+                            <span className="font-medium text-zinc-900">
                               {goal.month ? `${goal.month}월` : '연간'} 목표
                             </span>
                           </div>
@@ -74,10 +74,10 @@ export default async function GoalHistoryPage() {
                             </span>
                           )}
                         </div>
-                        <div className="text-sm text-gray-600 mb-2">
+                        <div className="text-sm text-zinc-600 mb-2">
                           {goal.targetBooks}권 중 {goal.achievedBooks}권 ({pct}%)
                         </div>
-                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-2 bg-zinc-200 rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full ${
                               goal.isCompleted ? 'bg-green-500' : 'bg-blue-500'

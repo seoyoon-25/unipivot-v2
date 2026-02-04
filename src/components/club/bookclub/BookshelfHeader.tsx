@@ -18,14 +18,14 @@ export default function BookshelfHeader({
           <BookOpen className="w-6 h-6 text-purple-600" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+          <h1 className="text-2xl font-bold text-zinc-900">{title}</h1>
           {description && (
-            <p className="text-gray-500">{description}</p>
+            <p className="text-zinc-500">{description}</p>
           )}
         </div>
       </div>
-      <p className="text-sm text-gray-400">
-        총 <span className="font-medium text-gray-600">{totalCount}권</span>의 책을 함께 읽었어요
+      <p className="text-sm text-zinc-400">
+        총 <span className="font-medium text-zinc-600">{totalCount}권</span>의 책을 함께 읽었어요
       </p>
     </div>
   );

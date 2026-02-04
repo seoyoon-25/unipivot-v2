@@ -110,6 +110,13 @@ export async function getNavigationMenu() {
     ],
   };
 
+  // 유니클럽 (하이라이트 단일 링크)
+  const clubMenu = {
+    label: '유니클럽',
+    href: '/club',
+    highlight: true,
+  };
+
   // 리서치랩 (외부 링크)
   const researchLabMenu = {
     label: '리서치랩',
@@ -120,6 +127,7 @@ export async function getNavigationMenu() {
   return [
     introMenu,
     programMenu,
+    clubMenu,
     communityMenu,
     participateMenu,
     researchLabMenu,

@@ -25,7 +25,7 @@ export default function JoinButton({
     return (
       <button
         disabled
-        className="w-full py-2.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-400 cursor-not-allowed"
+        className="w-full py-2.5 rounded-lg text-sm font-medium bg-zinc-100 text-zinc-400 cursor-not-allowed"
       >
         종료된 챌린지
       </button>
@@ -65,7 +65,7 @@ export default function JoinButton({
         disabled={isPending}
         className={`w-full py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
           isParticipant
-            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            ? 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
             : 'bg-blue-600 text-white hover:bg-blue-700'
         }`}
       >

@@ -24,8 +24,8 @@ export default function GoalBadge({ badge, earnedAt }: Props) {
         <Icon className="w-5 h-5 text-yellow-600" />
       </div>
       <div>
-        <p className="font-medium text-gray-900 text-sm">{badge.name}</p>
-        <p className="text-xs text-gray-500">
+        <p className="font-medium text-zinc-900 text-sm">{badge.name}</p>
+        <p className="text-xs text-zinc-500">
           {format(new Date(earnedAt), 'yyyy.M.d', { locale: ko })} 획득
         </p>
       </div>

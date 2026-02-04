@@ -95,8 +95,8 @@ export default function AddWishBookModal({
       <div ref={modalRef} className="relative w-full max-w-md bg-white rounded-2xl shadow-xl max-h-[80vh] overflow-hidden flex flex-col">
         {/* 헤더 */}
         <div className="flex items-center justify-between p-4 border-b">
-          <h2 id="wishbook-modal-title" className="text-lg font-semibold text-gray-900">읽고 싶은 책 추가</h2>
-          <button onClick={() => { onClose(); resetForm(); }} className="p-1 text-gray-400 hover:text-gray-600" aria-label="닫기">
+          <h2 id="wishbook-modal-title" className="text-lg font-semibold text-zinc-900">읽고 싶은 책 추가</h2>
+          <button onClick={() => { onClose(); resetForm(); }} className="p-1 text-zinc-400 hover:text-zinc-600" aria-label="닫기">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -108,7 +108,7 @@ export default function AddWishBookModal({
             className={`flex-1 py-3 text-sm font-medium ${
               mode === 'select'
                 ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500'
+                : 'text-zinc-500'
             }`}
           >
             책장에서 선택
@@ -118,7 +118,7 @@ export default function AddWishBookModal({
             className={`flex-1 py-3 text-sm font-medium ${
               mode === 'custom'
                 ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500'
+                : 'text-zinc-500'
             }`}
           >
             직접 입력
@@ -131,20 +131,20 @@ export default function AddWishBookModal({
             <>
               {/* 검색 */}
               <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                 <input
                   type="text"
                   placeholder="책 제목 또는 저자 검색"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm"
+                  className="w-full pl-10 pr-4 py-2 border border-zinc-200 rounded-lg text-sm"
                 />
               </div>
 
               {/* 책 목록 */}
               <div className="space-y-2">
                 {filteredBooks.length === 0 ? (
-                  <p className="text-center text-gray-500 py-8">
+                  <p className="text-center text-zinc-500 py-8">
                     검색 결과가 없습니다
                   </p>
                 ) : (
@@ -155,7 +155,7 @@ export default function AddWishBookModal({
                       className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors ${
                         selectedBook?.id === book.id
                           ? 'bg-blue-50 border-2 border-blue-500'
-                          : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent'
+                          : 'bg-zinc-50 hover:bg-zinc-100 border-2 border-transparent'
                       }`}
                     >
                       {book.image ? (
@@ -167,13 +167,13 @@ export default function AddWishBookModal({
                           className="w-10 h-14 object-cover rounded"
                         />
                       ) : (
-                        <div className="w-10 h-14 bg-gray-200 rounded flex items-center justify-center">
-                          <BookOpen className="w-4 h-4 text-gray-400" />
+                        <div className="w-10 h-14 bg-zinc-200 rounded flex items-center justify-center">
+                          <BookOpen className="w-4 h-4 text-zinc-400" />
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900 truncate">{book.title}</p>
-                        <p className="text-sm text-gray-500 truncate">{book.author || ''}</p>
+                        <p className="font-medium text-zinc-900 truncate">{book.title}</p>
+                        <p className="text-sm text-zinc-500 truncate">{book.author || ''}</p>
                       </div>
                     </button>
                   ))
@@ -185,7 +185,7 @@ export default function AddWishBookModal({
               {/* 직접 입력 */}
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-zinc-700 mb-1">
                     책 제목 *
                   </label>
                   <input
@@ -193,11 +193,11 @@ export default function AddWishBookModal({
                     value={customTitle}
                     onChange={(e) => setCustomTitle(e.target.value)}
                     placeholder="책 제목을 입력하세요"
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                    className="w-full px-3 py-2 border border-zinc-200 rounded-lg text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-zinc-700 mb-1">
                     저자
                   </label>
                   <input
@@ -205,7 +205,7 @@ export default function AddWishBookModal({
                     value={customAuthor}
                     onChange={(e) => setCustomAuthor(e.target.value)}
                     placeholder="저자를 입력하세요"
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                    className="w-full px-3 py-2 border border-zinc-200 rounded-lg text-sm"
                   />
                 </div>
               </div>
@@ -214,7 +214,7 @@ export default function AddWishBookModal({
 
           {/* 메모 (공통) */}
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-zinc-700 mb-1">
               메모 (선택)
             </label>
             <textarea
@@ -222,7 +222,7 @@ export default function AddWishBookModal({
               onChange={(e) => setMemo(e.target.value)}
               placeholder="왜 이 책을 읽고 싶은지 메모해보세요"
               rows={2}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
+              className="w-full px-3 py-2 border border-zinc-200 rounded-lg text-sm resize-none"
             />
           </div>
         </div>
@@ -232,7 +232,7 @@ export default function AddWishBookModal({
           <button
             onClick={handleSubmit}
             disabled={!canSubmit || isPending}
-            className="w-full py-2.5 bg-blue-600 text-white rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="w-full py-2.5 bg-blue-600 text-white rounded-lg font-medium disabled:bg-zinc-300 disabled:cursor-not-allowed"
           >
             {isPending ? '추가 중...' : '추가하기'}
           </button>

@@ -15,12 +15,12 @@ export default function ClubLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-zinc-50">
       <SkipLink />
       <ClubHeader />
       <div className="flex">
         <ClubSidebar />
-        <main id="main-content" className="flex-1 min-h-[calc(100vh-3.5rem)] pb-20 lg:pb-0">
+        <main id="main-content" className="flex-1 min-h-[calc(100vh-4rem)] p-4 md:p-8 pb-20 lg:pb-0">
           {children}
         </main>
       </div>

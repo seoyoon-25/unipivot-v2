@@ -39,13 +39,13 @@ export default function ReviewListClient({
     <div>
       {/* Tabs */}
       {isLoggedIn && (
-        <div className="flex gap-1 mb-4 bg-gray-100 p-1 rounded-lg">
+        <div className="flex gap-1 mb-4 bg-zinc-100 p-1 rounded-lg">
           <button
             onClick={() => setTab('public')}
             className={`flex-1 py-2 text-sm rounded-md font-medium transition-colors ${
               tab === 'public'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-white text-zinc-900 shadow-sm'
+                : 'text-zinc-500 hover:text-zinc-700'
             }`}
           >
             전체 소감 ({publicReviews.length})
@@ -54,8 +54,8 @@ export default function ReviewListClient({
             onClick={() => setTab('my')}
             className={`flex-1 py-2 text-sm rounded-md font-medium transition-colors ${
               tab === 'my'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-white text-zinc-900 shadow-sm'
+                : 'text-zinc-500 hover:text-zinc-700'
             }`}
           >
             내 소감 ({myReviews.length})
@@ -71,7 +71,7 @@ export default function ReviewListClient({
               <ReviewCard key={review.id} review={review} showAuthor />
             ))
           ) : (
-            <div className="text-center py-12 text-gray-400">
+            <div className="text-center py-12 text-zinc-400">
               아직 공개된 소감이 없습니다
             </div>
           )
@@ -80,7 +80,7 @@ export default function ReviewListClient({
             <ReviewCard key={review.id} review={review} showAuthor={false} />
           ))
         ) : (
-          <div className="text-center py-12 text-gray-400">
+          <div className="text-center py-12 text-zinc-400">
             아직 작성한 소감이 없습니다
           </div>
         )}

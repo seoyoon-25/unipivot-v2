@@ -39,39 +39,39 @@ export default async function SettingsPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">설정</h1>
+      <h1 className="text-2xl font-bold text-zinc-900 mb-6">설정</h1>
 
-      <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm divide-y divide-zinc-100">
         {menuItems.map((item) => {
           const Icon = item.icon
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors ${
+              className={`flex items-center gap-4 p-4 hover:bg-zinc-50 transition-colors ${
                 item.danger ? 'text-red-600' : ''
               }`}
             >
               <div
-                className={`p-2 rounded-lg ${item.danger ? 'bg-red-100' : 'bg-gray-100'}`}
+                className={`p-2 rounded-lg ${item.danger ? 'bg-red-100' : 'bg-zinc-100'}`}
               >
                 <Icon
-                  className={`w-5 h-5 ${item.danger ? 'text-red-600' : 'text-gray-600'}`}
+                  className={`w-5 h-5 ${item.danger ? 'text-red-600' : 'text-zinc-600'}`}
                 />
               </div>
               <div className="flex-1">
                 <p
-                  className={`font-medium ${item.danger ? 'text-red-600' : 'text-gray-900'}`}
+                  className={`font-medium ${item.danger ? 'text-red-600' : 'text-zinc-900'}`}
                 >
                   {item.title}
                 </p>
                 <p
-                  className={`text-sm ${item.danger ? 'text-red-400' : 'text-gray-500'}`}
+                  className={`text-sm ${item.danger ? 'text-red-400' : 'text-zinc-500'}`}
                 >
                   {item.description}
                 </p>
               </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
+              <ChevronRight className="w-5 h-5 text-zinc-400" />
             </Link>
           )
         })}

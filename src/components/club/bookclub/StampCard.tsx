@@ -12,7 +12,7 @@ export default function StampCard({ programTitle, totalSlots, stamps }: Props) {
 
   return (
     <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-200">
-      <h3 className="font-bold text-gray-900 mb-4">{programTitle}</h3>
+      <h3 className="font-bold text-zinc-900 mb-4">{programTitle}</h3>
       <div className="grid grid-cols-4 gap-3">
         {Array.from({ length: totalSlots }, (_, i) => i + 1).map((slot) => (
           <div
@@ -28,7 +28,7 @@ export default function StampCard({ programTitle, totalSlots, stamps }: Props) {
         ))}
       </div>
       <div className="mt-4 flex justify-between text-sm">
-        <span className="text-gray-500">{count} / {totalSlots} 스탬프</span>
+        <span className="text-zinc-500">{count} / {totalSlots} 스탬프</span>
         <span className="text-amber-600 font-medium">{totalSlots > 0 ? Math.round((count / totalSlots) * 100) : 0}% 달성</span>
       </div>
     </div>

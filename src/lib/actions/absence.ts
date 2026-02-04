@@ -407,7 +407,7 @@ export async function cancelAbsenceRequest(requestId: string) {
     where: { id: requestId }
   })
 
-  revalidatePath('/mypage')
+  revalidatePath('/my')
 
   return { success: true }
 }

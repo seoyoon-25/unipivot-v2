@@ -39,24 +39,24 @@ export default async function MyStatsPage({ searchParams }: PageProps) {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">나의 통계</h1>
+        <h1 className="text-2xl font-bold text-zinc-900">나의 통계</h1>
         <StatsPeriodFilter currentPeriod={period} />
       </div>
 
       <StatsOverview data={overview} />
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">월별 출석 현황</h2>
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-zinc-900 mb-4">월별 출석 현황</h2>
         <AttendanceChart data={monthlyAttendance} />
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">독서량 추이</h2>
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-zinc-900 mb-4">독서량 추이</h2>
         <ReadingChart data={monthlyReading} />
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">장르별 독서 분포</h2>
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-zinc-900 mb-4">장르별 독서 분포</h2>
         <GenreChart data={genreData} />
       </div>
     </div>

@@ -35,7 +35,7 @@ export default function Leaderboard({
 }: LeaderboardProps) {
   if (participants.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500 text-sm">아직 참가자가 없습니다.</div>
+      <div className="text-center py-8 text-zinc-500 text-sm">아직 참가자가 없습니다.</div>
     )
   }
 
@@ -49,21 +49,21 @@ export default function Leaderboard({
           <div
             key={p.id}
             className={`flex items-center gap-3 p-3 rounded-lg ${
-              isMe ? 'bg-blue-50 border border-blue-100' : 'bg-gray-50'
+              isMe ? 'bg-blue-50 border border-blue-100' : 'bg-zinc-50'
             }`}
           >
             <span className="w-8 text-center text-lg shrink-0">{getMedalIcon(idx + 1)}</span>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-1">
-                <span className={`text-sm font-medium truncate ${isMe ? 'text-blue-700' : 'text-gray-900'}`}>
+                <span className={`text-sm font-medium truncate ${isMe ? 'text-blue-700' : 'text-zinc-900'}`}>
                   {p.user.name || '익명'}
                   {isMe && <span className="text-xs text-blue-500 ml-1">(나)</span>}
                 </span>
-                <span className="text-xs text-gray-500 shrink-0 ml-2">
+                <span className="text-xs text-zinc-500 shrink-0 ml-2">
                   {p.progress}/{targetValue}
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-zinc-200 rounded-full h-2">
                 <div
                   className={`h-2 rounded-full transition-all ${
                     p.isCompleted ? 'bg-green-500' : 'bg-blue-500'
@@ -72,7 +72,7 @@ export default function Leaderboard({
                 />
               </div>
             </div>
-            <span className="text-xs text-gray-500 shrink-0 w-10 text-right">
+            <span className="text-xs text-zinc-500 shrink-0 w-10 text-right">
               {percentage}%
             </span>
           </div>

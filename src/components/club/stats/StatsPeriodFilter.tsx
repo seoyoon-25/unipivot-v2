@@ -22,8 +22,8 @@ export default function StatsPeriodFilter({ currentPeriod }: Props) {
           href={`/club/my/stats?period=${p.value}`}
           className={`px-3 py-1.5 text-sm rounded-lg ${
             currentPeriod === p.value
-              ? 'bg-gray-900 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ? 'bg-zinc-900 text-white'
+              : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
           }`}
         >
           {p.label}

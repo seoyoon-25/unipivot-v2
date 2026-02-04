@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
-import { Users, ClipboardList, FileSearch, TrendingUp, LayoutDashboard, Menu, X, User, LogOut, ChevronDown, Settings } from 'lucide-react'
+import { Users, ClipboardList, FileSearch, TrendingUp, LayoutDashboard, Menu, X, User, LogOut, ChevronDown, Settings, ArrowLeft } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { LabBadgeList } from './LabBadge'
 
@@ -69,16 +69,25 @@ export function LabNavigation() {
     <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/lab" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">R</span>
-            </div>
-            <div>
-              <p className="font-bold text-gray-900">유니피벗 리서치랩</p>
-              <p className="text-xs text-gray-500">Research Lab</p>
-            </div>
-          </Link>
+          {/* Back + Logo */}
+          <div className="flex items-center gap-2">
+            <a
+              href={`https://${MAIN_DOMAIN}`}
+              className="flex items-center justify-center w-9 h-9 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+              aria-label="메인으로 돌아가기"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </a>
+            <Link href="/lab" className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-lg">R</span>
+              </div>
+              <div>
+                <p className="font-bold text-gray-900">유니피벗 리서치랩</p>
+                <p className="text-xs text-gray-500">Research Lab</p>
+              </div>
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1">

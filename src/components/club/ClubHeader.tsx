@@ -23,12 +23,12 @@ export default function ClubHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white border-b border-gray-200">
+      <header className="sticky top-0 z-40 h-16 bg-white/80 backdrop-blur-xl border-b border-zinc-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14">
+          <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <button
-                className="lg:hidden p-2 -ml-2 text-gray-500 hover:text-gray-700"
+                className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl text-zinc-500 hover:bg-zinc-100 transition-colors duration-200"
                 onClick={() => setMobileMenuOpen(true)}
                 aria-label="메뉴 열기"
               >
@@ -36,7 +36,7 @@ export default function ClubHeader() {
               </button>
 
               <Link href="/club" className="flex items-center gap-2">
-                <span className="text-xl font-bold text-gray-900">유니클럽</span>
+                <span className="text-xl font-bold text-blue-600">유니클럽</span>
               </Link>
             </div>
 
@@ -53,7 +53,7 @@ export default function ClubHeader() {
               ) : (
                 <Link
                   href="/login"
-                  className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                  className="text-sm font-medium text-zinc-700 hover:text-zinc-900 transition-colors duration-200"
                 >
                   로그인
                 </Link>

@@ -243,7 +243,7 @@ export async function cancelApplication(applicationId: string) {
     },
   })
 
-  revalidatePath('/mypage/applications')
+  revalidatePath('/my/applications')
   revalidatePath(`/admin/programs/${application.programId}/applications`)
 
   return { success: true }

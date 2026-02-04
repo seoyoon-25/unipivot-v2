@@ -25,7 +25,7 @@ export default function ShareMenu({ shareParams, url }: Props) {
 
       <button
         onClick={handleCopyLink}
-        className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+        className="flex items-center gap-2 px-4 py-2 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors text-sm"
       >
         {copied ? (
           <>

@@ -24,13 +24,13 @@ export default async function SearchPage({ searchParams }: PageProps) {
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
       <div className="flex items-center gap-2 mb-6">
-        <Search className="w-5 h-5 text-gray-400" />
-        <h1 className="text-xl font-bold text-gray-900">
+        <Search className="w-5 h-5 text-zinc-400" />
+        <h1 className="text-xl font-bold text-zinc-900">
           {query ? (
             <>
               &ldquo;{query}&rdquo; 검색 결과
               {results && (
-                <span className="text-sm font-normal text-gray-500 ml-2">
+                <span className="text-sm font-normal text-zinc-500 ml-2">
                   {results.totalCount}건
                 </span>
               )}
@@ -44,13 +44,13 @@ export default async function SearchPage({ searchParams }: PageProps) {
       {/* Search form for mobile or when no query */}
       <form action="/club/search" method="get" className="mb-6">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
           <input
             type="text"
             name="q"
             defaultValue={query}
             placeholder="프로그램, 공지, 독후감, 명문장 검색..."
-            className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
+            className="w-full pl-9 pr-4 py-2.5 text-sm rounded-2xl border border-zinc-100 shadow-sm bg-white focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
             autoFocus={!query}
           />
         </div>
@@ -68,10 +68,10 @@ export default async function SearchPage({ searchParams }: PageProps) {
       )}
 
       {!query && (
-        <div className="bg-white rounded-lg p-12 text-center text-gray-500">
-          <Search className="w-8 h-8 mx-auto mb-3 text-gray-300" />
+        <div className="bg-white rounded-lg p-12 text-center text-zinc-500">
+          <Search className="w-8 h-8 mx-auto mb-3 text-zinc-300" />
           <p className="text-sm">검색어를 입력하세요</p>
-          <p className="text-xs mt-1 text-gray-400">
+          <p className="text-xs mt-1 text-zinc-400">
             프로그램, 공지사항, 독후감, 명문장을 검색할 수 있습니다
           </p>
         </div>

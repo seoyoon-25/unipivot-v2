@@ -6,7 +6,7 @@ import { createPost, updatePost } from '@/app/club/community/actions'
 
 const RichTextEditor = dynamic(
   () => import('@/components/editor/RichTextEditor').then((mod) => mod.RichTextEditor),
-  { ssr: false, loading: () => <div className="h-64 bg-gray-50 rounded-lg animate-pulse" /> }
+  { ssr: false, loading: () => <div className="h-64 bg-zinc-50 rounded-lg animate-pulse" /> }
 )
 
 const categories = [
@@ -51,14 +51,14 @@ export default function PostForm({ postId, initialData }: Props) {
       )}
 
       <div>
-        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="category" className="block text-sm font-medium text-zinc-700 mb-1">
           카테고리
         </label>
         <select
           id="category"
           name="category"
           defaultValue={initialData?.category || 'FREE'}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
           {categories.map((cat) => (
             <option key={cat.value} value={cat.value}>
@@ -69,7 +69,7 @@ export default function PostForm({ postId, initialData }: Props) {
       </div>
 
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="title" className="block text-sm font-medium text-zinc-700 mb-1">
           제목
         </label>
         <input
@@ -79,12 +79,12 @@ export default function PostForm({ postId, initialData }: Props) {
           defaultValue={initialData?.title || ''}
           placeholder="제목을 입력하세요"
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">내용</label>
+        <label className="block text-sm font-medium text-zinc-700 mb-1">내용</label>
         <RichTextEditor content={content} onChange={setContent} />
       </div>
 

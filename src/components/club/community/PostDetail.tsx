@@ -50,22 +50,22 @@ export default function PostDetail({ post, isAuthor, isLoggedIn }: Props) {
     <div>
       <Link
         href="/club/community"
-        className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-6"
+        className="inline-flex items-center gap-2 text-zinc-500 hover:text-zinc-700 mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
         목록으로
       </Link>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
         <div className="flex items-center gap-2 mb-3">
-          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700 font-medium">
+          <span className="px-2 py-0.5 text-xs rounded-full bg-zinc-100 text-zinc-700 font-medium">
             {categoryLabels[post.category] || post.category}
           </span>
         </div>
 
-        <h1 className="text-xl font-bold text-gray-900 mb-3">{post.title}</h1>
+        <h1 className="text-xl font-bold text-zinc-900 mb-3">{post.title}</h1>
 
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-6 pb-6 border-b border-gray-100">
+        <div className="flex items-center gap-2 text-sm text-zinc-500 mb-6 pb-6 border-b border-zinc-100">
           <span>{post.author.name || '익명'}</span>
           <span>·</span>
           <span>{format(new Date(post.createdAt), 'yyyy.M.d', { locale: ko })}</span>
@@ -77,11 +77,11 @@ export default function PostDetail({ post, isAuthor, isLoggedIn }: Props) {
         </div>
 
         <div
-          className="prose prose-sm max-w-none text-gray-800 mb-6"
+          className="prose prose-sm max-w-none text-zinc-800 mb-6"
           dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
         />
 
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="flex items-center justify-between pt-4 border-t border-zinc-100">
           <LikeButton
             postId={post.id}
             initialLiked={post.isLiked}
@@ -93,7 +93,7 @@ export default function PostDetail({ post, isAuthor, isLoggedIn }: Props) {
             <div className="flex items-center gap-2">
               <Link
                 href={`/club/community/${post.id}/edit`}
-                className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
+                className="flex items-center gap-1 px-3 py-1.5 text-sm text-zinc-600 hover:bg-zinc-100 rounded-lg"
               >
                 <Edit2 className="w-3.5 h-3.5" />
                 수정

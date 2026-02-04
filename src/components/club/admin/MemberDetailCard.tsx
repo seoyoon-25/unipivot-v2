@@ -26,7 +26,7 @@ const roleLabels: Record<string, string> = {
 };
 
 const roleColors: Record<string, string> = {
-  USER: 'bg-gray-100 text-gray-700',
+  USER: 'bg-zinc-100 text-zinc-700',
   FACILITATOR: 'bg-blue-100 text-blue-700',
   ADMIN: 'bg-purple-100 text-purple-700',
   SUPER_ADMIN: 'bg-red-100 text-red-700',
@@ -37,7 +37,7 @@ export default function MemberDetailCard({ member }: Props) {
 
   return (
     <>
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
         <div className="flex items-start gap-6">
           {/* 프로필 이미지 */}
           {member.image ? (
@@ -49,29 +49,29 @@ export default function MemberDetailCard({ member }: Props) {
               className="w-24 h-24 rounded-full object-cover"
             />
           ) : (
-            <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-3xl text-gray-400">
+            <div className="w-24 h-24 rounded-full bg-zinc-200 flex items-center justify-center text-3xl text-zinc-400">
               {member.name?.[0] || '?'}
             </div>
           )}
 
           {/* 정보 */}
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-zinc-900">
               {member.name || '(이름 없음)'}
             </h1>
-            <p className="text-gray-500 mt-1">{member.email}</p>
+            <p className="text-zinc-500 mt-1">{member.email}</p>
 
             <div className="flex items-center gap-4 mt-4 flex-wrap">
               {/* 역할 */}
               <div className="flex items-center gap-2">
                 <span
-                  className={`px-3 py-1 text-sm rounded-full ${roleColors[member.role] || 'bg-gray-100 text-gray-700'}`}
+                  className={`px-3 py-1 text-sm rounded-full ${roleColors[member.role] || 'bg-zinc-100 text-zinc-700'}`}
                 >
                   {roleLabels[member.role] || member.role}
                 </span>
                 <button
                   onClick={() => setShowRoleModal(true)}
-                  className="p-1 text-gray-400 hover:text-purple-600 transition-colors"
+                  className="p-1 text-zinc-400 hover:text-purple-600 transition-colors"
                   title="역할 변경"
                 >
                   <UserCog className="w-4 h-4" />
@@ -79,7 +79,7 @@ export default function MemberDetailCard({ member }: Props) {
               </div>
 
               {/* 가입일 */}
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-zinc-500">
                 가입일:{' '}
                 {format(new Date(member.createdAt), 'yyyy년 M월 d일', {
                   locale: ko,

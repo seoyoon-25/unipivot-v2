@@ -53,9 +53,9 @@ export default async function MyBookshelfPage({ searchParams }: Props) {
           <div className="p-2 bg-blue-100 rounded-lg">
             <BookOpen className="w-6 h-6 text-blue-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">내 책장</h1>
+          <h1 className="text-2xl font-bold text-zinc-900">내 책장</h1>
         </div>
-        <p className="text-gray-500">
+        <p className="text-zinc-500">
           {session.user.name}님의 독서 기록
         </p>
       </div>

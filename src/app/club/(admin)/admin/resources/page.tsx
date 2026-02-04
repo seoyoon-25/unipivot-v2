@@ -44,8 +44,8 @@ export default async function AdminResourcesPage({ searchParams }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">자료 관리</h1>
-          <p className="text-gray-500 mt-1">총 {total}개 자료</p>
+          <h1 className="text-2xl font-bold text-zinc-900">자료 관리</h1>
+          <p className="text-zinc-500 mt-1">총 {total}개 자료</p>
         </div>
         <Link
           href="/club/admin/resources/upload"
@@ -57,22 +57,22 @@ export default async function AdminResourcesPage({ searchParams }: Props) {
       </div>
 
       {/* Resources Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="text-left px-4 py-3 font-medium text-gray-500">제목</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">프로그램 / 세션</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">유형</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">업로더</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">등록일</th>
+              <tr className="border-b border-zinc-200 bg-zinc-50">
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">제목</th>
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">프로그램 / 세션</th>
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">유형</th>
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">업로더</th>
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">등록일</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-zinc-100">
               {resources.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-gray-400">
+                  <td colSpan={5} className="px-4 py-12 text-center text-zinc-400">
                     등록된 자료가 없습니다.
                   </td>
                 </tr>
@@ -82,16 +82,16 @@ export default async function AdminResourcesPage({ searchParams }: Props) {
                   const TypeIcon = typeConfig.icon;
 
                   return (
-                    <tr key={resource.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={resource.id} className="hover:bg-zinc-50 transition-colors">
                       {/* Title */}
                       <td className="px-4 py-3">
                         <div className="flex items-start gap-2">
                           <div>
-                            <p className="font-medium text-gray-900">
+                            <p className="font-medium text-zinc-900">
                               {resource.title}
                             </p>
                             {resource.description && (
-                              <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">
+                              <p className="text-xs text-zinc-400 mt-0.5 line-clamp-1">
                                 {resource.description}
                               </p>
                             )}
@@ -112,10 +112,10 @@ export default async function AdminResourcesPage({ searchParams }: Props) {
                       {/* Program / Session */}
                       <td className="px-4 py-3">
                         <div>
-                          <p className="text-gray-900">
+                          <p className="text-zinc-900">
                             {resource.session.program.title}
                           </p>
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-zinc-400">
                             {resource.session.sessionNo
                               ? `${resource.session.sessionNo}회차`
                               : ''}
@@ -137,12 +137,12 @@ export default async function AdminResourcesPage({ searchParams }: Props) {
                       </td>
 
                       {/* Uploader */}
-                      <td className="px-4 py-3 text-gray-500">
+                      <td className="px-4 py-3 text-zinc-500">
                         {resource.user.name || '(이름 없음)'}
                       </td>
 
                       {/* Date */}
-                      <td className="px-4 py-3 text-gray-500">
+                      <td className="px-4 py-3 text-zinc-500">
                         {format(new Date(resource.createdAt), 'yyyy.MM.dd', {
                           locale: ko,
                         })}
@@ -162,32 +162,32 @@ export default async function AdminResourcesPage({ searchParams }: Props) {
           {page > 1 ? (
             <Link
               href={pageUrl(page - 1)}
-              className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center gap-1 px-3 py-2 text-sm text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
               이전
             </Link>
           ) : (
-            <span className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-300 bg-white border border-gray-200 rounded-lg cursor-not-allowed">
+            <span className="inline-flex items-center gap-1 px-3 py-2 text-sm text-zinc-300 bg-white border border-zinc-200 rounded-lg cursor-not-allowed">
               <ChevronLeft className="w-4 h-4" />
               이전
             </span>
           )}
 
-          <span className="px-3 py-2 text-sm text-gray-500">
+          <span className="px-3 py-2 text-sm text-zinc-500">
             {page} / {totalPages}
           </span>
 
           {page < totalPages ? (
             <Link
               href={pageUrl(page + 1)}
-              className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center gap-1 px-3 py-2 text-sm text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
             >
               다음
               <ChevronRight className="w-4 h-4" />
             </Link>
           ) : (
-            <span className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-300 bg-white border border-gray-200 rounded-lg cursor-not-allowed">
+            <span className="inline-flex items-center gap-1 px-3 py-2 text-sm text-zinc-300 bg-white border border-zinc-200 rounded-lg cursor-not-allowed">
               다음
               <ChevronRight className="w-4 h-4" />
             </span>

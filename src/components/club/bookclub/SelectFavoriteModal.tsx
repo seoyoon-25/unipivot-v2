@@ -85,9 +85,9 @@ export default function SelectFavoriteModal({
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-2">
             <Heart className="w-5 h-5 text-amber-500" />
-            <h2 id="favorite-modal-title" className="text-lg font-semibold text-gray-900">인생 책 선정</h2>
+            <h2 id="favorite-modal-title" className="text-lg font-semibold text-zinc-900">인생 책 선정</h2>
           </div>
-          <button onClick={() => { onClose(); resetForm(); }} className="p-1 text-gray-400 hover:text-gray-600" aria-label="닫기">
+          <button onClick={() => { onClose(); resetForm(); }} className="p-1 text-zinc-400 hover:text-zinc-600" aria-label="닫기">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -96,20 +96,20 @@ export default function SelectFavoriteModal({
         <div className="flex-1 overflow-y-auto p-4">
           {/* 검색 */}
           <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
             <input
               type="text"
               placeholder="책 제목 또는 저자 검색"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm"
+              className="w-full pl-10 pr-4 py-2 border border-zinc-200 rounded-lg text-sm"
             />
           </div>
 
           {/* 책 목록 */}
           <div className="space-y-2 mb-4">
             {filteredBooks.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">
+              <p className="text-center text-zinc-500 py-8">
                 {availableBooks.length === 0
                   ? '선정 가능한 책이 없습니다'
                   : '검색 결과가 없습니다'}
@@ -122,7 +122,7 @@ export default function SelectFavoriteModal({
                   className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors ${
                     selectedBook?.id === book.id
                       ? 'bg-amber-50 border-2 border-amber-500'
-                      : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent'
+                      : 'bg-zinc-50 hover:bg-zinc-100 border-2 border-transparent'
                   }`}
                 >
                   {book.image ? (
@@ -134,13 +134,13 @@ export default function SelectFavoriteModal({
                       className="w-10 h-14 object-cover rounded"
                     />
                   ) : (
-                    <div className="w-10 h-14 bg-gray-200 rounded flex items-center justify-center">
-                      <BookOpen className="w-4 h-4 text-gray-400" />
+                    <div className="w-10 h-14 bg-zinc-200 rounded flex items-center justify-center">
+                      <BookOpen className="w-4 h-4 text-zinc-400" />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">{book.title}</p>
-                    <p className="text-sm text-gray-500 truncate">{book.author || ''}</p>
+                    <p className="font-medium text-zinc-900 truncate">{book.title}</p>
+                    <p className="text-sm text-zinc-500 truncate">{book.author || ''}</p>
                   </div>
                   {selectedBook?.id === book.id && (
                     <Heart className="w-5 h-5 text-amber-500 fill-amber-500" />
@@ -153,7 +153,7 @@ export default function SelectFavoriteModal({
           {/* 한줄 소감 */}
           {selectedBook && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-zinc-700 mb-1">
                 한줄 소감 (선택)
               </label>
               <textarea
@@ -162,9 +162,9 @@ export default function SelectFavoriteModal({
                 placeholder="이 책이 왜 인생 책인지 한줄로 표현해보세요"
                 rows={2}
                 maxLength={100}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
+                className="w-full px-3 py-2 border border-zinc-200 rounded-lg text-sm resize-none"
               />
-              <p className="text-xs text-gray-400 mt-1 text-right">
+              <p className="text-xs text-zinc-400 mt-1 text-right">
                 {comment.length}/100
               </p>
             </div>
@@ -176,7 +176,7 @@ export default function SelectFavoriteModal({
           <button
             onClick={handleSubmit}
             disabled={!selectedBook || isPending}
-            className="w-full py-2.5 bg-amber-500 text-white rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="w-full py-2.5 bg-amber-500 text-white rounded-lg font-medium disabled:bg-zinc-300 disabled:cursor-not-allowed"
           >
             {isPending ? '선정 중...' : '인생 책으로 선정'}
           </button>

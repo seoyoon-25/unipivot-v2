@@ -59,7 +59,7 @@ export default function ProfileEditForm({ profile }: Props) {
       <ProfileImageUpload currentImage={profileImage} onUpload={setProfileImage} />
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-zinc-700 mb-1">
           이름 <span className="text-red-500">*</span>
         </label>
         <input
@@ -67,28 +67,28 @@ export default function ProfileEditForm({ profile }: Props) {
           name="name"
           defaultValue={profile.name || ''}
           required
-          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">자기소개</label>
+        <label className="block text-sm font-medium text-zinc-700 mb-1">자기소개</label>
         <textarea
           name="bio"
           defaultValue={profile.bio || ''}
           rows={4}
           maxLength={500}
-          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+          className="w-full px-4 py-2 border border-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
           placeholder="간단한 자기소개를 작성해주세요"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">좋아하는 장르</label>
+        <label className="block text-sm font-medium text-zinc-700 mb-1">좋아하는 장르</label>
         <select
           name="favoriteGenre"
           defaultValue={profile.favoriteGenre || ''}
-          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
           <option value="">선택 안함</option>
           {genres.map((genre) => (
@@ -99,10 +99,10 @@ export default function ProfileEditForm({ profile }: Props) {
         </select>
       </div>
 
-      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+      <div className="flex items-center justify-between p-4 bg-zinc-50 rounded-lg">
         <div>
-          <p className="font-medium text-gray-900">프로필 공개</p>
-          <p className="text-sm text-gray-500">다른 회원이 내 프로필을 볼 수 있습니다</p>
+          <p className="font-medium text-zinc-900">프로필 공개</p>
+          <p className="text-sm text-zinc-500">다른 회원이 내 프로필을 볼 수 있습니다</p>
         </div>
         <label className="relative inline-flex items-center cursor-pointer">
           <input
@@ -112,7 +112,7 @@ export default function ProfileEditForm({ profile }: Props) {
             defaultChecked={profile.isPublicProfile}
             className="sr-only peer"
           />
-          <div className="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all" />
+          <div className="w-11 h-6 bg-zinc-200 peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all" />
         </label>
       </div>
 
@@ -126,14 +126,14 @@ export default function ProfileEditForm({ profile }: Props) {
         <button
           type="button"
           onClick={() => router.back()}
-          className="flex-1 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50"
+          className="flex-1 py-2.5 border border-zinc-200 rounded-lg text-zinc-700 hover:bg-zinc-50"
         >
           취소
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50"
+          className="flex-1 py-2.5 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 disabled:opacity-50"
         >
           {isSubmitting ? '저장 중...' : '저장하기'}
         </button>

@@ -52,6 +52,29 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <head>
+        {/* Preconnect to font CDN */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        {/* Preload font CSS for early discovery, then load non-blocking.
+            Blocking CSS didn't help CLS (woff2 still loads async with font-display:swap)
+            but cost 3.6s render delay. Non-blocking saves LCP with same CLS. */}
+        <link
+          rel="preload"
+          as="style"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css';l.media='print';l.onload=function(){l.media='all'};document.head.appendChild(l)})()`,
+          }}
+        />
+        <noscript>
+          <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+          />
+        </noscript>
+      </head>
       <body className="font-pretendard">
         <GlobalProtection />
         <Providers>{children}</Providers>

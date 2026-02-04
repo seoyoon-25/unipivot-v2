@@ -34,12 +34,12 @@ export default function AdminHeader({ user }: Props) {
   const pathname = usePathname();
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-3">
+    <header className="bg-white border-b border-zinc-200 px-6 py-3">
       <div className="flex items-center justify-between">
         {/* 모바일 메뉴 버튼 */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="lg:hidden p-2 text-gray-500 hover:text-gray-700"
+          className="lg:hidden p-2 text-zinc-500 hover:text-zinc-700"
         >
           {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
@@ -49,8 +49,8 @@ export default function AdminHeader({ user }: Props) {
         {/* 사용자 정보 */}
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <p className="text-sm font-medium text-gray-900">{user.name || user.email}</p>
-            <p className="text-xs text-gray-500">{roleLabels[user.role] || user.role}</p>
+            <p className="text-sm font-medium text-zinc-900">{user.name || user.email}</p>
+            <p className="text-xs text-zinc-500">{roleLabels[user.role] || user.role}</p>
           </div>
           {user.image ? (
             <Image src={user.image} alt="" width={32} height={32} className="w-8 h-8 rounded-full" />
@@ -66,7 +66,7 @@ export default function AdminHeader({ user }: Props) {
 
       {/* 모바일 메뉴 */}
       {mobileOpen && (
-        <nav className="lg:hidden mt-3 pt-3 border-t border-gray-200">
+        <nav className="lg:hidden mt-3 pt-3 border-t border-zinc-200">
           <ul className="space-y-1">
             {mobileMenuItems.map((item) => {
               const isActive =
@@ -81,7 +81,7 @@ export default function AdminHeader({ user }: Props) {
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                       isActive
                         ? 'bg-blue-50 text-blue-700 font-medium'
-                        : 'text-gray-600 hover:bg-gray-50'
+                        : 'text-zinc-600 hover:bg-zinc-50'
                     }`}
                   >
                     <Icon className="w-5 h-5" />
@@ -93,7 +93,7 @@ export default function AdminHeader({ user }: Props) {
           </ul>
           <Link
             href="/club"
-            className="block mt-3 px-4 py-2 text-sm text-gray-500 hover:text-gray-700"
+            className="block mt-3 px-4 py-2 text-sm text-zinc-500 hover:text-zinc-700"
           >
             &larr; 유니클럽으로 돌아가기
           </Link>

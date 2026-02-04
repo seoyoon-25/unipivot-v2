@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 // 현재 활성 플로팅 버튼 목록 조회 (공개 API)
 export async function GET(request: NextRequest) {
   try {

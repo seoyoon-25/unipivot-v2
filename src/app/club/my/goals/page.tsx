@@ -22,10 +22,10 @@ export default async function GoalsPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">나의 독서 목표</h1>
+        <h1 className="text-2xl font-bold text-zinc-900">나의 독서 목표</h1>
         <Link
           href="/club/my/goals/set"
-          className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-sm"
+          className="flex items-center gap-2 px-4 py-2 border border-zinc-200 rounded-lg hover:bg-zinc-50 text-sm"
         >
           <Settings className="w-4 h-4" />
           설정
@@ -41,8 +41,8 @@ export default async function GoalsPage() {
           type="yearly"
         />
       ) : (
-        <div className="bg-gray-50 rounded-xl border border-gray-200 p-6 text-center">
-          <p className="text-gray-500 mb-4">연간 목표가 설정되지 않았습니다.</p>
+        <div className="bg-zinc-50 rounded-2xl border border-zinc-100 shadow-sm p-6 text-center">
+          <p className="text-zinc-500 mb-4">연간 목표가 설정되지 않았습니다.</p>
           <Link href="/club/my/goals/set" className="text-blue-600 hover:underline text-sm">
             목표 설정하기
           </Link>
@@ -58,8 +58,8 @@ export default async function GoalsPage() {
           type="monthly"
         />
       ) : (
-        <div className="bg-gray-50 rounded-xl border border-gray-200 p-6 text-center">
-          <p className="text-gray-500 mb-4">월간 목표가 설정되지 않았습니다.</p>
+        <div className="bg-zinc-50 rounded-2xl border border-zinc-100 shadow-sm p-6 text-center">
+          <p className="text-zinc-500 mb-4">월간 목표가 설정되지 않았습니다.</p>
           <Link href="/club/my/goals/set" className="text-blue-600 hover:underline text-sm">
             목표 설정하기
           </Link>
@@ -67,8 +67,8 @@ export default async function GoalsPage() {
       )}
 
       {badges.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="font-semibold text-gray-900 mb-4">획득 배지</h2>
+        <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+          <h2 className="font-semibold text-zinc-900 mb-4">획득 배지</h2>
           <div className="flex flex-wrap gap-3">
             {badges.map((ub) => (
               <GoalBadge key={ub.id} badge={ub.badge} earnedAt={ub.earnedAt.toISOString()} />
@@ -78,7 +78,7 @@ export default async function GoalsPage() {
       )}
 
       <div className="text-center">
-        <Link href="/club/my/goals/history" className="text-sm text-gray-500 hover:text-gray-700">
+        <Link href="/club/my/goals/history" className="text-sm text-zinc-500 hover:text-zinc-700">
           과거 목표 기록 보기
         </Link>
       </div>

@@ -18,13 +18,13 @@ export default async function ChallengesPage() {
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">독서 챌린지</h1>
-          <p className="text-sm text-gray-500 mt-1">함께 도전하고 성장해요</p>
+          <h1 className="text-2xl font-bold text-zinc-900">독서 챌린지</h1>
+          <p className="text-sm text-zinc-500 mt-1">함께 도전하고 성장해요</p>
         </div>
         <div className="flex items-center gap-2">
           <Link
             href="/club/challenges/my"
-            className="px-3 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            className="px-3 py-2 text-sm text-zinc-700 bg-zinc-100 rounded-lg hover:bg-zinc-200 transition-colors"
           >
             내 챌린지
           </Link>
@@ -43,8 +43,8 @@ export default async function ChallengesPage() {
       {challenges.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-4xl mb-4">🏃</div>
-          <p className="text-gray-500 mb-2">진행 중인 챌린지가 없습니다.</p>
-          <p className="text-sm text-gray-400">새로운 챌린지가 곧 시작됩니다!</p>
+          <p className="text-zinc-500 mb-2">진행 중인 챌린지가 없습니다.</p>
+          <p className="text-sm text-zinc-400">새로운 챌린지가 곧 시작됩니다!</p>
         </div>
       ) : (
         <div className="space-y-3">

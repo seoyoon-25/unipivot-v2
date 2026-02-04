@@ -53,10 +53,10 @@ export default async function ProgramRecapPage({ params }: Props) {
   if (program.status !== 'COMPLETED') {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        <h1 className="text-2xl font-bold text-zinc-900 mb-2">
           아직 회고를 볼 수 없습니다
         </h1>
-        <p className="text-gray-500">
+        <p className="text-zinc-500">
           프로그램이 완료된 후에 시즌 회고를 확인할 수 있습니다.
         </p>
       </div>

@@ -24,8 +24,8 @@ export default function RecapParticipants({ participants }: Props) {
   const attendanceChamp = sortedByAttendance[0];
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">참가자</h2>
+    <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+      <h2 className="text-lg font-semibold text-zinc-900 mb-4">참가자</h2>
 
       {/* 출석왕 */}
       {attendanceChamp && attendanceChamp.attendanceRate > 0 && (
@@ -36,7 +36,7 @@ export default function RecapParticipants({ participants }: Props) {
             </div>
             <div className="flex-1">
               <p className="text-sm text-amber-700">출석왕</p>
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold text-zinc-900">
                 {attendanceChamp.user.name || '(이름 없음)'}
               </p>
             </div>
@@ -52,7 +52,7 @@ export default function RecapParticipants({ participants }: Props) {
         {participants.map((p) => (
           <div
             key={p.id}
-            className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+            className="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg"
           >
             {p.user.image ? (
               <Image
@@ -63,15 +63,15 @@ export default function RecapParticipants({ participants }: Props) {
                 className="w-10 h-10 rounded-full object-cover"
               />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
+              <div className="w-10 h-10 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-500 text-sm">
                 {p.user.name?.[0] || '?'}
               </div>
             )}
             <div>
-              <p className="font-medium text-gray-900 text-sm">
+              <p className="font-medium text-zinc-900 text-sm">
                 {p.user.name || '(이름 없음)'}
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-zinc-500">
                 출석 {p.attendedCount}회 ({p.attendanceRate}%)
               </p>
             </div>

@@ -243,7 +243,7 @@ export default function SurveyRespondPage({ params }: PageProps) {
             <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
             <h2 className="mt-4 text-lg font-semibold">설문을 찾을 수 없습니다</h2>
             <p className="mt-2 text-gray-500">요청하신 설문이 존재하지 않거나 접근 권한이 없습니다.</p>
-            <Button className="mt-4" onClick={() => router.push('/mypage')}>
+            <Button className="mt-4" onClick={() => router.push('/my')}>
               마이페이지로 이동
             </Button>
           </CardContent>
@@ -262,7 +262,7 @@ export default function SurveyRespondPage({ params }: PageProps) {
             <p className="mt-2 text-gray-500">
               설문에 참여해 주셔서 감사합니다!
             </p>
-            <Button className="mt-6" onClick={() => router.push('/mypage')}>
+            <Button className="mt-6" onClick={() => router.push('/my')}>
               마이페이지로 이동
             </Button>
           </CardContent>

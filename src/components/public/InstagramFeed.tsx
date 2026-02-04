@@ -12,7 +12,7 @@ export async function InstagramFeed() {
   const { account, link } = accountInfo
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-white min-h-[400px]">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12 animate-on-scroll">
           <span className="text-primary text-sm font-semibold tracking-wider uppercase">Instagram</span>
@@ -40,6 +40,7 @@ export async function InstagramFeed() {
                     src={post.imageUrl}
                     alt={post.caption || `Instagram post ${index + 1}`}
                     fill
+                    loading="lazy"
                     className="object-cover transition-transform duration-300 group-hover:scale-110"
                     sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
                   />

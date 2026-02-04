@@ -100,8 +100,8 @@ export default function SearchResults({
             onClick={() => setTab(t.key)}
             className={`px-3 py-1.5 text-sm rounded-lg whitespace-nowrap ${
               tab === t.key
-                ? 'bg-gray-900 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-zinc-900 text-white'
+                : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
             }`}
           >
             {t.label}
@@ -112,7 +112,7 @@ export default function SearchResults({
 
       {/* Results */}
       {results.length === 0 ? (
-        <div className="bg-white rounded-lg p-12 text-center text-gray-500">
+        <div className="bg-white rounded-lg p-12 text-center text-zinc-500">
           <p className="text-sm">
             &ldquo;{query}&rdquo;에 대한 검색 결과가 없습니다.
           </p>
@@ -126,7 +126,7 @@ export default function SearchResults({
               <Link
                 key={`${result.type}-${result.id}`}
                 href={result.link}
-                className="block bg-white rounded-lg border border-gray-100 p-4 hover:bg-gray-50 transition-colors"
+                className="block bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 hover:bg-zinc-50 transition-colors"
               >
                 <div className="flex items-start gap-3">
                   <span
@@ -136,15 +136,15 @@ export default function SearchResults({
                     {config.label}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-gray-900 truncate">
+                    <h3 className="text-sm font-medium text-zinc-900 truncate">
                       {highlightText(result.title, query)}
                     </h3>
                     {result.content && (
-                      <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                      <p className="text-xs text-zinc-500 mt-1 line-clamp-2">
                         {highlightText(result.content, query)}
                       </p>
                     )}
-                    <div className="flex items-center gap-2 mt-1.5 text-[11px] text-gray-400">
+                    <div className="flex items-center gap-2 mt-1.5 text-[11px] text-zinc-400">
                       <span>{new Date(result.createdAt).toLocaleDateString('ko-KR')}</span>
                       {result.meta?.bookTitle && <span>{result.meta.bookTitle}</span>}
                       {result.meta?.author && <span>{result.meta.author}</span>}

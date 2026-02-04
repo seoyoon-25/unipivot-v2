@@ -51,15 +51,15 @@ export default function RecapStats({ recap }: Props) {
         return (
           <div
             key={stat.label}
-            className="bg-white rounded-xl border border-gray-200 p-6 text-center"
+            className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6 text-center"
           >
             <div
               className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3 ${colorStyles[stat.color]}`}
             >
               <Icon className="w-6 h-6" />
             </div>
-            <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-            <p className="text-sm text-gray-500">{stat.label}</p>
+            <p className="text-2xl font-bold text-zinc-900">{stat.value}</p>
+            <p className="text-sm text-zinc-500">{stat.label}</p>
           </div>
         );
       })}

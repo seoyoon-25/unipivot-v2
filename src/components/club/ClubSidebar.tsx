@@ -15,11 +15,11 @@ export default function ClubSidebar() {
   const menuItems = sidebarMenuItems.member;
 
   return (
-    <aside className="hidden lg:block w-64 min-h-[calc(100vh-3.5rem)] bg-white border-r border-gray-200">
-      <nav className="sticky top-14 p-4 space-y-6" aria-label="클럽 메뉴">
+    <aside className="hidden lg:block w-64 min-h-[calc(100vh-4rem)] bg-white border-r border-zinc-100">
+      <nav className="sticky top-16 p-4 space-y-6" aria-label="클럽 메뉴">
         {menuItems.map((section) => (
           <div key={section.title}>
-            <h3 className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+            <h3 className="px-3 mb-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
               {section.title}
             </h3>
             <ul className="space-y-1">
@@ -33,13 +33,16 @@ export default function ClubSidebar() {
                       href={item.href}
                       aria-current={isActive ? 'page' : undefined}
                       className={cn(
-                        'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
+                        'relative flex items-center gap-3 px-3 h-10 rounded-lg text-sm transition-colors duration-200',
                         isActive
-                          ? 'bg-blue-50 text-blue-600 font-medium'
-                          : 'text-gray-700 hover:bg-gray-50'
+                          ? 'bg-blue-50 text-blue-700 font-semibold'
+                          : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
                       )}
                     >
-                      <Icon className={cn('w-5 h-5', isActive ? 'text-blue-600' : 'text-gray-400')} />
+                      {isActive && (
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full bg-blue-600" />
+                      )}
+                      <Icon className={cn('w-5 h-5', isActive ? 'text-blue-600' : 'text-zinc-400')} />
                       {item.name}
                     </Link>
                   </li>

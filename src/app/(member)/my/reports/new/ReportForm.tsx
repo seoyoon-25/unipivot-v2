@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Save, Book } from 'lucide-react'
 import { createBookReport } from '@/lib/actions/public'
@@ -22,6 +22,7 @@ interface Props {
 
 export default function ReportForm({ books }: Props) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({
@@ -30,6 +31,17 @@ export default function ReportForm({ books }: Props) {
     content: '',
     isPublic: false
   })
+
+  // URL의 bookTitle 파라미터로 도서 자동 선택
+  useEffect(() => {
+    const bookTitle = searchParams.get('bookTitle')
+    if (bookTitle && !form.bookId) {
+      const matched = books.find(b => b.title === bookTitle)
+      if (matched) {
+        setForm(prev => ({ ...prev, bookId: matched.id }))
+      }
+    }
+  }, [searchParams, books, form.bookId])
 
   const { hasDraft, lastSaved, restoreDraft, clearDraft } = useAutoSave({
     key: DRAFT_KEY,

@@ -9,7 +9,7 @@ import PeriodFilter from '@/components/club/admin/analytics/PeriodFilter'
 
 const ContentChart = dynamic(
   () => import('@/components/club/admin/analytics/ContentChart'),
-  { ssr: false, loading: () => <div className="h-80 bg-gray-50 rounded-lg animate-pulse" /> }
+  { ssr: false, loading: () => <div className="h-80 bg-zinc-50 rounded-lg animate-pulse" /> }
 )
 
 export const metadata = { title: '콘텐츠 분석 | 유니클럽 관리자' }
@@ -36,17 +36,17 @@ export default async function ContentAnalyticsPage({ searchParams }: Props) {
         <div>
           <Link
             href="/club/admin/analytics"
-            className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-2"
+            className="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-700 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             대시보드
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">콘텐츠 분석</h1>
+          <h1 className="text-2xl font-bold text-zinc-900">콘텐츠 분석</h1>
         </div>
         <PeriodFilter currentPeriod={period} />
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
         <ContentChart
           topBooks={data.topBooks}
           totalReports={data.totalReports}

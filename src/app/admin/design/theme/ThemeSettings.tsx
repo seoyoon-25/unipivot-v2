@@ -68,6 +68,7 @@ export default function ThemeSettings({ settings }: Props) {
     logo: useRef<HTMLInputElement>(null),
     logoDark: useRef<HTMLInputElement>(null),
     favicon: useRef<HTMLInputElement>(null),
+    portalHeroImage: useRef<HTMLInputElement>(null),
   }
 
   const handleChange = (key: string, value: string) => {
@@ -429,6 +430,21 @@ export default function ThemeSettings({ settings }: Props) {
               label="파비콘"
               settingKey="theme.favicon"
               description="권장 크기: 32x32px 또는 64x64px"
+            />
+          </div>
+        </div>
+
+        {/* Portal Settings */}
+        <div className="bg-white rounded-2xl shadow-sm p-6">
+          <div className="flex items-center gap-2 mb-6">
+            <Image className="w-5 h-5 text-gray-500" />
+            <h2 className="text-lg font-semibold text-gray-900">포탈 페이지</h2>
+          </div>
+          <div className="space-y-5">
+            <ImageUploadInput
+              label="히어로 이미지"
+              settingKey="theme.portalHeroImage"
+              description="포탈 메인 카드 배경 이미지. 권장: 1920x1080px 이상, WebP 형식"
             />
           </div>
         </div>

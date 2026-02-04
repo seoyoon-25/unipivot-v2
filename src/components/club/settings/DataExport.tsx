@@ -32,9 +32,9 @@ export default function DataExport() {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-2">내 데이터 내보내기</h2>
-      <p className="text-sm text-gray-500 mb-4">
+    <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+      <h2 className="text-lg font-semibold text-zinc-900 mb-2">내 데이터 내보내기</h2>
+      <p className="text-sm text-zinc-500 mb-4">
         독후감, 명문장, 출석 기록 등 내 활동 데이터를 JSON 파일로 다운로드합니다.
       </p>
 
@@ -45,7 +45,7 @@ export default function DataExport() {
       <button
         onClick={handleExport}
         disabled={isPending}
-        className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 text-sm"
+        className="flex items-center gap-2 px-4 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 disabled:opacity-50 text-sm"
       >
         <Download className="w-4 h-4" />
         {isPending ? '준비 중...' : '데이터 다운로드 (JSON)'}

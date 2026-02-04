@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 // GET: 내 응답 대기 중인 만족도 조사 목록
 export async function GET() {
   try {

@@ -71,7 +71,7 @@ export default function QRScanner({ onScan, onError }: QRScannerProps) {
       <div
         id="qr-reader"
         ref={scannerRef}
-        className="w-full max-w-sm mx-auto rounded-xl overflow-hidden bg-gray-900"
+        className="w-full max-w-sm mx-auto rounded-xl overflow-hidden bg-zinc-900"
         style={{ minHeight: isScanning ? '300px' : '0' }}
       />
 
@@ -93,7 +93,7 @@ export default function QRScanner({ onScan, onError }: QRScannerProps) {
       ) : (
         <button
           onClick={stopScanning}
-          className="w-full flex items-center justify-center gap-2 bg-gray-600 text-white py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          className="w-full flex items-center justify-center gap-2 bg-zinc-600 text-white py-3 rounded-lg hover:bg-zinc-700 transition-colors font-medium"
         >
           스캔 중지
         </button>

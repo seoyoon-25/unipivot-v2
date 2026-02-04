@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
-  LayoutDashboard, Users, BookOpen, Briefcase, Wallet,
+  LayoutDashboard, Users, BookOpen, Library, Briefcase, Wallet,
   FileText, Bot, Palette, Settings, Home,
   ChevronDown, Bell, Handshake, FlaskConical, ClipboardList,
   Layout, UserCircle
@@ -36,6 +36,11 @@ const sidebarItems = [
     label: '프로그램',
     href: '/admin/programs',
     icon: BookOpen,
+  },
+  {
+    label: '책 관리',
+    href: '/admin/books',
+    icon: Library,
   },
   {
     label: '만족도 조사',

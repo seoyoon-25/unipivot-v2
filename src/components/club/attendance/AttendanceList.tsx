@@ -54,7 +54,7 @@ export default function AttendanceList({ sessionId, attendances, isEditable = fa
       case 'ABSENT':
         return <X className="w-4 h-4 text-red-500" />
       default:
-        return <X className="w-4 h-4 text-gray-400" />
+        return <X className="w-4 h-4 text-zinc-400" />
     }
   }
 
@@ -72,30 +72,30 @@ export default function AttendanceList({ sessionId, attendances, isEditable = fa
       case 'PRESENT': return 'bg-green-50 text-green-700'
       case 'LATE': return 'bg-yellow-50 text-yellow-700'
       case 'ABSENT': return 'bg-red-50 text-red-700'
-      default: return 'bg-gray-50 text-gray-500'
+      default: return 'bg-zinc-50 text-zinc-500'
     }
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-2">
+    <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
+      <div className="px-4 py-3 border-b border-zinc-100 flex items-center gap-2">
         <UserCheck className="w-4 h-4 text-blue-600" />
-        <span className="text-sm font-medium text-gray-900">출석 현황</span>
-        <span className="text-xs text-gray-400">({items.length}명)</span>
+        <span className="text-sm font-medium text-zinc-900">출석 현황</span>
+        <span className="text-xs text-zinc-400">({items.length}명)</span>
       </div>
-      <div className="divide-y divide-gray-50">
+      <div className="divide-y divide-zinc-50">
         {items.map((item) => (
           <div key={item.id} className="px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1.5">
                 {statusIcon(item.status)}
-                <span className="text-sm font-medium text-gray-900">{item.user.name}</span>
+                <span className="text-sm font-medium text-zinc-900">{item.user.name}</span>
               </div>
               <span className={`text-xs px-2 py-0.5 rounded-full ${statusColor(item.status)}`}>
                 {statusText(item.status)}
               </span>
               {item.checkedAt && (
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-zinc-400">
                   {new Date(item.checkedAt).toLocaleTimeString('ko-KR', {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -103,7 +103,7 @@ export default function AttendanceList({ sessionId, attendances, isEditable = fa
                 </span>
               )}
               {item.checkMethod && (
-                <span className="text-xs text-gray-300">
+                <span className="text-xs text-zinc-300">
                   ({item.checkMethod === 'QR' ? 'QR' : '수동'})
                 </span>
               )}
@@ -118,7 +118,7 @@ export default function AttendanceList({ sessionId, attendances, isEditable = fa
                     className={`px-2 py-1 text-xs rounded transition-colors ${
                       item.status === s
                         ? `${statusColor(s)} font-medium`
-                        : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                        : 'text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50'
                     } disabled:opacity-50`}
                   >
                     {statusText(s)}
@@ -129,7 +129,7 @@ export default function AttendanceList({ sessionId, attendances, isEditable = fa
           </div>
         ))}
         {items.length === 0 && (
-          <div className="px-4 py-8 text-center text-sm text-gray-400">
+          <div className="px-4 py-8 text-center text-sm text-zinc-400">
             출석 데이터가 없습니다
           </div>
         )}

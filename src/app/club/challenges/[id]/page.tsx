@@ -52,17 +52,17 @@ export default async function ChallengeDetailPage({
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
       <Link
         href="/club/challenges"
-        className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+        className="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-700"
       >
         <ArrowLeft className="w-4 h-4" />
         챌린지 목록
       </Link>
 
       {/* 챌린지 정보 */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h1 className="text-xl font-bold text-gray-900 mb-2">{challenge.title}</h1>
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+        <h1 className="text-xl font-bold text-zinc-900 mb-2">{challenge.title}</h1>
         {challenge.description && (
-          <p className="text-gray-600 text-sm mb-4">{challenge.description}</p>
+          <p className="text-zinc-600 text-sm mb-4">{challenge.description}</p>
         )}
 
         <div className="flex flex-wrap gap-3 mb-4">
@@ -70,11 +70,11 @@ export default async function ChallengeDetailPage({
             <Target className="w-3.5 h-3.5" />
             {getTypeLabel(challenge.type, challenge.targetValue, challenge.targetGenre)}
           </span>
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-zinc-100 text-zinc-600 rounded-full text-xs">
             <Calendar className="w-3.5 h-3.5" />
             {formatDate(challenge.startDate)} ~ {formatDate(challenge.endDate)}
           </span>
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-zinc-100 text-zinc-600 rounded-full text-xs">
             <Users className="w-3.5 h-3.5" />
             {challenge.participants.length}명 참가
           </span>
@@ -124,8 +124,8 @@ export default async function ChallengeDetailPage({
       </div>
 
       {/* 리더보드 */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="font-semibold text-gray-900 mb-4">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+        <h2 className="font-semibold text-zinc-900 mb-4">
           리더보드 ({challenge.participants.length}명)
         </h2>
         <Leaderboard
@@ -135,7 +135,7 @@ export default async function ChallengeDetailPage({
         />
       </div>
 
-      <p className="text-xs text-gray-400 text-center">
+      <p className="text-xs text-zinc-400 text-center">
         만든 사람: {challenge.creator.name || '관리자'}
       </p>
     </div>

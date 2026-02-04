@@ -28,9 +28,9 @@ export default async function UserProfilePage({ params }: PageProps) {
   if (!result.isPublic) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <Lock className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">비공개 프로필</h2>
-        <p className="text-gray-500">이 회원의 프로필은 비공개입니다.</p>
+        <Lock className="w-12 h-12 mx-auto text-zinc-300 mb-4" />
+        <h2 className="text-lg font-semibold text-zinc-900 mb-2">비공개 프로필</h2>
+        <p className="text-zinc-500">이 회원의 프로필은 비공개입니다.</p>
       </div>
     )
   }
@@ -44,7 +44,7 @@ export default async function UserProfilePage({ params }: PageProps) {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
         <div className="flex justify-between items-start">
           <ProfileHeader
             profile={{ ...result.user, email: '' }}
@@ -56,18 +56,18 @@ export default async function UserProfilePage({ params }: PageProps) {
         </div>
 
         {/* 팔로워/팔로잉 수 */}
-        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100">
+        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-zinc-100">
           <Link
             href={`/club/social/followers`}
-            className="text-sm text-gray-600 hover:text-blue-600"
+            className="text-sm text-zinc-600 hover:text-blue-600"
           >
-            팔로워 <span className="font-semibold text-gray-900">{counts.followers}</span>
+            팔로워 <span className="font-semibold text-zinc-900">{counts.followers}</span>
           </Link>
           <Link
             href={`/club/social/following`}
-            className="text-sm text-gray-600 hover:text-blue-600"
+            className="text-sm text-zinc-600 hover:text-blue-600"
           >
-            팔로잉 <span className="font-semibold text-gray-900">{counts.following}</span>
+            팔로잉 <span className="font-semibold text-zinc-900">{counts.following}</span>
           </Link>
         </div>
       </div>

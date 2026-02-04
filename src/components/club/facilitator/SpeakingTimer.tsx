@@ -103,14 +103,14 @@ export default function SpeakingTimer({ sessionId, participants }: SpeakingTimer
         <button
           onClick={pauseAll}
           disabled={!isRunning}
-          className="flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors text-sm"
+          className="flex items-center gap-1.5 px-4 py-2 bg-zinc-100 text-zinc-700 rounded-lg hover:bg-zinc-200 disabled:opacity-50 transition-colors text-sm"
         >
           <Pause className="w-4 h-4" />
           일시정지
         </button>
         <button
           onClick={resetAll}
-          className="flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+          className="flex items-center gap-1.5 px-4 py-2 bg-zinc-100 text-zinc-700 rounded-lg hover:bg-zinc-200 transition-colors text-sm"
         >
           <RotateCcw className="w-4 h-4" />
           초기화
@@ -131,8 +131,8 @@ export default function SpeakingTimer({ sessionId, participants }: SpeakingTimer
       </div>
 
       {/* Total time */}
-      <div className="text-center text-sm text-gray-500">
-        총 발언 시간: <span className="font-mono font-medium text-gray-900">{formatTime(totalTime)}</span>
+      <div className="text-center text-sm text-zinc-500">
+        총 발언 시간: <span className="font-mono font-medium text-zinc-900">{formatTime(totalTime)}</span>
       </div>
 
       {/* Participant timers */}
@@ -149,19 +149,19 @@ export default function SpeakingTimer({ sessionId, participants }: SpeakingTimer
               className={`w-full text-left rounded-xl border-2 p-4 transition-all ${
                 isActive
                   ? 'border-blue-500 bg-blue-50 shadow-sm'
-                  : 'border-gray-200 bg-white hover:border-gray-300'
+                  : 'border-zinc-200 bg-white hover:border-zinc-300'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <div
                     className={`p-1.5 rounded-full ${
-                      isActive ? 'bg-blue-500' : 'bg-gray-200'
+                      isActive ? 'bg-blue-500' : 'bg-zinc-200'
                     }`}
                   >
-                    <User className={`w-4 h-4 ${isActive ? 'text-white' : 'text-gray-500'}`} />
+                    <User className={`w-4 h-4 ${isActive ? 'text-white' : 'text-zinc-500'}`} />
                   </div>
-                  <span className="font-medium text-gray-900">{p.name || '이름 없음'}</span>
+                  <span className="font-medium text-zinc-900">{p.name || '이름 없음'}</span>
                   {isActive && (
                     <span className="flex items-center gap-1 text-xs text-blue-600">
                       <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
@@ -170,21 +170,21 @@ export default function SpeakingTimer({ sessionId, participants }: SpeakingTimer
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-lg font-semibold text-gray-900">
+                  <span className="font-mono text-lg font-semibold text-zinc-900">
                     {formatTime(time)}
                   </span>
                   {isActive ? (
                     <Pause className="w-5 h-5 text-blue-500" />
                   ) : (
-                    <Play className="w-5 h-5 text-gray-400" />
+                    <Play className="w-5 h-5 text-zinc-400" />
                   )}
                 </div>
               </div>
               {/* Bar chart */}
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-2 bg-zinc-100 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
-                    isActive ? 'bg-blue-500' : 'bg-gray-300'
+                    isActive ? 'bg-blue-500' : 'bg-zinc-300'
                   }`}
                   style={{ width: `${barWidth}%` }}
                 />
@@ -195,7 +195,7 @@ export default function SpeakingTimer({ sessionId, participants }: SpeakingTimer
       </div>
 
       {participants.length === 0 && (
-        <div className="text-center py-8 text-gray-400 text-sm">
+        <div className="text-center py-8 text-zinc-400 text-sm">
           참가자가 없습니다
         </div>
       )}

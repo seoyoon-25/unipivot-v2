@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 // GET - 활성화된 이슈 설문 목록 조회 (공개용)
 export async function GET(request: NextRequest) {
   try {

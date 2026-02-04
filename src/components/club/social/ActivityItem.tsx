@@ -35,7 +35,7 @@ export default function ActivityItem({ activity }: ActivityItemProps) {
   const Icon = config.icon
 
   const inner = (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:border-gray-300 transition-colors">
+    <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 hover:border-zinc-300 transition-colors">
       <div className="flex items-start gap-3">
         <Link href={`/club/profile/${activity.user.id}`} className="shrink-0">
           {activity.user.image ? (
@@ -47,27 +47,27 @@ export default function ActivityItem({ activity }: ActivityItemProps) {
               className="w-9 h-9 rounded-full object-cover"
             />
           ) : (
-            <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-sm text-gray-400">
+            <div className="w-9 h-9 rounded-full bg-zinc-200 flex items-center justify-center text-sm text-zinc-400">
               {activity.user.name?.[0] || '?'}
             </div>
           )}
         </Link>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-sm font-medium text-gray-900">
+            <span className="text-sm font-medium text-zinc-900">
               {activity.user.name || '(이름 없음)'}
             </span>
             <span className={`p-1 rounded ${config.bg}`}>
               <Icon className={`w-3 h-3 ${config.color}`} />
             </span>
           </div>
-          <p className="text-sm text-gray-700">{activity.title}</p>
+          <p className="text-sm text-zinc-700">{activity.title}</p>
           {activity.content && (
-            <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+            <p className="text-xs text-zinc-500 mt-1 line-clamp-2">
               &ldquo;{activity.content}&rdquo;
             </p>
           )}
-          <p className="text-xs text-gray-400 mt-1.5">{timeAgo(activity.createdAt)}</p>
+          <p className="text-xs text-zinc-400 mt-1.5">{timeAgo(activity.createdAt)}</p>
         </div>
       </div>
     </div>

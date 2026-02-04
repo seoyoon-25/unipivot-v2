@@ -75,7 +75,7 @@ export default function ProgramEditParticipants({
     <>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-zinc-900">
             참가자 목록 ({participants.length}명)
           </h3>
           <button
@@ -95,7 +95,7 @@ export default function ProgramEditParticipants({
         )}
 
         {participants.length === 0 ? (
-          <div className="py-8 text-center text-gray-400 text-sm">
+          <div className="py-8 text-center text-zinc-400 text-sm">
             등록된 참가자가 없습니다.
           </div>
         ) : (
@@ -103,7 +103,7 @@ export default function ProgramEditParticipants({
             {participants.map((participant) => (
               <div
                 key={participant.id}
-                className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-between p-3 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   {/* Avatar */}
@@ -117,8 +117,8 @@ export default function ProgramEditParticipants({
                         className="rounded-full object-cover"
                       />
                     ) : (
-                      <div className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center">
-                        <User className="w-4 h-4 text-gray-500" />
+                      <div className="w-9 h-9 bg-zinc-200 rounded-full flex items-center justify-center">
+                        <User className="w-4 h-4 text-zinc-500" />
                       </div>
                     )}
                   </div>
@@ -126,16 +126,16 @@ export default function ProgramEditParticipants({
                   {/* Info */}
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm font-medium text-zinc-900">
                         {participant.user.name || '이름 없음'}
                       </span>
-                      <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-600">
+                      <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-zinc-100 text-zinc-600">
                         {STATUS_LABELS[participant.status] ?? participant.status}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
+                    <div className="flex items-center gap-2 text-xs text-zinc-500 mt-0.5">
                       <span>{participant.user.email || '-'}</span>
-                      <span className="text-gray-300">|</span>
+                      <span className="text-zinc-300">|</span>
                       <span>가입: {formatJoinedAt(participant.joinedAt)}</span>
                     </div>
                   </div>
@@ -147,7 +147,7 @@ export default function ProgramEditParticipants({
                     handleRemove(participant.id, participant.user.name)
                   }
                   disabled={isPending || removingId === participant.id}
-                  className="flex-shrink-0 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                  className="flex-shrink-0 p-2 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                   title="제거"
                 >
                   <Trash2 className="w-4 h-4" />

@@ -25,7 +25,7 @@ interface Props {
 export default function PostList({ posts, currentPage, totalPages, category }: Props) {
   if (posts.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500 text-sm">
+      <div className="text-center py-12 text-zinc-500 text-sm">
         게시글이 없습니다.
       </div>
     )
@@ -56,7 +56,7 @@ export default function PostList({ posts, currentPage, totalPages, category }: P
               className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm ${
                 page === currentPage
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
               }`}
             >
               {page}

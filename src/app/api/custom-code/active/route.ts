@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 // GET: 활성 커스텀 코드 조회 (클라이언트용)
 export async function GET(request: NextRequest) {
   try {

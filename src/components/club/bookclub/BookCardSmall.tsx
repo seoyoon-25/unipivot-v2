@@ -27,8 +27,8 @@ export default function BookCardSmall({
 }: BookCardSmallProps) {
   return (
     <div
-      className={`flex gap-4 p-4 bg-white rounded-xl border border-gray-200 ${
-        onClick ? 'cursor-pointer hover:border-blue-300 hover:shadow-sm transition-all' : ''
+      className={`flex gap-4 p-4 club-card ${
+        onClick ? 'cursor-pointer club-card-hover' : ''
       }`}
       onClick={onClick}
     >
@@ -40,28 +40,28 @@ export default function BookCardSmall({
             alt={book.title}
             width={64}
             height={80}
-            className="w-full h-full object-cover rounded-lg"
+            className="w-full h-full object-cover rounded-lg shadow-md"
           />
         ) : (
-          <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-gray-300" />
+          <div className="w-full h-full bg-zinc-100 rounded-lg flex items-center justify-center">
+            <BookOpen className="w-6 h-6 text-zinc-300" />
           </div>
         )}
       </div>
 
       {/* 정보 */}
       <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-gray-900 truncate">{book.title}</h3>
-        <p className="text-sm text-gray-500 truncate">{book.author}</p>
+        <h3 className="font-medium text-zinc-900 truncate">{book.title}</h3>
+        <p className="text-xs text-zinc-500 truncate">{book.author}</p>
 
         {showComment && book.comment && (
-          <p className="text-sm text-gray-600 mt-2 line-clamp-2 italic">
+          <p className="text-sm text-zinc-600 mt-2 line-clamp-2 italic">
             &ldquo;{book.comment}&rdquo;
           </p>
         )}
 
         {book.memo && (
-          <p className="text-xs text-gray-400 mt-1 line-clamp-1">
+          <p className="text-xs text-zinc-400 mt-1 line-clamp-1">
             메모: {book.memo}
           </p>
         )}
@@ -74,7 +74,7 @@ export default function BookCardSmall({
             e.stopPropagation();
             onRemove();
           }}
-          className="p-1.5 text-gray-400 hover:text-red-500 transition-colors self-start"
+          className="p-1.5 text-zinc-400 hover:text-red-500 rounded-lg hover:bg-zinc-50 transition-colors duration-200 self-start"
         >
           <X className="w-5 h-5" />
         </button>

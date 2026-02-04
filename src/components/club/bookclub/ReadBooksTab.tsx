@@ -36,10 +36,10 @@ export default function ReadBooksTab({ books }: ReadBooksTabProps) {
       {books.map((book) => (
         <div
           key={book.id}
-          className="bg-white rounded-xl border border-gray-200 overflow-hidden"
+          className="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden"
         >
           {/* 표지 */}
-          <div className="aspect-[3/4] bg-gray-100 relative">
+          <div className="aspect-[3/4] bg-zinc-100 relative">
             {book.image ? (
               <Image
                 src={book.image}
@@ -50,20 +50,20 @@ export default function ReadBooksTab({ books }: ReadBooksTabProps) {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <BookOpen className="w-10 h-10 text-gray-300" />
+                <BookOpen className="w-10 h-10 text-zinc-300" />
               </div>
             )}
           </div>
 
           {/* 정보 */}
           <div className="p-3">
-            <h3 className="font-medium text-gray-900 text-sm line-clamp-2 mb-1">
+            <h3 className="font-medium text-zinc-900 text-sm line-clamp-2 mb-1">
               {book.title}
             </h3>
-            <p className="text-xs text-gray-500 truncate">{book.author}</p>
+            <p className="text-xs text-zinc-500 truncate">{book.author}</p>
 
             {book.readDate && (
-              <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
+              <p className="text-xs text-zinc-400 mt-2 flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
                 {format(new Date(book.readDate), 'yyyy.M', { locale: ko })}
               </p>

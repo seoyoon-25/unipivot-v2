@@ -65,7 +65,7 @@ export default function ProfileImageUpload({ currentImage, onUpload }: Props) {
             className="w-28 h-28 rounded-full object-cover"
           />
         ) : (
-          <div className="w-28 h-28 rounded-full bg-gray-200 flex items-center justify-center text-4xl text-gray-400">
+          <div className="w-28 h-28 rounded-full bg-zinc-200 flex items-center justify-center text-4xl text-zinc-400">
             ?
           </div>
         )}
@@ -73,12 +73,12 @@ export default function ProfileImageUpload({ currentImage, onUpload }: Props) {
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="absolute bottom-0 right-0 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-sm hover:bg-gray-50 disabled:opacity-50"
+          className="absolute bottom-0 right-0 w-8 h-8 bg-white border border-zinc-200 rounded-full flex items-center justify-center shadow-sm hover:bg-zinc-50 disabled:opacity-50"
         >
-          <Camera className="w-4 h-4 text-gray-600" />
+          <Camera className="w-4 h-4 text-zinc-600" />
         </button>
       </div>
-      {uploading && <p className="text-xs text-gray-500 mt-2">업로드 중...</p>}
+      {uploading && <p className="text-xs text-zinc-500 mt-2">업로드 중...</p>}
       <input
         ref={fileInputRef}
         type="file"

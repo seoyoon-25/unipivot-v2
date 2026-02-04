@@ -102,7 +102,7 @@ export default function NotificationBell() {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        className="p-2 text-gray-500 hover:text-gray-700 relative"
+        className="p-2 text-zinc-500 hover:text-zinc-700 relative"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="알림"
       >
@@ -115,9 +115,9 @@ export default function NotificationBell() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-            <h3 className="font-semibold text-sm text-gray-900">알림</h3>
+        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-zinc-200 z-50">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-100">
+            <h3 className="font-semibold text-sm text-zinc-900">알림</h3>
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
@@ -131,33 +131,33 @@ export default function NotificationBell() {
 
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="px-4 py-8 text-center text-sm text-gray-500">
+              <div className="px-4 py-8 text-center text-sm text-zinc-500">
                 알림이 없습니다
               </div>
             ) : (
               notifications.map((n) => (
                 <div
                   key={n.id}
-                  className={`px-4 py-3 border-b border-gray-50 hover:bg-gray-50 ${
+                  className={`px-4 py-3 border-b border-zinc-50 hover:bg-zinc-50 ${
                     !n.isRead ? 'bg-blue-50/50' : ''
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm ${!n.isRead ? 'font-semibold' : ''} text-gray-900 truncate`}>
+                      <p className={`text-sm ${!n.isRead ? 'font-semibold' : ''} text-zinc-900 truncate`}>
                         {n.title}
                       </p>
                       {n.content && (
-                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{n.content}</p>
+                        <p className="text-xs text-zinc-500 mt-0.5 line-clamp-2">{n.content}</p>
                       )}
-                      <p className="text-[11px] text-gray-400 mt-1">{formatTime(n.createdAt)}</p>
+                      <p className="text-[11px] text-zinc-400 mt-1">{formatTime(n.createdAt)}</p>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       {!n.isRead && (
                         <button
                           onClick={() => markAsRead([n.id])}
                           disabled={loading}
-                          className="p-1 text-gray-400 hover:text-blue-600"
+                          className="p-1 text-zinc-400 hover:text-blue-600"
                           title="읽음 처리"
                         >
                           <Check className="w-3.5 h-3.5" />
@@ -166,7 +166,7 @@ export default function NotificationBell() {
                       {n.link && (
                         <Link
                           href={n.link}
-                          className="p-1 text-gray-400 hover:text-blue-600"
+                          className="p-1 text-zinc-400 hover:text-blue-600"
                           onClick={() => {
                             if (!n.isRead) markAsRead([n.id])
                             setIsOpen(false)
@@ -182,7 +182,7 @@ export default function NotificationBell() {
             )}
           </div>
 
-          <div className="px-4 py-2 border-t border-gray-100">
+          <div className="px-4 py-2 border-t border-zinc-100">
             <Link
               href="/club/notifications"
               className="text-xs text-blue-600 hover:text-blue-800"

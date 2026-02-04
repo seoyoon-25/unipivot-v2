@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 // GET: 은행 대량이체용 엑셀 다운로드
 export async function GET(request: NextRequest) {
   try {

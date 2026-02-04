@@ -23,10 +23,10 @@ export default async function NoticeAdminPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-gray-900">공지사항 관리</h1>
+        <h1 className="text-xl font-bold text-zinc-900">공지사항 관리</h1>
         <Link
           href="/club/notices/admin/new"
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800"
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-800"
         >
           <Plus className="w-4 h-4" />
           새 공지
@@ -34,7 +34,7 @@ export default async function NoticeAdminPage() {
       </div>
 
       {notices.length === 0 ? (
-        <div className="bg-white rounded-lg p-12 text-center text-gray-500">
+        <div className="bg-white rounded-lg p-12 text-center text-zinc-500">
           등록된 공지사항이 없습니다.
         </div>
       ) : (
@@ -43,7 +43,7 @@ export default async function NoticeAdminPage() {
             <div
               key={notice.id}
               className={`bg-white rounded-lg border p-4 ${
-                !notice.isPublished ? 'border-yellow-200 bg-yellow-50/30' : 'border-gray-100'
+                !notice.isPublished ? 'border-yellow-200 bg-yellow-50/30' : 'border-zinc-100'
               }`}
             >
               <div className="flex items-start justify-between gap-3">
@@ -55,9 +55,9 @@ export default async function NoticeAdminPage() {
                         미발행
                       </span>
                     )}
-                    <h2 className="text-sm font-medium text-gray-900 truncate">{notice.title}</h2>
+                    <h2 className="text-sm font-medium text-zinc-900 truncate">{notice.title}</h2>
                   </div>
-                  <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                  <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500">
                     <span>{notice.author.name}</span>
                     <span>{new Date(notice.createdAt).toLocaleDateString('ko-KR')}</span>
                     <span className="flex items-center gap-1">
@@ -69,7 +69,7 @@ export default async function NoticeAdminPage() {
                 <div className="flex items-center gap-1 shrink-0">
                   <Link
                     href={`/club/notices/admin/${notice.id}/edit`}
-                    className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-gray-100"
+                    className="p-2 text-zinc-400 hover:text-blue-600 rounded-lg hover:bg-zinc-100"
                     title="수정"
                   >
                     <Pencil className="w-4 h-4" />

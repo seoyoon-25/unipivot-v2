@@ -91,11 +91,11 @@ export default function QuestionGenerator({ sessionId, reportCount }: QuestionGe
   return (
     <div className="space-y-4">
       {/* Generate button */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-5">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h3 className="font-semibold text-gray-900">AI 토론 질문 생성</h3>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <h3 className="font-semibold text-zinc-900">AI 토론 질문 생성</h3>
+            <p className="text-xs text-zinc-500 mt-0.5">
               제출된 독후감 {reportCount}개를 분석하여 질문을 생성합니다
             </p>
           </div>
@@ -133,7 +133,7 @@ export default function QuestionGenerator({ sessionId, reportCount }: QuestionGe
           {questions.map((q) => {
             const categoryInfo = CATEGORY_LABELS[q.category] || {
               label: q.category,
-              color: 'bg-gray-100 text-gray-600',
+              color: 'bg-zinc-100 text-zinc-600',
             }
 
             return (
@@ -142,7 +142,7 @@ export default function QuestionGenerator({ sessionId, reportCount }: QuestionGe
                 className={`bg-white rounded-xl border p-4 transition-all ${
                   q.isUsed
                     ? 'border-green-200 bg-green-50/30'
-                    : 'border-gray-200'
+                    : 'border-zinc-200'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -158,18 +158,18 @@ export default function QuestionGenerator({ sessionId, reportCount }: QuestionGe
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-900 font-medium flex items-start gap-2">
-                      <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                    <p className="text-sm text-zinc-900 font-medium flex items-start gap-2">
+                      <MessageSquare className="w-4 h-4 text-zinc-400 mt-0.5 shrink-0" />
                       {q.question}
                     </p>
                     {q.reasoning && (
-                      <p className="text-xs text-gray-500 mt-2 ml-6">{q.reasoning}</p>
+                      <p className="text-xs text-zinc-500 mt-2 ml-6">{q.reasoning}</p>
                     )}
                   </div>
                   {!q.isUsed && (
                     <button
                       onClick={() => handleToggleUsed(q.id)}
-                      className="shrink-0 px-3 py-1 text-xs border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600 transition-colors"
+                      className="shrink-0 px-3 py-1 text-xs border border-zinc-200 rounded-lg hover:bg-zinc-50 text-zinc-600 transition-colors"
                     >
                       사용
                     </button>
@@ -182,7 +182,7 @@ export default function QuestionGenerator({ sessionId, reportCount }: QuestionGe
       )}
 
       {questions.length === 0 && !generating && (
-        <div className="text-center py-8 text-gray-400 text-sm">
+        <div className="text-center py-8 text-zinc-400 text-sm">
           아직 생성된 질문이 없습니다
         </div>
       )}

@@ -16,8 +16,8 @@ export default function RecapHighlights({ highlights, aiHighlights }: Props) {
     <div className="space-y-6">
       {/* 인기 책 */}
       {highlights.topBooks.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-zinc-900 mb-4 flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-blue-600" />
             가장 인기 있었던 책
           </h2>
@@ -28,9 +28,9 @@ export default function RecapHighlights({ highlights, aiHighlights }: Props) {
                   {i + 1}
                 </span>
                 <div>
-                  <p className="font-medium text-gray-900">{book.title}</p>
+                  <p className="font-medium text-zinc-900">{book.title}</p>
                   {book.author && (
-                    <p className="text-sm text-gray-500">{book.author}</p>
+                    <p className="text-sm text-zinc-500">{book.author}</p>
                   )}
                 </div>
               </div>
@@ -45,7 +45,7 @@ export default function RecapHighlights({ highlights, aiHighlights }: Props) {
           {/* AI 요약 */}
           {aiHighlights.summary && (
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6">
-              <p className="text-gray-700 text-lg leading-relaxed">
+              <p className="text-zinc-700 text-lg leading-relaxed">
                 {aiHighlights.summary}
               </p>
             </div>
@@ -54,7 +54,7 @@ export default function RecapHighlights({ highlights, aiHighlights }: Props) {
           {/* 주요 인사이트 */}
           {aiHighlights.keyInsights && aiHighlights.keyInsights.length > 0 && (
             <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-zinc-900 mb-4 flex items-center gap-2">
                 <Lightbulb className="w-5 h-5 text-purple-600" />
                 주요 인사이트
               </h2>
@@ -62,7 +62,7 @@ export default function RecapHighlights({ highlights, aiHighlights }: Props) {
                 {aiHighlights.keyInsights.map((insight, i) => (
                   <li key={i} className="flex items-start gap-2">
                     <span className="text-purple-600 mt-0.5">&#x2022;</span>
-                    <span className="text-gray-700">{insight}</span>
+                    <span className="text-zinc-700">{insight}</span>
                   </li>
                 ))}
               </ul>
@@ -73,7 +73,7 @@ export default function RecapHighlights({ highlights, aiHighlights }: Props) {
           {aiHighlights.memorableQuotes &&
             aiHighlights.memorableQuotes.length > 0 && (
               <div className="bg-amber-50 rounded-xl border border-amber-200 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-zinc-900 mb-4 flex items-center gap-2">
                   <Quote className="w-5 h-5 text-amber-600" />
                   기억에 남는 명문장
                 </h2>
@@ -81,7 +81,7 @@ export default function RecapHighlights({ highlights, aiHighlights }: Props) {
                   {aiHighlights.memorableQuotes.map((quote, i) => (
                     <blockquote
                       key={i}
-                      className="text-gray-700 italic border-l-4 border-amber-400 pl-4"
+                      className="text-zinc-700 italic border-l-4 border-amber-400 pl-4"
                     >
                       &ldquo;{quote}&rdquo;
                     </blockquote>

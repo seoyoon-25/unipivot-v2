@@ -23,8 +23,8 @@ export default async function AdminProgramsPage({ searchParams }: Props) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">프로그램 관리</h1>
-          <p className="text-gray-500 mt-1">총 {total}개 프로그램</p>
+          <h1 className="text-2xl font-bold text-zinc-900">프로그램 관리</h1>
+          <p className="text-zinc-500 mt-1">총 {total}개 프로그램</p>
         </div>
         <Link
           href="/club/admin/programs/new"

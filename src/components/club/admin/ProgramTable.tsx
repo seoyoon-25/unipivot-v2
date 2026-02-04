@@ -46,7 +46,7 @@ const STATUS_LABELS: Record<string, string> = {
 const STATUS_COLORS: Record<string, string> = {
   RECRUITING: 'bg-green-100 text-green-700',
   ONGOING: 'bg-blue-100 text-blue-700',
-  COMPLETED: 'bg-gray-100 text-gray-500',
+  COMPLETED: 'bg-zinc-100 text-zinc-500',
 };
 
 function formatDate(date: string | Date | null): string {
@@ -134,13 +134,13 @@ export default function ProgramTable({
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4">
         <div className="flex flex-wrap items-center gap-3">
           {/* Status filter */}
           <select
             value={filters.status || 'all'}
             onChange={(e) => handleFilterChange('status', e.target.value)}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+            className="px-3 py-2 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
           >
             <option value="all">전체 상태</option>
             <option value="RECRUITING">모집중</option>
@@ -152,7 +152,7 @@ export default function ProgramTable({
           <select
             value={filters.type || 'all'}
             onChange={(e) => handleFilterChange('type', e.target.value)}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+            className="px-3 py-2 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
           >
             <option value="all">전체 타입</option>
             <option value="BOOKCLUB">독서모임</option>
@@ -163,13 +163,13 @@ export default function ProgramTable({
           {/* Search */}
           <form onSubmit={handleSearchSubmit} className="flex-1 min-w-[200px]">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
               <input
                 type="text"
                 placeholder="프로그램 검색..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full pl-9 pr-4 py-2 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
           </form>
@@ -177,39 +177,39 @@ export default function ProgramTable({
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="text-left px-4 py-3 font-medium text-gray-500">제목</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">타입</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">상태</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">시작일</th>
-                <th className="text-center px-4 py-3 font-medium text-gray-500">참가자</th>
-                <th className="text-right px-4 py-3 font-medium text-gray-500">액션</th>
+              <tr className="border-b border-zinc-200 bg-zinc-50">
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">제목</th>
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">타입</th>
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">상태</th>
+                <th className="text-left px-4 py-3 font-medium text-zinc-500">시작일</th>
+                <th className="text-center px-4 py-3 font-medium text-zinc-500">참가자</th>
+                <th className="text-right px-4 py-3 font-medium text-zinc-500">액션</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-zinc-100">
               {programs.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-gray-400">
+                  <td colSpan={6} className="px-4 py-12 text-center text-zinc-400">
                     프로그램이 없습니다.
                   </td>
                 </tr>
               ) : (
                 programs.map((program) => {
                   const statusLabel = STATUS_LABELS[program.status] ?? program.status;
-                  const statusColor = STATUS_COLORS[program.status] ?? 'bg-gray-100 text-gray-500';
+                  const statusColor = STATUS_COLORS[program.status] ?? 'bg-zinc-100 text-zinc-500';
                   const typeLabel = TYPE_LABELS[program.type] ?? program.type;
 
                   return (
-                    <tr key={program.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={program.id} className="hover:bg-zinc-50 transition-colors">
                       {/* 제목 */}
                       <td className="px-4 py-3">
                         <Link
                           href={`/club/admin/programs/${program.id}/edit`}
-                          className="font-medium text-gray-900 hover:text-blue-600 transition-colors"
+                          className="font-medium text-zinc-900 hover:text-blue-600 transition-colors"
                         >
                           {program.title}
                         </Link>
@@ -217,7 +217,7 @@ export default function ProgramTable({
 
                       {/* 타입 */}
                       <td className="px-4 py-3">
-                        <span className="inline-block px-2 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-600">
+                        <span className="inline-block px-2 py-0.5 text-xs font-medium rounded bg-zinc-100 text-zinc-600">
                           {typeLabel}
                         </span>
                       </td>
@@ -232,12 +232,12 @@ export default function ProgramTable({
                       </td>
 
                       {/* 시작일 */}
-                      <td className="px-4 py-3 text-gray-500">
+                      <td className="px-4 py-3 text-zinc-500">
                         {formatDate(program.startDate)}
                       </td>
 
                       {/* 참가자 */}
-                      <td className="px-4 py-3 text-center text-gray-500">
+                      <td className="px-4 py-3 text-center text-zinc-500">
                         {program.participantCount}명
                       </td>
 
@@ -246,7 +246,7 @@ export default function ProgramTable({
                         <div className="flex items-center justify-end gap-1">
                           <Link
                             href={`/club/admin/programs/${program.id}/edit`}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="수정"
                           >
                             <Pencil className="w-4 h-4" />
@@ -254,7 +254,7 @@ export default function ProgramTable({
                           <button
                             onClick={() => handleDelete(program.id, program.title)}
                             disabled={deleting === program.id}
-                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                            className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                             title="삭제"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -276,32 +276,32 @@ export default function ProgramTable({
           {currentPage > 1 ? (
             <Link
               href={pageUrl(currentPage - 1)}
-              className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center gap-1 px-3 py-2 text-sm text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
               이전
             </Link>
           ) : (
-            <span className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-300 bg-white border border-gray-200 rounded-lg cursor-not-allowed">
+            <span className="inline-flex items-center gap-1 px-3 py-2 text-sm text-zinc-300 bg-white border border-zinc-200 rounded-lg cursor-not-allowed">
               <ChevronLeft className="w-4 h-4" />
               이전
             </span>
           )}
 
-          <span className="px-3 py-2 text-sm text-gray-500">
+          <span className="px-3 py-2 text-sm text-zinc-500">
             {currentPage} / {totalPages}
           </span>
 
           {currentPage < totalPages ? (
             <Link
               href={pageUrl(currentPage + 1)}
-              className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center gap-1 px-3 py-2 text-sm text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
             >
               다음
               <ChevronRight className="w-4 h-4" />
             </Link>
           ) : (
-            <span className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-300 bg-white border border-gray-200 rounded-lg cursor-not-allowed">
+            <span className="inline-flex items-center gap-1 px-3 py-2 text-sm text-zinc-300 bg-white border border-zinc-200 rounded-lg cursor-not-allowed">
               다음
               <ChevronRight className="w-4 h-4" />
             </span>

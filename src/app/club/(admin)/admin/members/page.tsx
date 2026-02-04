@@ -30,8 +30,8 @@ export default async function AdminMembersPage({ searchParams }: Props) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">회원 관리</h1>
-          <p className="text-gray-500 mt-1">총 {total}명</p>
+          <h1 className="text-2xl font-bold text-zinc-900">회원 관리</h1>
+          <p className="text-zinc-500 mt-1">총 {total}명</p>
         </div>
         <ExportButton type="members" label="CSV 내보내기" />
       </div>

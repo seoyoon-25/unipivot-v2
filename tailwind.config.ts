@@ -57,6 +57,7 @@ const config: Config = {
   			pretendard: [
   				'Pretendard Variable',
   				'Pretendard',
+  				'Pretendard Fallback',
   				'-apple-system',
   				'BlinkMacSystemFont',
   				'system-ui',
@@ -71,6 +72,7 @@ const config: Config = {
   			sans: [
   				'Pretendard Variable',
   				'Pretendard',
+  				'Pretendard Fallback',
   				'-apple-system',
   				'BlinkMacSystemFont',
   				'system-ui',

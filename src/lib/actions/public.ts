@@ -5,6 +5,26 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
 // =============================================
+// Portal Stats
+// =============================================
+
+export async function getPortalStats() {
+  try {
+    const [programCount, heroImageSetting] = await Promise.all([
+      prisma.program.count({ where: { status: 'COMPLETED' } }).catch(() => 0),
+      prisma.siteSetting.findUnique({ where: { key: 'theme.portalHeroImage' } }).catch(() => null),
+    ])
+    return {
+      members: 585,
+      programs: programCount,
+      heroImage: heroImageSetting?.value || '/images/hero-bg.webp',
+    }
+  } catch {
+    return { members: 585, programs: 0, heroImage: '/images/hero-bg.webp' }
+  }
+}
+
+// =============================================
 // Home Page Data
 // =============================================
 

@@ -22,29 +22,29 @@ const categoryLabels: Record<string, string> = {
 }
 
 const categoryColors: Record<string, string> = {
-  FREE: 'bg-gray-100 text-gray-700',
-  BOOK_REVIEW: 'bg-blue-100 text-blue-700',
-  QUESTION: 'bg-green-100 text-green-700',
-  MEETUP: 'bg-purple-100 text-purple-700',
+  FREE: 'bg-zinc-100 text-zinc-700',
+  BOOK_REVIEW: 'bg-blue-50 text-blue-700',
+  QUESTION: 'bg-emerald-50 text-emerald-700',
+  MEETUP: 'bg-purple-50 text-purple-700',
 }
 
 export default function PostCard({ post }: { post: PostData }) {
   return (
     <Link href={`/club/community/${post.id}`}>
-      <div className="bg-white rounded-xl border border-gray-200 p-4 hover:border-gray-300 transition-colors">
+      <div className="club-card club-card-hover p-4">
         <div className="flex items-center gap-2 mb-2">
           <span
-            className={`px-2 py-0.5 text-xs rounded-full font-medium ${
-              categoryColors[post.category] || 'bg-gray-100 text-gray-700'
+            className={`px-2.5 py-1 text-xs rounded-full font-semibold ${
+              categoryColors[post.category] || 'bg-zinc-100 text-zinc-700'
             }`}
           >
             {categoryLabels[post.category] || post.category}
           </span>
         </div>
 
-        <h3 className="font-medium text-gray-900 mb-2 line-clamp-1">{post.title}</h3>
+        <h3 className="text-base font-bold text-zinc-900 mb-2 line-clamp-1">{post.title}</h3>
 
-        <div className="flex items-center justify-between text-sm text-gray-500">
+        <div className="flex items-center justify-between text-xs text-zinc-400">
           <div className="flex items-center gap-1">
             <span>{post.author.name || '익명'}</span>
             <span>·</span>

@@ -137,6 +137,7 @@ export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
               alt="UniPivot"
               width={160}
               height={48}
+              priority
               className="h-10 w-auto transition-opacity group-hover:opacity-80"
             />
           </Link>

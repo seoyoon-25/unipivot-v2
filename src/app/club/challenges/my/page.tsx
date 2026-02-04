@@ -30,19 +30,19 @@ export default async function MyChallengesPage() {
       <div>
         <Link
           href="/club/challenges"
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4"
+          className="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-700 mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
           챌린지 목록
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">내 챌린지</h1>
-        <p className="text-sm text-gray-500 mt-1">참가 중인 챌린지 현황</p>
+        <h1 className="text-2xl font-bold text-zinc-900">내 챌린지</h1>
+        <p className="text-sm text-zinc-500 mt-1">참가 중인 챌린지 현황</p>
       </div>
 
       {participations.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-4xl mb-4">🏃</div>
-          <p className="text-gray-500 mb-2">참가 중인 챌린지가 없습니다.</p>
+          <p className="text-zinc-500 mb-2">참가 중인 챌린지가 없습니다.</p>
           <Link
             href="/club/challenges"
             className="text-sm text-blue-600 hover:text-blue-700"
@@ -55,7 +55,7 @@ export default async function MyChallengesPage() {
           {/* 진행 중 */}
           {active.length > 0 && (
             <section>
-              <h2 className="font-semibold text-gray-900 mb-3">
+              <h2 className="font-semibold text-zinc-900 mb-3">
                 진행 중 ({active.length})
               </h2>
               <div className="space-y-3">
@@ -68,22 +68,22 @@ export default async function MyChallengesPage() {
                     <Link
                       key={p.id}
                       href={`/club/challenges/${p.challengeId}`}
-                      className="block bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-200 transition-all"
+                      className="block bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 hover:border-blue-200 transition-all"
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-medium text-gray-900">{p.challenge.title}</h3>
+                        <h3 className="font-medium text-zinc-900">{p.challenge.title}</h3>
                         <span className="flex items-center gap-1 text-xs text-blue-600">
                           <Target className="w-3.5 h-3.5" />
                           {p.progress}/{p.challenge.targetValue}
                         </span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                      <div className="w-full bg-zinc-200 rounded-full h-2 mb-2">
                         <div
                           className="h-2 rounded-full bg-blue-500 transition-all"
                           style={{ width: `${percentage}%` }}
                         />
                       </div>
-                      <div className="flex items-center justify-between text-xs text-gray-500">
+                      <div className="flex items-center justify-between text-xs text-zinc-500">
                         <span>{percentage}% 달성</span>
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
@@ -100,7 +100,7 @@ export default async function MyChallengesPage() {
           {/* 완료 */}
           {completed.length > 0 && (
             <section>
-              <h2 className="font-semibold text-gray-900 mb-3">
+              <h2 className="font-semibold text-zinc-900 mb-3">
                 달성 완료 ({completed.length})
               </h2>
               <div className="space-y-3">
@@ -113,7 +113,7 @@ export default async function MyChallengesPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Trophy className="w-4 h-4 text-green-600" />
-                        <h3 className="font-medium text-gray-900">{p.challenge.title}</h3>
+                        <h3 className="font-medium text-zinc-900">{p.challenge.title}</h3>
                       </div>
                       <span className="text-xs text-green-600 font-medium">
                         {p.challenge.targetValue}권 달성
@@ -128,7 +128,7 @@ export default async function MyChallengesPage() {
           {/* 미달성 종료 */}
           {expired.length > 0 && (
             <section>
-              <h2 className="font-semibold text-gray-900 mb-3">
+              <h2 className="font-semibold text-zinc-900 mb-3">
                 종료 ({expired.length})
               </h2>
               <div className="space-y-3">
@@ -136,11 +136,11 @@ export default async function MyChallengesPage() {
                   <Link
                     key={p.id}
                     href={`/club/challenges/${p.challengeId}`}
-                    className="block bg-gray-50 rounded-xl border border-gray-200 p-4"
+                    className="block bg-zinc-50 rounded-2xl border border-zinc-100 shadow-sm p-4"
                   >
                     <div className="flex items-center justify-between">
-                      <h3 className="font-medium text-gray-500">{p.challenge.title}</h3>
-                      <span className="text-xs text-gray-400">
+                      <h3 className="font-medium text-zinc-500">{p.challenge.title}</h3>
+                      <span className="text-xs text-zinc-400">
                         {p.progress}/{p.challenge.targetValue}
                       </span>
                     </div>

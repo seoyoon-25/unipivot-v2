@@ -104,8 +104,8 @@ export default function NotificationList() {
             onClick={() => { setFilter('all'); setPage(1) }}
             className={`px-3 py-1.5 text-sm rounded-lg ${
               filter === 'all'
-                ? 'bg-gray-900 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-zinc-900 text-white'
+                : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
             }`}
           >
             전체
@@ -114,8 +114,8 @@ export default function NotificationList() {
             onClick={() => { setFilter('unread'); setPage(1) }}
             className={`px-3 py-1.5 text-sm rounded-lg ${
               filter === 'unread'
-                ? 'bg-gray-900 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-zinc-900 text-white'
+                : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
             }`}
           >
             안읽음
@@ -123,7 +123,7 @@ export default function NotificationList() {
         </div>
         <button
           onClick={markAllRead}
-          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+          className="flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-700"
         >
           <CheckCheck className="w-4 h-4" />
           모두 읽음
@@ -135,13 +135,13 @@ export default function NotificationList() {
         <div className="space-y-3">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="bg-white rounded-lg p-4 animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-              <div className="h-3 bg-gray-100 rounded w-1/2" />
+              <div className="h-4 bg-zinc-200 rounded w-3/4 mb-2" />
+              <div className="h-3 bg-zinc-100 rounded w-1/2" />
             </div>
           ))}
         </div>
       ) : notifications.length === 0 ? (
-        <div className="bg-white rounded-lg p-12 text-center text-gray-500">
+        <div className="bg-white rounded-lg p-12 text-center text-zinc-500">
           {filter === 'unread' ? '읽지 않은 알림이 없습니다.' : '알림이 없습니다.'}
         </div>
       ) : (
@@ -150,7 +150,7 @@ export default function NotificationList() {
             <div
               key={n.id}
               className={`bg-white rounded-lg p-4 border ${
-                !n.isRead ? 'border-blue-200 bg-blue-50/30' : 'border-gray-100'
+                !n.isRead ? 'border-blue-200 bg-blue-50/30' : 'border-zinc-100'
               }`}
             >
               <div className="flex items-start justify-between gap-3">
@@ -159,20 +159,20 @@ export default function NotificationList() {
                     {!n.isRead && (
                       <span className="w-2 h-2 bg-blue-500 rounded-full shrink-0" />
                     )}
-                    <p className={`text-sm ${!n.isRead ? 'font-semibold' : ''} text-gray-900`}>
+                    <p className={`text-sm ${!n.isRead ? 'font-semibold' : ''} text-zinc-900`}>
                       {n.title}
                     </p>
                   </div>
                   {n.content && (
-                    <p className="text-sm text-gray-600 mt-1">{n.content}</p>
+                    <p className="text-sm text-zinc-600 mt-1">{n.content}</p>
                   )}
-                  <p className="text-xs text-gray-400 mt-2">{formatDate(n.createdAt)}</p>
+                  <p className="text-xs text-zinc-400 mt-2">{formatDate(n.createdAt)}</p>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   {!n.isRead && (
                     <button
                       onClick={() => markAsRead([n.id])}
-                      className="p-1.5 text-gray-400 hover:text-blue-600 rounded"
+                      className="p-1.5 text-zinc-400 hover:text-blue-600 rounded"
                       title="읽음 처리"
                     >
                       <Check className="w-4 h-4" />
@@ -181,7 +181,7 @@ export default function NotificationList() {
                   {n.link && (
                     <Link
                       href={n.link}
-                      className="p-1.5 text-gray-400 hover:text-blue-600 rounded"
+                      className="p-1.5 text-zinc-400 hover:text-blue-600 rounded"
                       onClick={() => { if (!n.isRead) markAsRead([n.id]) }}
                     >
                       <ExternalLink className="w-4 h-4" />
@@ -189,7 +189,7 @@ export default function NotificationList() {
                   )}
                   <button
                     onClick={() => deleteNotification(n.id)}
-                    className="p-1.5 text-gray-400 hover:text-red-500 rounded"
+                    className="p-1.5 text-zinc-400 hover:text-red-500 rounded"
                     title="삭제"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -207,17 +207,17 @@ export default function NotificationList() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-3 py-1.5 text-sm rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-50"
+            className="px-3 py-1.5 text-sm rounded-lg bg-zinc-100 text-zinc-600 hover:bg-zinc-200 disabled:opacity-50"
           >
             이전
           </button>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-zinc-500">
             {page} / {totalPages}
           </span>
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-3 py-1.5 text-sm rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-50"
+            className="px-3 py-1.5 text-sm rounded-lg bg-zinc-100 text-zinc-600 hover:bg-zinc-200 disabled:opacity-50"
           >
             다음
           </button>

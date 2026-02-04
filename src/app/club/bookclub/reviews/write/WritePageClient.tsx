@@ -30,8 +30,8 @@ export default function WritePageClient({ programs }: WritePageClientProps) {
   if (programs.length === 0) {
     return (
       <div className="text-center py-12">
-        <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-        <p className="text-gray-500">참여 중인 프로그램이 없습니다</p>
+        <BookOpen className="w-12 h-12 text-zinc-300 mx-auto mb-3" />
+        <p className="text-zinc-500">참여 중인 프로그램이 없습니다</p>
       </div>
     )
   }
@@ -39,20 +39,20 @@ export default function WritePageClient({ programs }: WritePageClientProps) {
   if (!selectedProgram) {
     return (
       <div className="space-y-3">
-        <p className="text-sm text-gray-600 mb-4">프로그램을 선택하세요</p>
+        <p className="text-sm text-zinc-600 mb-4">프로그램을 선택하세요</p>
         {programs.map((program) => (
           <button
             key={program.id}
             onClick={() => setSelectedProgram(program)}
-            className="w-full bg-white rounded-xl border border-gray-200 p-4 text-left hover:border-blue-300 hover:shadow-sm transition-all flex items-center justify-between"
+            className="w-full bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 text-left hover:border-blue-300 hover:shadow-sm transition-all flex items-center justify-between"
           >
             <div>
-              <div className="font-medium text-gray-900">{program.title}</div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="font-medium text-zinc-900">{program.title}</div>
+              <div className="text-xs text-zinc-500 mt-1">
                 {program.sessions.length}개 회차 · {program.status === 'ONGOING' ? '진행 중' : '완료'}
               </div>
             </div>
-            <ChevronRight className="w-5 h-5 text-gray-400" />
+            <ChevronRight className="w-5 h-5 text-zinc-400" />
           </button>
         ))}
       </div>
@@ -67,11 +67,11 @@ export default function WritePageClient({ programs }: WritePageClientProps) {
       >
         ← 프로그램 다시 선택
       </button>
-      <p className="text-sm text-gray-600 mb-4">
+      <p className="text-sm text-zinc-600 mb-4">
         <span className="font-medium">{selectedProgram.title}</span>의 회차를 선택하세요
       </p>
       {selectedProgram.sessions.length === 0 ? (
-        <div className="text-center py-8 text-gray-400">등록된 회차가 없습니다</div>
+        <div className="text-center py-8 text-zinc-400">등록된 회차가 없습니다</div>
       ) : (
         selectedProgram.sessions.map((s) => (
           <button
@@ -81,18 +81,18 @@ export default function WritePageClient({ programs }: WritePageClientProps) {
                 `/club/bookclub/reviews/write?programId=${selectedProgram.id}&sessionId=${s.id}`
               )
             }
-            className="w-full bg-white rounded-xl border border-gray-200 p-4 text-left hover:border-blue-300 hover:shadow-sm transition-all flex items-center justify-between"
+            className="w-full bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 text-left hover:border-blue-300 hover:shadow-sm transition-all flex items-center justify-between"
           >
             <div>
-              <div className="font-medium text-gray-900">
+              <div className="font-medium text-zinc-900">
                 {s.sessionNo}회차{s.title ? ` - ${s.title}` : ''}
               </div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-zinc-500 mt-1">
                 {s.bookTitle || '책 미정'}{' '}
                 {s.date && `· ${new Date(s.date).toLocaleDateString('ko-KR')}`}
               </div>
             </div>
-            <ChevronRight className="w-5 h-5 text-gray-400" />
+            <ChevronRight className="w-5 h-5 text-zinc-400" />
           </button>
         ))
       )}

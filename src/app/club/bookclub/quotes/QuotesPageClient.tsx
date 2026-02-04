@@ -94,13 +94,13 @@ export default function QuotesPageClient({
       {/* Search + Add */}
       <div className="flex items-center gap-2 mb-4">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="책 제목, 구절 검색..."
-            className="w-full rounded-lg border border-gray-300 pl-9 pr-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-lg border border-zinc-300 pl-9 pr-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
         </div>
         {isLoggedIn && (
@@ -118,8 +118,8 @@ export default function QuotesPageClient({
       {showForm && (
         <div className="bg-white rounded-xl border border-blue-200 p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-900">명문장 추가</h3>
-            <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600">
+            <h3 className="font-semibold text-zinc-900">명문장 추가</h3>
+            <button onClick={() => setShowForm(false)} className="text-zinc-400 hover:text-zinc-600">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -130,21 +130,21 @@ export default function QuotesPageClient({
                 value={formBookTitle}
                 onChange={(e) => setFormBookTitle(e.target.value)}
                 placeholder="책 제목 *"
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
               <input
                 type="text"
                 value={formBookAuthor}
                 onChange={(e) => setFormBookAuthor(e.target.value)}
                 placeholder="저자"
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <textarea
               value={formContent}
               onChange={(e) => setFormContent(e.target.value)}
               placeholder="인상 깊은 구절을 입력하세요 *"
-              className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[100px] resize-y"
+              className="w-full rounded-lg border border-zinc-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[100px] resize-y"
             />
             <div className="grid grid-cols-2 gap-3">
               <input
@@ -152,7 +152,7 @@ export default function QuotesPageClient({
                 value={formPage}
                 onChange={(e) => setFormPage(e.target.value)}
                 placeholder="페이지 (선택)"
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
               <div className="flex items-center gap-2">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -160,9 +160,9 @@ export default function QuotesPageClient({
                     type="checkbox"
                     checked={formIsPublic}
                     onChange={(e) => setFormIsPublic(e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm text-gray-600">공개</span>
+                  <span className="text-sm text-zinc-600">공개</span>
                 </label>
               </div>
             </div>
@@ -171,7 +171,7 @@ export default function QuotesPageClient({
               value={formMemo}
               onChange={(e) => setFormMemo(e.target.value)}
               placeholder="메모 (선택)"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             />
             {formError && (
               <div className="text-sm text-red-600 bg-red-50 rounded-lg p-2">{formError}</div>
@@ -189,13 +189,13 @@ export default function QuotesPageClient({
 
       {/* Tabs */}
       {isLoggedIn && (
-        <div className="flex gap-1 mb-4 bg-gray-100 p-1 rounded-lg">
+        <div className="flex gap-1 mb-4 bg-zinc-100 p-1 rounded-lg">
           <button
             onClick={() => setTab('public')}
             className={`flex-1 py-2 text-sm rounded-md font-medium transition-colors ${
               tab === 'public'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-white text-zinc-900 shadow-sm'
+                : 'text-zinc-500 hover:text-zinc-700'
             }`}
           >
             전체 ({publicQuotes.length})
@@ -204,8 +204,8 @@ export default function QuotesPageClient({
             onClick={() => setTab('my')}
             className={`flex-1 py-2 text-sm rounded-md font-medium transition-colors ${
               tab === 'my'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-white text-zinc-900 shadow-sm'
+                : 'text-zinc-500 hover:text-zinc-700'
             }`}
           >
             내 명문장 ({myQuotes.length})
@@ -225,7 +225,7 @@ export default function QuotesPageClient({
             />
           ))
         ) : (
-          <div className="text-center py-12 text-gray-400">
+          <div className="text-center py-12 text-zinc-400">
             {search ? '검색 결과가 없습니다' : '아직 등록된 명문장이 없습니다'}
           </div>
         )}

@@ -69,14 +69,14 @@ export default async function QRCodePage({ searchParams }: PageProps) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-1">QR 출석 코드</h1>
-      <p className="text-sm text-gray-500 mb-6">
+      <h1 className="text-2xl font-bold text-zinc-900 mb-1">QR 출석 코드</h1>
+      <p className="text-sm text-zinc-500 mb-6">
         {programSession.program.title} · {programSession.sessionNo}회차
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="font-semibold text-gray-900 mb-4 text-center">QR 코드</h2>
+        <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+          <h2 className="font-semibold text-zinc-900 mb-4 text-center">QR 코드</h2>
           <QRDisplay
             sessionId={sessionId}
             initialToken={activeQR?.token}
