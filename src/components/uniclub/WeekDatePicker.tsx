@@ -36,7 +36,12 @@ export default function WeekDatePicker({
   })
 
   return (
-    <div className="flex items-center gap-2 p-2 bg-white/80 backdrop-blur-xl rounded-2xl border border-stone-200/50 shadow-lg shadow-stone-200/30">
+    <div
+      className="flex items-center gap-2 p-2.5 bg-white rounded-2xl border border-stone-200"
+      style={{
+        boxShadow: '0 10px 30px -10px rgba(120, 113, 108, 0.15)',
+      }}
+    >
       {days.map((day) => {
         const isSelected = isSameDay(day, selectedDate)
         const isToday = isSameDay(day, today)
@@ -45,16 +50,16 @@ export default function WeekDatePicker({
           <button
             key={day.toISOString()}
             onClick={() => onSelect(day)}
-            className={`relative flex flex-col items-center justify-center w-12 md:w-14 h-16 md:h-[72px] rounded-xl transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+            className={`relative flex flex-col items-center justify-center w-12 md:w-14 h-16 md:h-[72px] rounded-xl transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${
               isSelected
-                ? 'bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/30 scale-105'
+                ? 'bg-gradient-to-br from-teal-500 to-teal-600 text-white shadow-lg shadow-teal-500/30 scale-105'
                 : isToday
-                  ? 'bg-indigo-50 text-indigo-600 border border-indigo-200'
+                  ? 'bg-amber-50 text-amber-700 border border-amber-200'
                   : 'text-stone-600 hover:bg-stone-50'
             }`}
           >
             <span className={`text-[10px] font-medium leading-none mb-1.5 ${
-              isSelected ? 'text-indigo-100' : isToday ? 'text-indigo-500' : 'text-stone-400'
+              isSelected ? 'text-teal-100' : isToday ? 'text-amber-600' : 'text-stone-400'
             }`}>
               {isToday ? '오늘' : DAY_LABELS[day.getDay()]}
             </span>
@@ -63,7 +68,7 @@ export default function WeekDatePicker({
             </span>
             {/* Session dot */}
             {hasSession && !isSelected && (
-              <span className="absolute bottom-2 w-1.5 h-1.5 rounded-full bg-indigo-500" />
+              <span className="absolute bottom-2 w-1.5 h-1.5 rounded-full bg-teal-500" />
             )}
             {hasSession && isSelected && (
               <span className="absolute bottom-2 w-1.5 h-1.5 rounded-full bg-white/80" />

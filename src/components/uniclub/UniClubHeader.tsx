@@ -4,13 +4,14 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { BookOpen, Search, User, Menu, X, Sparkles } from 'lucide-react'
+import { Library, Search, User, Menu, X, ChevronRight, Home, BookOpen, Users, Calendar, Gift } from 'lucide-react'
 
 const NAV_ITEMS = [
-  { label: '도서', href: '/club/bookclub/bookshelf' },
-  { label: '북클럽', href: '/club/bookclub' },
-  { label: '이벤트', href: '/programs' },
-  { label: '커뮤니티', href: '/club/community' },
+  { label: '홈', href: '/uniclub', icon: Home },
+  { label: '도서', href: '/club/bookclub/bookshelf', icon: BookOpen },
+  { label: '북클럽', href: '/club/bookclub', icon: Users },
+  { label: '일정', href: '/club/bookclub', icon: Calendar },
+  { label: '이벤트', href: '/programs', icon: Gift },
 ]
 
 export default function UniClubHeader() {
@@ -20,48 +21,60 @@ export default function UniClubHeader() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 8)
+    const handleScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [menuOpen])
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
 
   return (
     <>
-      {/* Top accent line */}
-      <div className="fixed top-0 left-0 right-0 z-[51] h-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500" />
-
       <header
-        className={`fixed top-0.5 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-white/80 backdrop-blur-2xl shadow-[0_1px_3px_rgba(0,0,0,0.05),0_8px_24px_rgba(0,0,0,0.04)]'
+            ? 'bg-[#faf8f5]/90 backdrop-blur-xl shadow-lg shadow-stone-200/20 border-b border-stone-200/50'
             : 'bg-transparent'
         }`}
       >
-        <div className="max-w-6xl mx-auto flex items-center justify-between h-16 px-4 lg:px-8">
+        <div className="max-w-6xl mx-auto flex items-center justify-between h-16 md:h-20 px-4 lg:px-8">
           {/* Logo */}
           <Link href="/uniclub" className="flex items-center gap-3 group">
-            {/* Logo Mark */}
-            <div className="relative">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:shadow-lg group-hover:shadow-indigo-500/20"
-                style={{
-                  background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #7c3aed 100%)',
-                }}
-              >
-                <BookOpen className="w-5 h-5 text-white" />
-              </div>
-              {/* Sparkle accent */}
-              <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                scrolled
+                  ? 'bg-gradient-to-br from-teal-500 to-teal-600 shadow-lg shadow-teal-500/25'
+                  : 'bg-white/20 backdrop-blur-sm border border-white/30'
+              }`}
+            >
+              <Library className="w-5 h-5 text-white" />
             </div>
-            {/* Logo Text */}
             <div className="flex flex-col">
-              <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                UNICLUB
+              <span
+                className={`font-bold text-lg tracking-tight transition-colors duration-300 ${
+                  scrolled ? 'text-stone-800' : 'text-white'
+                }`}
+              >
+                유니클럽
               </span>
-              <span className="text-[9px] font-medium text-stone-400 tracking-widest uppercase -mt-0.5">
-                Reading Community
+              <span
+                className={`text-[9px] font-medium tracking-widest uppercase -mt-0.5 transition-colors duration-300 ${
+                  scrolled ? 'text-stone-400' : 'text-white/70'
+                }`}
+              >
+                Literary Community
               </span>
             </div>
           </Link>
@@ -72,16 +85,17 @@ export default function UniClubHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative px-4 py-2.5 text-sm font-medium transition-all duration-200 rounded-xl ${
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive(item.href)
-                    ? 'text-indigo-600 bg-indigo-50/80'
-                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/60'
+                    ? scrolled
+                      ? 'text-teal-700 bg-teal-50'
+                      : 'text-white bg-white/20'
+                    : scrolled
+                      ? 'text-stone-600 hover:text-teal-600 hover:bg-stone-100'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
               >
                 {item.label}
-                {isActive(item.href) && (
-                  <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-indigo-500" />
-                )}
               </Link>
             ))}
           </nav>
@@ -91,7 +105,11 @@ export default function UniClubHeader() {
             {/* Search */}
             <Link
               href="/club/bookclub/bookshelf"
-              className="flex items-center justify-center w-10 h-10 rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-100/60 transition-all duration-200"
+              className={`hidden md:flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 ${
+                scrolled
+                  ? 'text-stone-600 hover:text-teal-600 hover:bg-stone-100'
+                  : 'text-white/80 hover:text-white hover:bg-white/10'
+              }`}
               aria-label="검색"
             >
               <Search className="w-[18px] h-[18px]" />
@@ -101,10 +119,11 @@ export default function UniClubHeader() {
             {session?.user ? (
               <Link
                 href="/club"
-                className="hidden md:flex items-center gap-2 h-10 px-4 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/25"
-                style={{
-                  background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-                }}
+                className={`hidden md:flex items-center gap-2 h-10 px-5 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                  scrolled
+                    ? 'bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg shadow-teal-500/25 hover:shadow-xl hover:shadow-teal-500/40'
+                    : 'bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30'
+                }`}
               >
                 <User className="w-4 h-4" />
                 마이클럽
@@ -112,10 +131,11 @@ export default function UniClubHeader() {
             ) : (
               <Link
                 href="/login"
-                className="hidden md:flex items-center h-10 px-5 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/25"
-                style={{
-                  background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-                }}
+                className={`hidden md:flex items-center h-10 px-5 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                  scrolled
+                    ? 'bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg shadow-teal-500/25 hover:shadow-xl hover:shadow-teal-500/40'
+                    : 'bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30'
+                }`}
               >
                 로그인
               </Link>
@@ -124,45 +144,79 @@ export default function UniClubHeader() {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl text-stone-600 hover:bg-stone-100/60 transition-colors duration-200"
+              className={`md:hidden flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-200 ${
+                scrolled
+                  ? 'text-stone-700 hover:bg-stone-100'
+                  : 'text-white hover:bg-white/10'
+              }`}
               aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
             >
               {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
+      </header>
 
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <nav className="md:hidden bg-white/95 backdrop-blur-2xl border-t border-stone-100 px-4 pb-6 pt-3 shadow-xl">
-            <div className="space-y-1">
+      {/* Mobile Menu Overlay */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+            onClick={() => setMenuOpen(false)}
+          />
+
+          {/* Menu Panel */}
+          <div className="absolute top-0 right-0 w-[85%] max-w-sm h-full bg-[#faf8f5] shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 h-16 border-b border-stone-200">
+              <span className="text-lg font-bold text-stone-800">메뉴</span>
+              <button
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center justify-center w-10 h-10 rounded-xl text-stone-600 hover:bg-stone-100 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Nav Items */}
+            <nav className="px-4 py-6 space-y-2">
               {NAV_ITEMS.map((item) => {
-                const active = isActive(item.href)
+                const Icon = item.icon
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setMenuOpen(false)}
-                    className={`flex items-center h-12 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${
-                      active
-                        ? 'text-indigo-600 bg-indigo-50'
-                        : 'text-stone-700 hover:bg-stone-50'
+                    className={`flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-200 ${
+                      isActive(item.href)
+                        ? 'bg-teal-50 text-teal-700'
+                        : 'text-stone-600 hover:bg-stone-100'
                     }`}
                   >
-                    {item.label}
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        isActive(item.href)
+                          ? 'bg-gradient-to-br from-teal-500 to-teal-600 text-white'
+                          : 'bg-stone-100 text-stone-500'
+                      }`}
+                    >
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <span className="flex-1 font-medium">{item.label}</span>
+                    <ChevronRight className="w-4 h-4 text-stone-400" />
                   </Link>
                 )
               })}
-            </div>
-            <div className="mt-4 pt-4 border-t border-stone-100">
+            </nav>
+
+            {/* Bottom CTA */}
+            <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-stone-200 bg-white">
               {session?.user ? (
                 <Link
                   href="/club"
                   onClick={() => setMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 h-12 rounded-xl text-white text-sm font-semibold transition-all duration-200"
-                  style={{
-                    background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-                  }}
+                  className="flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-gradient-to-r from-teal-500 to-teal-600 text-white font-semibold shadow-lg shadow-teal-500/25"
                 >
                   <User className="w-4 h-4" />
                   마이클럽
@@ -171,18 +225,16 @@ export default function UniClubHeader() {
                 <Link
                   href="/login"
                   onClick={() => setMenuOpen(false)}
-                  className="flex items-center justify-center h-12 rounded-xl text-white text-sm font-semibold transition-all duration-200"
-                  style={{
-                    background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-                  }}
+                  className="flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-gradient-to-r from-teal-500 to-teal-600 text-white font-semibold shadow-lg shadow-teal-500/25"
                 >
                   로그인
+                  <ChevronRight className="w-4 h-4" />
                 </Link>
               )}
             </div>
-          </nav>
-        )}
-      </header>
+          </div>
+        </div>
+      )}
     </>
   )
 }

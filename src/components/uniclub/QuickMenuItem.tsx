@@ -23,7 +23,7 @@ export default function QuickMenuItem({
   return (
     <Link
       href={href}
-      className="group flex flex-col items-center gap-3 p-2 rounded-2xl transition-all duration-300 hover:-translate-y-1"
+      className="group flex flex-col items-center gap-3 p-2 rounded-2xl transition-all duration-300 hover:-translate-y-2"
       style={{
         animationDelay: `${index * 50}ms`,
       }}
@@ -32,13 +32,13 @@ export default function QuickMenuItem({
       <div
         className={`relative w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center transition-all duration-300 group-hover:scale-110`}
         style={{
-          boxShadow: `0 8px 24px -4px ${shadowColor}`,
+          boxShadow: `0 10px 25px -5px ${shadowColor}`,
         }}
       >
         <Icon className="w-6 h-6 md:w-7 md:h-7 text-white" strokeWidth={1.8} />
 
         {/* Shine effect on hover */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-white/0 via-white/25 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
 
       {/* Label */}

@@ -19,7 +19,7 @@ interface EventBannerProps {
 
 const STATUS_MAP: Record<string, { label: string; gradient: string }> = {
   RECRUITING: { label: '모집중', gradient: 'from-emerald-500 to-emerald-600' },
-  ONGOING: { label: '진행중', gradient: 'from-indigo-500 to-indigo-600' },
+  ONGOING: { label: '진행중', gradient: 'from-teal-500 to-teal-600' },
 }
 
 function formatDateRange(start: string | Date | null, end: string | Date | null) {
@@ -50,7 +50,7 @@ export default function EventBanner({
   return (
     <Link
       href={`/programs/${slug}`}
-      className="group block w-full rounded-3xl overflow-hidden bg-white shadow-xl shadow-stone-200/50 hover:shadow-2xl hover:shadow-indigo-200/40 transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-4 hover:-translate-y-2"
+      className="group block w-full rounded-[2rem] overflow-hidden bg-white shadow-xl shadow-stone-200/40 hover:shadow-2xl hover:shadow-teal-200/30 transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-4 hover:-translate-y-2"
     >
       {/* Image */}
       <div className="relative w-full aspect-[16/9] bg-stone-100 overflow-hidden">
@@ -63,8 +63,8 @@ export default function EventBanner({
             sizes="(max-width: 768px) 100vw, 50vw"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-indigo-100 via-purple-50 to-indigo-100 flex items-center justify-center">
-            <span className="text-indigo-300 text-sm font-medium">No Image</span>
+          <div className="w-full h-full bg-gradient-to-br from-amber-50 via-stone-50 to-teal-50 flex items-center justify-center">
+            <span className="text-stone-300 text-sm font-medium">No Image</span>
           </div>
         )}
 
@@ -78,7 +78,7 @@ export default function EventBanner({
 
         {/* Free Badge */}
         {feeType === 'FREE' && (
-          <span className="absolute top-5 right-5 bg-white/95 backdrop-blur-sm text-indigo-600 text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+          <span className="absolute top-5 right-5 bg-white/95 backdrop-blur-sm text-amber-600 text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
             무료
           </span>
         )}
@@ -122,7 +122,7 @@ export default function EventBanner({
               {likeCount}
             </span>
           </div>
-          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-teal-600 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
             자세히
             <ArrowRight className="w-4 h-4" />
           </span>

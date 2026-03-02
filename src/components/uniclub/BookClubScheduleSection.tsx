@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { ChevronRight, CalendarDays, Sparkles } from 'lucide-react'
+import { ChevronRight, CalendarDays, Clock } from 'lucide-react'
 import Link from 'next/link'
 import WeekDatePicker from './WeekDatePicker'
 import ScheduleItem from './ScheduleItem'
@@ -53,23 +53,26 @@ export default function BookClubScheduleSection({ sessions }: { sessions: Sessio
   }, [sessions, selectedDate])
 
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-b from-stone-50 to-white">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-[#faf8f5] via-white to-[#faf8f5]">
       <div className="max-w-6xl mx-auto px-4 lg:px-8">
         {/* Section Header */}
         <div className="flex items-end justify-between mb-10">
           <div>
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-50 border border-purple-100 mb-4">
-              <CalendarDays className="w-3.5 h-3.5 text-purple-500" />
-              <span className="text-xs font-semibold text-purple-600 tracking-wide">SCHEDULE</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-50 border border-teal-200 mb-4">
+              <CalendarDays className="w-4 h-4 text-teal-600" />
+              <span className="text-xs font-semibold text-teal-700 tracking-wide uppercase">Schedule</span>
             </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-stone-900 tracking-tight">
+            <h2 className="text-2xl md:text-3xl font-bold text-stone-800 tracking-tight">
               북클럽 모임 일정
             </h2>
+            <p className="text-stone-500 mt-2 text-sm md:text-base">
+              이번 주 예정된 독서 모임을 확인하세요
+            </p>
           </div>
           <Link
             href="/club/bookclub"
-            className="flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors duration-200"
+            className="flex items-center gap-1 text-sm font-semibold text-teal-600 hover:text-teal-700 transition-colors duration-200"
           >
             전체보기
             <ChevronRight className="w-4 h-4" />
@@ -107,9 +110,9 @@ export default function BookClubScheduleSection({ sessions }: { sessions: Sessio
               </div>
             ))
           ) : (
-            <div className="flex flex-col items-center justify-center py-20 rounded-3xl bg-white/80 backdrop-blur-sm border border-stone-100">
+            <div className="flex flex-col items-center justify-center py-20 rounded-[2rem] bg-white border border-stone-100">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-stone-100 to-stone-50 flex items-center justify-center mb-4">
-                <CalendarDays className="w-8 h-8 text-stone-300" />
+                <Clock className="w-8 h-8 text-stone-300" />
               </div>
               <p className="text-base font-medium text-stone-500">이 날은 예정된 일정이 없어요</p>
               <p className="text-sm text-stone-400 mt-1">다른 날짜를 선택해 보세요</p>
