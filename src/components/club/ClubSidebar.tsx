@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { ChevronRight } from 'lucide-react';
 import { sidebarMenuItems } from '@/lib/club/navigation';
 import { cn } from '@/lib/utils';
 
@@ -15,13 +16,18 @@ export default function ClubSidebar() {
   const menuItems = sidebarMenuItems.member;
 
   return (
-    <aside className="hidden lg:block w-64 min-h-[calc(100vh-4rem)] bg-white border-r border-zinc-100">
+    <aside className="hidden lg:block w-64 min-h-[calc(100vh-4rem)] bg-white/50 backdrop-blur-sm border-r border-stone-100">
       <nav className="sticky top-16 p-4 space-y-6" aria-label="클럽 메뉴">
-        {menuItems.map((section) => (
+        {menuItems.map((section, sectionIdx) => (
           <div key={section.title}>
-            <h3 className="px-3 mb-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-              {section.title}
-            </h3>
+            {/* Section header with gradient underline */}
+            <div className="px-3 mb-3">
+              <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wider">
+                {section.title}
+              </h3>
+              <div className="mt-2 h-px bg-gradient-to-r from-indigo-200 via-stone-200 to-transparent" />
+            </div>
+
             <ul className="space-y-1">
               {section.items.map((item) => {
                 const isActive = pathname === item.href;
@@ -33,17 +39,39 @@ export default function ClubSidebar() {
                       href={item.href}
                       aria-current={isActive ? 'page' : undefined}
                       className={cn(
-                        'relative flex items-center gap-3 px-3 h-10 rounded-lg text-sm transition-colors duration-200',
+                        'group relative flex items-center gap-3 px-3 h-11 rounded-xl text-sm transition-all duration-200',
                         isActive
-                          ? 'bg-blue-50 text-blue-700 font-semibold'
-                          : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
+                          ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                          : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
                       )}
                     >
+                      {/* Active indicator with gradient */}
                       {isActive && (
-                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full bg-blue-600" />
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-gradient-to-b from-indigo-500 to-indigo-600" />
                       )}
-                      <Icon className={cn('w-5 h-5', isActive ? 'text-blue-600' : 'text-zinc-400')} />
-                      {item.name}
+
+                      {/* Icon with background box */}
+                      <span
+                        className={cn(
+                          'flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200',
+                          isActive
+                            ? 'bg-indigo-100 text-indigo-600'
+                            : 'bg-stone-100 text-stone-500 group-hover:bg-stone-200 group-hover:text-stone-700'
+                        )}
+                      >
+                        <Icon className="w-4 h-4" />
+                      </span>
+
+                      <span className="flex-1">{item.name}</span>
+
+                      {/* Hover arrow animation */}
+                      <ChevronRight
+                        className={cn(
+                          'w-4 h-4 opacity-0 -translate-x-2 transition-all duration-200',
+                          'group-hover:opacity-100 group-hover:translate-x-0',
+                          isActive ? 'text-indigo-400' : 'text-stone-400'
+                        )}
+                      />
                     </Link>
                   </li>
                 );
