@@ -21,8 +21,14 @@ export default function UniClubBottomNav() {
   }
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-t border-zinc-200/60">
-      <div className="flex items-center justify-around h-16 pb-[env(safe-area-inset-bottom)]">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50">
+      {/* Glass background */}
+      <div className="absolute inset-0 bg-white/80 backdrop-blur-xl border-t border-stone-200/60" />
+
+      {/* Gradient accent line */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-400/50 to-transparent" />
+
+      <div className="relative flex items-center justify-around h-[72px] pb-[env(safe-area-inset-bottom)]">
         {TABS.map((tab) => {
           const active = isActive(tab.href, tab.exact)
           const Icon = tab.icon
@@ -30,23 +36,35 @@ export default function UniClubBottomNav() {
             <Link
               key={tab.href}
               href={tab.href}
-              className={`flex flex-col items-center justify-center gap-1 w-full h-full min-h-[44px] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset ${
-                active ? 'text-blue-600' : 'text-zinc-400 active:text-zinc-600'
+              className={`flex flex-col items-center justify-center gap-1.5 w-full h-full min-h-[56px] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 ${
+                active ? 'text-indigo-600' : 'text-stone-400 active:text-stone-600'
               }`}
             >
               <div className="relative">
-                <Icon
-                  className={`w-5 h-5 transition-transform duration-200 ${
-                    active ? 'scale-110' : ''
-                  }`}
-                  strokeWidth={active ? 2.5 : 2}
-                />
-                {/* Active dot indicator */}
+                {/* Active background glow */}
                 {active && (
-                  <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-600" />
+                  <div className="absolute -inset-3 rounded-2xl bg-indigo-100/60 blur-sm" />
                 )}
+                <div
+                  className={`relative flex items-center justify-center w-10 h-10 rounded-2xl transition-all duration-300 ${
+                    active
+                      ? 'bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-lg shadow-indigo-500/30'
+                      : ''
+                  }`}
+                >
+                  <Icon
+                    className={`w-5 h-5 transition-all duration-300 ${
+                      active ? 'text-white scale-110' : ''
+                    }`}
+                    strokeWidth={active ? 2.5 : 2}
+                  />
+                </div>
               </div>
-              <span className={`text-[10px] leading-none font-medium ${active ? 'font-semibold' : ''}`}>
+              <span
+                className={`text-[10px] leading-none font-medium transition-all duration-200 ${
+                  active ? 'font-semibold text-indigo-600' : ''
+                }`}
+              >
                 {tab.label}
               </span>
             </Link>

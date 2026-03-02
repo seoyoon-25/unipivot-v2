@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useCallback } from 'react'
-import { ChevronRight, ChevronLeft } from 'lucide-react'
+import { ChevronRight, ChevronLeft, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import BookCard from './BookCard'
 
@@ -31,12 +31,14 @@ export default function RecommendedBooksSection({ books }: { books: Book[] }) {
     <section className="py-16 md:py-24">
       <div className="max-w-6xl mx-auto px-4 lg:px-8">
         {/* Section Header */}
-        <div className="flex items-end justify-between mb-8">
+        <div className="flex items-end justify-between mb-10">
           <div>
-            <p className="text-xs font-semibold tracking-widest uppercase text-blue-600 mb-2">
-              Recommended
-            </p>
-            <h2 className="text-2xl md:text-[26px] font-bold text-zinc-900 tracking-tight">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 mb-4">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+              <span className="text-xs font-semibold text-indigo-600 tracking-wide">RECOMMENDED</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-stone-900 tracking-tight">
               이달의 추천 도서
             </h2>
           </div>
@@ -44,21 +46,21 @@ export default function RecommendedBooksSection({ books }: { books: Book[] }) {
             {/* Arrow nav (desktop) */}
             <button
               onClick={() => scroll('left')}
-              className="hidden md:flex items-center justify-center w-10 h-10 rounded-full border border-zinc-200 text-zinc-500 hover:border-zinc-400 hover:text-zinc-900 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className="hidden md:flex items-center justify-center w-11 h-11 rounded-xl bg-white border border-stone-200 text-stone-500 hover:border-indigo-300 hover:text-indigo-600 hover:shadow-md transition-all duration-200"
               aria-label="이전"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={() => scroll('right')}
-              className="hidden md:flex items-center justify-center w-10 h-10 rounded-full border border-zinc-200 text-zinc-500 hover:border-zinc-400 hover:text-zinc-900 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className="hidden md:flex items-center justify-center w-11 h-11 rounded-xl bg-white border border-stone-200 text-stone-500 hover:border-indigo-300 hover:text-indigo-600 hover:shadow-md transition-all duration-200"
               aria-label="다음"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-5 h-5" />
             </button>
             <Link
               href="/club/bookclub/bookshelf"
-              className="flex items-center gap-0.5 text-sm font-medium text-zinc-500 hover:text-blue-600 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded ml-2"
+              className="flex items-center gap-1 ml-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors duration-200"
             >
               더보기
               <ChevronRight className="w-4 h-4" />
@@ -74,8 +76,14 @@ export default function RecommendedBooksSection({ books }: { books: Book[] }) {
         style={{ scrollSnapType: 'x mandatory' }}
       >
         <div className="flex gap-5 px-4 lg:px-8 max-w-6xl mx-auto pb-4">
-          {books.map((book) => (
-            <div key={book.id} style={{ scrollSnapAlign: 'start' }}>
+          {books.map((book, index) => (
+            <div
+              key={book.id}
+              style={{
+                scrollSnapAlign: 'start',
+                animationDelay: `${index * 50}ms`,
+              }}
+            >
               <BookCard
                 id={book.id}
                 title={book.title}

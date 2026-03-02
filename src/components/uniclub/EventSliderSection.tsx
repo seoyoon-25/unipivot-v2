@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { ChevronRight, ChevronLeft, Pause, Play } from 'lucide-react'
+import { ChevronRight, ChevronLeft, Pause, Play, Rocket } from 'lucide-react'
 import Link from 'next/link'
 import EventBanner from './EventBanner'
 import { useSwipe } from '@/hooks/useSwipe'
@@ -76,21 +76,23 @@ export default function EventSliderSection({ programs }: { programs: EventProgra
   if (!current) return null
 
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-white to-stone-50">
       <div className="max-w-6xl mx-auto px-4 lg:px-8">
         {/* Section Header */}
-        <div className="flex items-end justify-between mb-8">
+        <div className="flex items-end justify-between mb-10">
           <div>
-            <p className="text-xs font-semibold tracking-widest uppercase text-blue-600 mb-2">
-              Events
-            </p>
-            <h2 className="text-2xl md:text-[26px] font-bold text-zinc-900 tracking-tight">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-50 border border-rose-100 mb-4">
+              <Rocket className="w-3.5 h-3.5 text-rose-500" />
+              <span className="text-xs font-semibold text-rose-600 tracking-wide">EVENTS</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-stone-900 tracking-tight">
               이벤트 & 프로그램
             </h2>
           </div>
           <Link
             href="/programs"
-            className="flex items-center gap-0.5 text-sm font-medium text-zinc-500 hover:text-blue-600 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+            className="flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors duration-200"
           >
             더보기
             <ChevronRight className="w-4 h-4" />
@@ -98,15 +100,15 @@ export default function EventSliderSection({ programs }: { programs: EventProgra
         </div>
 
         {/* Type Tabs */}
-        <div className="flex items-center gap-2 mb-8 overflow-x-auto scrollbar-hide">
+        <div className="flex items-center gap-2 mb-10 overflow-x-auto scrollbar-hide pb-1">
           {TYPE_TABS.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex-shrink-0 h-9 px-5 rounded-full text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+              className={`flex-shrink-0 h-10 px-6 rounded-full text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                 activeTab === tab.key
-                  ? 'bg-zinc-900 text-white'
-                  : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                  ? 'bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25'
+                  : 'bg-white text-stone-600 border border-stone-200 hover:border-indigo-300 hover:text-indigo-600'
               }`}
             >
               {tab.label}
@@ -144,14 +146,14 @@ export default function EventSliderSection({ programs }: { programs: EventProgra
             <>
               <button
                 onClick={prev}
-                className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-11 h-11 items-center justify-center rounded-full bg-white shadow-lg text-zinc-600 hover:text-zinc-900 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-white shadow-xl shadow-stone-200/50 text-stone-600 hover:text-indigo-600 hover:shadow-2xl hover:shadow-indigo-200/50 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                 aria-label="이전"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button
                 onClick={next}
-                className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-11 h-11 items-center justify-center rounded-full bg-white shadow-lg text-zinc-600 hover:text-zinc-900 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-white shadow-xl shadow-stone-200/50 text-stone-600 hover:text-indigo-600 hover:shadow-2xl hover:shadow-indigo-200/50 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                 aria-label="다음"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -162,16 +164,16 @@ export default function EventSliderSection({ programs }: { programs: EventProgra
 
         {/* Dot Indicators + Play/Pause */}
         {filtered.length > 1 && (
-          <div className="flex items-center justify-center gap-3 mt-6">
-            <div className="flex items-center gap-1.5">
+          <div className="flex items-center justify-center gap-4 mt-8">
+            <div className="flex items-center gap-2 p-2 rounded-full bg-white/80 backdrop-blur-sm border border-stone-100">
               {filtered.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => goTo(idx)}
-                  className={`rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                  className={`rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                     idx === currentIndex
-                      ? 'w-6 h-2 bg-blue-600'
-                      : 'w-2 h-2 bg-zinc-300 hover:bg-zinc-400'
+                      ? 'w-8 h-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600'
+                      : 'w-2.5 h-2.5 bg-stone-300 hover:bg-indigo-300'
                   }`}
                   aria-label={`${idx + 1}번째 이벤트`}
                 />
@@ -179,13 +181,13 @@ export default function EventSliderSection({ programs }: { programs: EventProgra
             </div>
             <button
               onClick={() => setAutoplay(!autoplay)}
-              className="flex items-center justify-center w-7 h-7 rounded-full text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className="flex items-center justify-center w-9 h-9 rounded-full bg-white border border-stone-200 text-stone-400 hover:text-indigo-600 hover:border-indigo-300 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
               aria-label={autoplay ? '자동재생 일시정지' : '자동재생 시작'}
             >
               {autoplay ? (
-                <Pause className="w-3.5 h-3.5" />
+                <Pause className="w-4 h-4" />
               ) : (
-                <Play className="w-3.5 h-3.5" />
+                <Play className="w-4 h-4" />
               )}
             </button>
           </div>

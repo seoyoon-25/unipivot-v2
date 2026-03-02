@@ -36,7 +36,7 @@ export default function WeekDatePicker({
   })
 
   return (
-    <div className="flex items-center gap-1.5 p-1 bg-zinc-100/80 rounded-2xl">
+    <div className="flex items-center gap-2 p-2 bg-white/80 backdrop-blur-xl rounded-2xl border border-stone-200/50 shadow-lg shadow-stone-200/30">
       {days.map((day) => {
         const isSelected = isSameDay(day, selectedDate)
         const isToday = isSameDay(day, today)
@@ -45,25 +45,28 @@ export default function WeekDatePicker({
           <button
             key={day.toISOString()}
             onClick={() => onSelect(day)}
-            className={`relative flex flex-col items-center justify-center w-12 h-16 rounded-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+            className={`relative flex flex-col items-center justify-center w-12 md:w-14 h-16 md:h-[72px] rounded-xl transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
               isSelected
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25'
+                ? 'bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/30 scale-105'
                 : isToday
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-zinc-600 hover:bg-white/80'
+                  ? 'bg-indigo-50 text-indigo-600 border border-indigo-200'
+                  : 'text-stone-600 hover:bg-stone-50'
             }`}
           >
-            <span className={`text-[10px] font-medium leading-none mb-1 ${
-              isSelected ? 'text-blue-100' : isToday ? 'text-blue-500' : 'text-zinc-400'
+            <span className={`text-[10px] font-medium leading-none mb-1.5 ${
+              isSelected ? 'text-indigo-100' : isToday ? 'text-indigo-500' : 'text-stone-400'
             }`}>
               {isToday ? '오늘' : DAY_LABELS[day.getDay()]}
             </span>
-            <span className={`text-sm font-bold ${isSelected ? '' : ''}`}>
+            <span className={`text-base font-bold ${isSelected ? '' : ''}`}>
               {day.getDate()}
             </span>
             {/* Session dot */}
             {hasSession && !isSelected && (
-              <span className="absolute bottom-1.5 w-1 h-1 rounded-full bg-blue-500" />
+              <span className="absolute bottom-2 w-1.5 h-1.5 rounded-full bg-indigo-500" />
+            )}
+            {hasSession && isSelected && (
+              <span className="absolute bottom-2 w-1.5 h-1.5 rounded-full bg-white/80" />
             )}
           </button>
         )

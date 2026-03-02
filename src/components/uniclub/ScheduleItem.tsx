@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Clock, MapPin, BookOpen, Wifi } from 'lucide-react'
+import { Clock, MapPin, BookOpen, Wifi, ArrowRight } from 'lucide-react'
 
 interface ScheduleItemProps {
   id: string
@@ -28,59 +28,64 @@ export default function ScheduleItem({
   const isOnline = location?.includes('온라인') || location?.includes('Zoom')
 
   return (
-    <div className="group flex items-center gap-4 p-4 rounded-xl bg-white border border-zinc-100 hover:border-blue-100 hover:shadow-md transition-all duration-200">
+    <Link
+      href={`/programs/${program.slug}`}
+      className="group flex items-center gap-4 md:gap-6 p-5 md:p-6 rounded-2xl bg-white border border-stone-100 hover:border-indigo-200 shadow-sm hover:shadow-xl hover:shadow-indigo-100/50 transition-all duration-300 hover:-translate-y-1"
+    >
       {/* Time Column */}
-      <div className="flex-shrink-0 w-16 text-center">
+      <div className="flex-shrink-0 w-16 md:w-20 text-center">
         {startTime && (
-          <p className="text-base font-bold text-zinc-900">{startTime}</p>
+          <p className="text-lg md:text-xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            {startTime}
+          </p>
         )}
         {endTime && (
-          <p className="text-[10px] text-zinc-400 mt-0.5">~{endTime}</p>
+          <p className="text-[11px] text-stone-400 mt-0.5 font-medium">~{endTime}</p>
         )}
       </div>
 
       {/* Divider */}
-      <div className="flex-shrink-0 w-px h-12 bg-zinc-200 group-hover:bg-blue-200 transition-colors duration-200" />
+      <div className="flex-shrink-0 w-px h-14 bg-gradient-to-b from-transparent via-indigo-200 to-transparent group-hover:via-indigo-400 transition-colors duration-300" />
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5">
-          <span className="text-[10px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className="inline-flex items-center text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg">
             {sessionNo}회차
           </span>
           {isOnline && (
-            <span className="flex items-center gap-0.5 text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
-              <Wifi className="w-2.5 h-2.5" />
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
+              <Wifi className="w-3 h-3" />
               온라인
             </span>
           )}
         </div>
-        <h4 className="text-sm font-semibold text-zinc-900 truncate">
+        <h4 className="text-base font-semibold text-stone-900 truncate group-hover:text-indigo-700 transition-colors duration-200">
           {program.title}
         </h4>
-        <div className="flex items-center gap-3 mt-1">
+        <div className="flex items-center gap-3 mt-2">
           {location && !isOnline && (
-            <span className="flex items-center gap-0.5 text-xs text-zinc-400">
-              <MapPin className="w-3 h-3" />
+            <span className="flex items-center gap-1 text-xs text-stone-400">
+              <MapPin className="w-3.5 h-3.5" />
               {location}
             </span>
           )}
           {bookTitle && (
-            <span className="flex items-center gap-0.5 text-xs text-zinc-400">
-              <BookOpen className="w-3 h-3" />
-              {bookTitle}
+            <span className="flex items-center gap-1 text-xs text-stone-400">
+              <BookOpen className="w-3.5 h-3.5" />
+              <span className="truncate max-w-[120px]">{bookTitle}</span>
             </span>
           )}
         </div>
       </div>
 
       {/* Join Button */}
-      <Link
-        href={`/programs/${program.slug}`}
-        className="flex-shrink-0 h-9 px-4 rounded-lg bg-blue-600 text-white text-xs font-semibold flex items-center hover:bg-blue-700 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 shadow-sm hover:shadow-md"
-      >
-        참가
-      </Link>
-    </div>
+      <div className="flex-shrink-0">
+        <span className="inline-flex items-center gap-1.5 h-10 px-5 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white text-sm font-semibold shadow-lg shadow-indigo-500/25 group-hover:shadow-xl group-hover:shadow-indigo-500/40 group-hover:-translate-y-0.5 transition-all duration-300">
+          참가
+          <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+        </span>
+      </div>
+    </Link>
   )
 }
