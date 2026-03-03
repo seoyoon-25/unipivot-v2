@@ -5,7 +5,7 @@ import BookshelfFilter from '@/components/club/bookclub/BookshelfFilter';
 import BookGrid from '@/components/club/bookclub/BookGrid';
 
 export const metadata = {
-  title: '책장',
+  title: '유니피벗 진행도서',
 };
 
 interface Props {
@@ -33,7 +33,7 @@ export default async function BookshelfPage({ searchParams }: Props) {
     <div className="max-w-6xl mx-auto px-4 py-6">
       <BookshelfHeader
         totalCount={books.length}
-        title="책장"
+        title="유니피벗 진행도서"
         description="함께 읽은 책들"
       />
 

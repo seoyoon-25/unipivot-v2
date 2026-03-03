@@ -102,22 +102,13 @@ export function HeroSection({ stats }: Props) {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center hero-fade-up" style={{ animationDelay: '0.6s' }}>
-          <Link
-            href="/club"
-            className="px-8 py-4 bg-white text-primary rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
-          >
+          <Link href="/club" className="btn-hero-cta">
             유니클럽
           </Link>
-          <Link
-            href="#programs"
-            className="px-8 py-4 bg-primary hover:bg-primary-dark text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-primary/30 hover:shadow-primary/40 hover:-translate-y-0.5"
-          >
+          <Link href="#programs" className="btn-hero-cta">
             프로그램 둘러보기
           </Link>
-          <Link
-            href="/about"
-            className="px-8 py-4 bg-white/10 border border-white/20 text-white rounded-xl font-medium transition-all duration-200 hover:bg-white/20"
-          >
+          <Link href="/about" className="btn-hero-cta">
             유니피벗 소개
           </Link>
         </div>

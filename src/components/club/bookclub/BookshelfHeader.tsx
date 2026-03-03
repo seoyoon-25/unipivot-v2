@@ -8,7 +8,7 @@ interface BookshelfHeaderProps {
 
 export default function BookshelfHeader({
   totalCount,
-  title = '책장',
+  title = '유니피벗 진행도서',
   description,
 }: BookshelfHeaderProps) {
   return (

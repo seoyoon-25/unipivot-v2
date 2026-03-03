@@ -4,10 +4,9 @@ import { cn } from '@/lib/utils'
 import { Menu, User, LogOut, Settings, Info, BookOpen, MessageSquare, Heart, FlaskConical, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { Avatar } from '@/components/ui'
-import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,7 +46,6 @@ type MenuItem = {
 
 const LAB_DOMAIN = process.env.NEXT_PUBLIC_LAB_DOMAIN || 'lab.bestcome.org'
 
-// 카테고리별 아이콘 매핑
 const ICON_MAP: Record<string, React.ReactNode> = {
   '소개': <Info className="w-4 h-4" />,
   '프로그램': <BookOpen className="w-4 h-4" />,
@@ -56,7 +54,6 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   '리서치랩': <FlaskConical className="w-4 h-4" />,
 }
 
-// 기본 메뉴 (서버에서 메뉴를 못 가져온 경우 폴백으로 사용)
 const defaultMenuItems: MenuItem[] = [
   {
     label: '소개',
@@ -69,7 +66,7 @@ const defaultMenuItems: MenuItem[] = [
     label: '프로그램',
     children: [
       { label: '전체 프로그램', href: '/programs', description: '모든 프로그램 보기' },
-      { label: '독서모임', href: '/programs?type=BOOKCLUB', description: '남Book북한걸음' },
+      { label: '독서모임', href: '/programs?type=BOOKCLUB', description: '독서모임' },
       { label: '강연 및 세미나', href: '/programs?type=SEMINAR', description: '정기 교육 세미나' },
       { label: 'K-Move', href: '/programs?type=KMOVE', description: '현장 탐방' },
       { label: '토론회', href: '/programs?type=DEBATE', description: '주제별 토론회' },
@@ -107,272 +104,434 @@ interface NavbarProps {
 
 const DEFAULT_LOGO = '/images/logo.png'
 
+// 메가메뉴 서브 아이템 (주황 배경 내 흰색 밑줄 효과)
+function MegaSubMenuItem({
+  child,
+  isHighlighted,
+  onClick,
+}: {
+  child: SubMenuItem
+  isHighlighted: boolean
+  onClick: () => void
+}) {
+  const [isHovered, setIsHovered] = useState(false)
+
+  return (
+    <Link
+      href={child.href}
+      target={child.external ? '_blank' : undefined}
+      rel={child.external ? 'noopener noreferrer' : undefined}
+      onClick={onClick}
+      className={cn(
+        'block py-2.5 text-sm text-center cursor-pointer',
+        isHighlighted
+          ? 'text-white/90 hover:text-white'
+          : 'text-gray-600 hover:text-orange-500'
+      )}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <span
+        className="relative inline-block pb-1"
+        style={{
+          borderBottom:
+            isHovered && isHighlighted
+              ? '2px solid rgba(255,255,255,0.9)'
+              : '2px solid transparent',
+          transition: 'border-color 0.15s ease',
+        }}
+      >
+        {child.label}
+        {child.external && <ExternalLink className="w-3 h-3 inline ml-1" />}
+      </span>
+    </Link>
+  )
+}
+
 export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { data: session } = useSession()
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
-    }
+  // 메가메뉴 상태
+  const [hoveredColumn, setHoveredColumn] = useState<number | null>(null)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const closeTimerRef = useRef<NodeJS.Timeout | null>(null)
 
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 50)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  const clearCloseTimer = useCallback(() => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+  }, [])
+
+  const handleTitleEnter = useCallback(
+    (index: number) => {
+      clearCloseTimer()
+      setIsMenuOpen(true)
+      setHoveredColumn(index)
+    },
+    [clearCloseTimer]
+  )
+
+  const handleSubmenuColumnEnter = useCallback(
+    (index: number) => {
+      clearCloseTimer()
+      setHoveredColumn(index)
+    },
+    [clearCloseTimer]
+  )
+
+  const handleMenuEnter = useCallback(() => {
+    clearCloseTimer()
+  }, [clearCloseTimer])
+
+  const handleMenuLeave = useCallback(() => {
+    clearCloseTimer()
+    closeTimerRef.current = setTimeout(() => {
+      setIsMenuOpen(false)
+      setHoveredColumn(null)
+    }, 150)
+  }, [clearCloseTimer])
+
+  const handleLinkClick = useCallback(() => {
+    setIsMenuOpen(false)
+    setHoveredColumn(null)
+  }, [])
+
+  useEffect(() => {
+    return () => clearCloseTimer()
+  }, [clearCloseTimer])
+
   return (
     <nav
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white border-b border-gray-200',
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white',
         isScrolled && 'shadow-lg shadow-gray-200/50'
       )}
     >
-      <div className="max-w-7xl mx-auto px-4 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center group">
-            <Image
-              src={logoUrl || DEFAULT_LOGO}
-              alt="UniPivot"
-              width={160}
-              height={48}
-              priority
-              className="h-10 w-auto transition-opacity group-hover:opacity-80"
-            />
-          </Link>
+      {/* ── 헤더 바: 로고 + 메뉴 타이틀 + 인증 (한 줄) ── */}
+      <div className="border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link href="/" className="flex-shrink-0 flex items-center group">
+              <Image
+                src={logoUrl || DEFAULT_LOGO}
+                alt="UniPivot"
+                width={160}
+                height={48}
+                priority
+                className="h-10 w-auto transition-opacity group-hover:opacity-80"
+              />
+            </Link>
 
-          {/* Desktop Menu - Krafton style with underline animation */}
-          <div className="hidden lg:flex items-center gap-8">
-            {menuItems.map((item) =>
-              item.children ? (
-                <DropdownMenu key={item.label}>
-                  <DropdownMenuTrigger asChild>
-                    <button className="nav-link-animated text-gray-600 hover:text-[#FF6B35] font-medium transition-colors py-2 text-lg">
-                      {item.label}
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56 bg-white border-gray-200">
-                    <DropdownMenuLabel className="text-gray-500 text-xs uppercase tracking-wider">
-                      {item.label}
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator className="bg-gray-200" />
-                    {item.children.map((child) => (
-                      <DropdownMenuItem key={child.href} asChild className="focus:bg-[#FF6B35]/10 focus:text-gray-900">
-                        <Link
-                          href={child.href}
-                          target={child.external ? '_blank' : undefined}
-                          rel={child.external ? 'noopener noreferrer' : undefined}
-                          className="flex flex-col items-start gap-0.5 text-gray-600 hover:text-gray-900"
-                        >
-                          <span className="font-medium flex items-center gap-1">
-                            {child.label}
-                            {child.external && <ExternalLink className="w-3 h-3" />}
-                          </span>
-                          {child.description && (
-                            <span className="text-xs text-gray-400">{child.description}</span>
-                          )}
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <a
+            {/* Desktop: 메가메뉴 타이틀 링크 (로고와 같은 줄) */}
+            <div
+              className="hidden lg:flex items-center h-full"
+              onMouseLeave={handleMenuLeave}
+            >
+              {menuItems.map((item, index) => (
+                <div
                   key={item.label}
-                  href={item.href!}
-                  target={item.external ? '_blank' : undefined}
-                  rel={item.external ? 'noopener noreferrer' : undefined}
-                  className="nav-link-animated text-gray-600 hover:text-[#FF6B35] font-medium transition-colors py-2 text-lg flex items-center gap-1"
+                  className="relative h-full flex items-center"
+                  onMouseEnter={() => handleTitleEnter(index)}
                 >
-                  {item.label}
-                  {item.external && <ExternalLink className="w-3 h-3" />}
-                </a>
-              )
-            )}
-          </div>
-
-          {/* Auth Buttons - Desktop */}
-          <div className="hidden lg:flex items-center gap-3">
-            {session ? (
-              <>
-                {/* Notification */}
-                <div className="rounded-full">
-                  <NotificationDropdown />
-                </div>
-
-                {/* User Dropdown */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="flex items-center gap-2 focus:outline-none">
-                      <Avatar
-                        src={session.user?.image}
-                        name={session.user?.name || '사용자'}
-                        size="sm"
-                      />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-white border-gray-200">
-                    <DropdownMenuLabel>
-                      <div className="flex flex-col">
-                        <span className="font-medium text-gray-900">{session.user?.name}</span>
-                        <span className="text-xs text-gray-500 font-normal">{session.user?.email}</span>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator className="bg-gray-200" />
-                    <DropdownMenuItem asChild className="text-gray-600 focus:bg-[#FF6B35]/10 focus:text-gray-900">
-                      <Link href="/my" className="flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        마이페이지
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="text-gray-600 focus:bg-[#FF6B35]/10 focus:text-gray-900">
-                      <Link href="/my/settings" className="flex items-center gap-2">
-                        <Settings className="w-4 h-4" />
-                        설정
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-gray-200" />
-                    <DropdownMenuItem
-                      onClick={() => signOut()}
-                      className="text-red-500 focus:text-red-600 focus:bg-red-500/10"
+                  {item.children ? (
+                    <span
+                      className={cn(
+                        'px-5 text-sm font-semibold cursor-pointer transition-colors',
+                        hoveredColumn === index
+                          ? 'text-orange-500'
+                          : 'text-gray-600 hover:text-gray-900'
+                      )}
                     >
-                      <LogOut className="w-4 h-4 mr-2" />
-                      로그아웃
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
-            ) : (
-              <Link
-                href="/login"
-                className="px-5 py-2 bg-[#FF6B35] text-white rounded-lg font-medium hover:bg-[#E55A2B] transition-all"
-              >
-                로그인
-              </Link>
-            )}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <button className="lg:hidden p-2 text-gray-600 hover:text-[#FF6B35] transition-colors">
-                <Menu className="w-6 h-6" />
-              </button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[350px] p-0 bg-white border-l border-gray-200">
-              <SheetHeader className="p-4 border-b border-gray-200">
-                <SheetTitle className="flex items-center gap-2 text-[#FF6B35]">
-                  UniPivot
-                </SheetTitle>
-              </SheetHeader>
-
-              {/* Mobile Menu Content */}
-              <div className="flex-1 overflow-y-auto">
-                <Accordion type="multiple" className="w-full">
-                  {menuItems.map((item, index) =>
-                    item.children ? (
-                      <AccordionItem key={item.label} value={`item-${index}`} className="border-b border-gray-200">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-gray-50 text-gray-700">
-                          <span className="flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-lg bg-[#FF6B35]/20 flex items-center justify-center text-[#FF6B35]">
-                              {ICON_MAP[item.label]}
-                            </span>
-                            <span className="font-medium">{item.label}</span>
-                          </span>
-                        </AccordionTrigger>
-                        <AccordionContent className="pb-0">
-                          <div className="bg-gray-50">
-                            {item.children.map((child) => (
-                              <Link
-                                key={child.href}
-                                href={child.href}
-                                target={child.external ? '_blank' : undefined}
-                                rel={child.external ? 'noopener noreferrer' : undefined}
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="flex items-center gap-3 px-4 py-3 pl-16 text-gray-600 hover:text-[#FF6B35] hover:bg-gray-100 transition-colors border-t border-gray-100 first:border-t-0"
-                              >
-                                <div className="flex-1">
-                                  <span className="font-medium flex items-center gap-1">
-                                    {child.label}
-                                    {child.external && <ExternalLink className="w-3 h-3" />}
-                                  </span>
-                                  {child.description && (
-                                    <span className="block text-xs text-gray-400 mt-0.5">{child.description}</span>
-                                  )}
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    ) : (
-                      <div key={item.label} className="border-b border-gray-200">
-                        <a
-                          href={item.href!}
-                          target={item.external ? '_blank' : undefined}
-                          rel={item.external ? 'noopener noreferrer' : undefined}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-[#FF6B35] hover:bg-gray-50 transition-colors"
-                        >
-                          <span className="w-8 h-8 rounded-lg bg-[#FF6B35]/20 flex items-center justify-center text-[#FF6B35]">
-                            {ICON_MAP[item.label]}
-                          </span>
-                          <span className="font-medium flex-1">{item.label}</span>
-                          {item.external && <ExternalLink className="w-4 h-4 text-gray-400" />}
-                        </a>
-                      </div>
-                    )
+                      {item.label}
+                    </span>
+                  ) : (
+                    <a
+                      href={item.href!}
+                      target={item.external ? '_blank' : undefined}
+                      rel={item.external ? 'noopener noreferrer' : undefined}
+                      className={cn(
+                        'px-5 text-sm font-semibold transition-colors',
+                        hoveredColumn === index
+                          ? 'text-orange-500'
+                          : 'text-gray-600 hover:text-orange-500'
+                      )}
+                    >
+                      <span className="flex items-center gap-1">
+                        {item.label}
+                        {item.external && <ExternalLink className="w-3 h-3" />}
+                      </span>
+                    </a>
                   )}
-                </Accordion>
-              </div>
 
-              {/* Mobile Auth Section */}
-              <div className="p-4 border-t border-gray-200 mt-auto">
+                  {/* 하단 인디케이터 바 */}
+                  {hoveredColumn === index && (
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-gray-700" />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Right side: Auth (desktop) + Mobile menu */}
+            <div className="flex items-center gap-3">
+              {/* Auth Buttons - Desktop */}
+              <div className="hidden lg:flex items-center gap-3">
                 {session ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 px-2 py-2">
-                      <Avatar
-                        src={session.user?.image}
-                        name={session.user?.name || '사용자'}
-                        size="sm"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900 truncate">{session.user?.name}</p>
-                        <p className="text-xs text-gray-500 truncate">{session.user?.email}</p>
-                      </div>
+                  <>
+                    <div className="rounded-full">
+                      <NotificationDropdown />
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Link
-                        href="/my"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                      >
-                        <User className="w-4 h-4" />
-                        마이페이지
-                      </Link>
-                      <button
-                        onClick={() => signOut()}
-                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        로그아웃
-                      </button>
-                    </div>
-                  </div>
+
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="flex items-center gap-2 focus:outline-none">
+                          <Avatar
+                            src={session.user?.image}
+                            name={session.user?.name || '사용자'}
+                            size="sm"
+                          />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56 bg-white border-gray-200">
+                        <DropdownMenuLabel>
+                          <div className="flex flex-col">
+                            <span className="font-medium text-gray-900">{session.user?.name}</span>
+                            <span className="text-xs text-gray-500 font-normal">{session.user?.email}</span>
+                          </div>
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-gray-200" />
+                        <DropdownMenuItem asChild className="text-gray-600 focus:bg-[#FF6B35]/10 focus:text-gray-900">
+                          <Link href="/my" className="flex items-center gap-2">
+                            <User className="w-4 h-4" />
+                            마이페이지
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild className="text-gray-600 focus:bg-[#FF6B35]/10 focus:text-gray-900">
+                          <Link href="/my/settings" className="flex items-center gap-2">
+                            <Settings className="w-4 h-4" />
+                            설정
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-gray-200" />
+                        <DropdownMenuItem
+                          onClick={() => signOut()}
+                          className="text-red-500 focus:text-red-600 focus:bg-red-500/10"
+                        >
+                          <LogOut className="w-4 h-4 mr-2" />
+                          로그아웃
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </>
                 ) : (
                   <Link
                     href="/login"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 w-full py-3 bg-[#FF6B35] text-white rounded-lg font-medium hover:bg-[#E55A2B] transition-colors"
+                    className="px-5 py-2 bg-[#FF6B35] text-white rounded-lg font-medium hover:bg-[#E55A2B] transition-all"
                   >
-                    <User className="w-4 h-4" />
                     로그인
                   </Link>
                 )}
               </div>
-            </SheetContent>
-          </Sheet>
+
+              {/* Mobile Menu Button */}
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <button className="lg:hidden p-2 text-gray-600 hover:text-[#FF6B35] transition-colors">
+                    <Menu className="w-6 h-6" />
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px] sm:w-[350px] p-0 bg-white border-l border-gray-200">
+                  <SheetHeader className="p-4 border-b border-gray-200">
+                    <SheetTitle className="flex items-center gap-2 text-[#FF6B35]">
+                      UniPivot
+                    </SheetTitle>
+                  </SheetHeader>
+
+                  <div className="flex-1 overflow-y-auto">
+                    <Accordion type="multiple" className="w-full">
+                      {menuItems.map((item, index) =>
+                        item.children ? (
+                          <AccordionItem key={item.label} value={`item-${index}`} className="border-b border-gray-200">
+                            <AccordionTrigger className="px-4 py-3 hover:bg-gray-50 text-gray-700">
+                              <span className="flex items-center gap-3">
+                                <span className="w-8 h-8 rounded-lg bg-[#FF6B35]/20 flex items-center justify-center text-[#FF6B35]">
+                                  {ICON_MAP[item.label]}
+                                </span>
+                                <span className="font-medium">{item.label}</span>
+                              </span>
+                            </AccordionTrigger>
+                            <AccordionContent className="pb-0">
+                              <div className="bg-gray-50">
+                                {item.children.map((child) => (
+                                  <Link
+                                    key={child.href}
+                                    href={child.href}
+                                    target={child.external ? '_blank' : undefined}
+                                    rel={child.external ? 'noopener noreferrer' : undefined}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-3 pl-16 text-gray-600 hover:text-[#FF6B35] hover:bg-gray-100 transition-colors border-t border-gray-100 first:border-t-0"
+                                  >
+                                    <div className="flex-1">
+                                      <span className="font-medium flex items-center gap-1">
+                                        {child.label}
+                                        {child.external && <ExternalLink className="w-3 h-3" />}
+                                      </span>
+                                      {child.description && (
+                                        <span className="block text-xs text-gray-400 mt-0.5">{child.description}</span>
+                                      )}
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        ) : (
+                          <div key={item.label} className="border-b border-gray-200">
+                            <a
+                              href={item.href!}
+                              target={item.external ? '_blank' : undefined}
+                              rel={item.external ? 'noopener noreferrer' : undefined}
+                              onClick={() => setMobileMenuOpen(false)}
+                              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-[#FF6B35] hover:bg-gray-50 transition-colors"
+                            >
+                              <span className="w-8 h-8 rounded-lg bg-[#FF6B35]/20 flex items-center justify-center text-[#FF6B35]">
+                                {ICON_MAP[item.label]}
+                              </span>
+                              <span className="font-medium flex-1">{item.label}</span>
+                              {item.external && <ExternalLink className="w-4 h-4 text-gray-400" />}
+                            </a>
+                          </div>
+                        )
+                      )}
+                    </Accordion>
+                  </div>
+
+                  <div className="p-4 border-t border-gray-200 mt-auto">
+                    {session ? (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3 px-2 py-2">
+                          <Avatar
+                            src={session.user?.image}
+                            name={session.user?.name || '사용자'}
+                            size="sm"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-900 truncate">{session.user?.name}</p>
+                            <p className="text-xs text-gray-500 truncate">{session.user?.email}</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Link
+                            href="/my"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                          >
+                            <User className="w-4 h-4" />
+                            마이페이지
+                          </Link>
+                          <button
+                            onClick={() => signOut()}
+                            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors"
+                          >
+                            <LogOut className="w-4 h-4" />
+                            로그아웃
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Link
+                        href="/login"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center justify-center gap-2 w-full py-3 bg-[#FF6B35] text-white rounded-lg font-medium hover:bg-[#E55A2B] transition-colors"
+                      >
+                        <User className="w-4 h-4" />
+                        로그인
+                      </Link>
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── 메가 드롭다운 서브메뉴 패널 (Desktop Only) ── */}
+      <div
+        className={cn(
+          'hidden lg:block w-screen overflow-hidden transition-all duration-200 ease-out',
+          isMenuOpen ? 'max-h-96 opacity-100 shadow-lg' : 'max-h-0 opacity-0'
+        )}
+        onMouseEnter={handleMenuEnter}
+        onMouseLeave={handleMenuLeave}
+      >
+        <div className="max-w-7xl mx-auto grid grid-cols-5 border-t border-gray-100 cursor-pointer">
+          {menuItems.map((item, index) => {
+            const isHighlighted = hoveredColumn === index
+            return (
+              <div
+                key={item.label}
+                className={cn(
+                  'py-6 px-4 min-h-[200px] transition-colors duration-150',
+                  'border-r border-gray-100 last:border-r-0',
+                  isHighlighted
+                    ? 'bg-orange-500'
+                    : 'bg-white'
+                )}
+                onMouseEnter={() => handleSubmenuColumnEnter(index)}
+              >
+                {/* 컬럼 타이틀 */}
+                {item.external && item.href ? (
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      'block text-sm font-bold text-center pb-2 mb-3 border-b transition-colors',
+                      isHighlighted
+                        ? 'text-white border-white/40'
+                        : 'text-gray-900 border-gray-200'
+                    )}
+                  >
+                    <span className="flex items-center justify-center gap-1">
+                      {item.label}
+                      <ExternalLink className="w-3 h-3" />
+                    </span>
+                  </a>
+                ) : (
+                  <div
+                    className={cn(
+                      'text-sm font-bold text-center pb-2 mb-3 border-b transition-colors',
+                      isHighlighted
+                        ? 'text-white border-white/40'
+                        : 'text-gray-900 border-gray-200'
+                    )}
+                  >
+                    {item.label}
+                  </div>
+                )}
+
+                {/* 서브메뉴 아이템 */}
+                {item.children?.map((child) => (
+                  <MegaSubMenuItem
+                    key={child.href}
+                    child={child}
+                    isHighlighted={isHighlighted}
+                    onClick={handleLinkClick}
+                  />
+                ))}
+              </div>
+            )
+          })}
         </div>
       </div>
     </nav>

@@ -39,12 +39,13 @@ interface ProgramSectionContent {
 const defaultPrograms: ProgramItem[] = [
   {
     id: '1',
-    title: '남Book북한걸음',
+    title: '독서모임',
     description: '책을 통해 남북을 이해하는 독서모임. 매 시즌 8주간 진행되며, 남북 청년들이 함께 책을 읽고 토론합니다.',
     href: '/programs?type=BOOKCLUB',
     badge: '격주 1회 총 8회',
     icon: 'BookOpen',
     gradient: 'from-blue-500 to-indigo-600',
+    image: '/images/programs/bookclub.jpg',
   },
   {
     id: '2',
@@ -54,6 +55,7 @@ const defaultPrograms: ProgramItem[] = [
     badge: '월 1회',
     icon: 'Mic',
     gradient: 'from-purple-500 to-pink-600',
+    image: '/images/programs/seminar.jpg',
   },
   {
     id: '3',
@@ -63,6 +65,7 @@ const defaultPrograms: ProgramItem[] = [
     badge: '분기 1회',
     icon: 'MapPin',
     gradient: 'from-orange-500 to-red-600',
+    image: '/images/programs/kmove.jpg',
   },
   {
     id: '4',

@@ -65,7 +65,7 @@ export const sidebarMenuItems = {
     {
       title: '독서모임',
       items: [
-        { name: '책장', href: '/club/bookclub/bookshelf', icon: BookOpen },
+        { name: '유니피벗 진행도서', href: '/club/bookclub/bookshelf', icon: BookOpen },
         { name: '내 책장', href: '/club/bookclub/my-bookshelf', icon: BookOpen },
         { name: '소감나눔', href: '/club/bookclub/reviews', icon: MessageSquare },
         { name: '평점 높은 책', href: '/club/bookclub/top-rated', icon: Star },

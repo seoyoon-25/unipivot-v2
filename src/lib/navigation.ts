@@ -6,7 +6,7 @@ export const staticMenuItems = [
     label: '프로그램',
     children: [
       { label: '전체 프로그램', href: '/programs', description: '모든 프로그램 보기' },
-      { label: '독서모임', href: '/programs?type=BOOKCLUB', description: '남Book북한걸음' },
+      { label: '독서모임', href: '/programs?type=BOOKCLUB', description: '독서모임' },
       { label: '강연 및 세미나', href: '/programs?type=SEMINAR', description: '정기 교육 세미나' },
       { label: 'K-Move', href: '/programs?type=KMOVE', description: '현장 탐방' },
       { label: '토론회', href: '/programs?type=DEBATE', description: '주제별 토론회' },
@@ -103,18 +103,11 @@ export async function getNavigationMenu() {
     label: '프로그램',
     children: [
       { label: '전체 프로그램', href: '/programs', description: '모든 프로그램 보기' },
-      { label: '독서모임', href: '/programs?type=BOOKCLUB', description: '남Book북한걸음' },
+      { label: '독서모임', href: '/programs?type=BOOKCLUB', description: '독서모임' },
       { label: '강연 및 세미나', href: '/programs?type=SEMINAR', description: '정기 교육 세미나' },
       { label: 'K-Move', href: '/programs?type=KMOVE', description: '현장 탐방' },
       { label: '토론회', href: '/programs?type=DEBATE', description: '주제별 토론회' },
     ],
-  };
-
-  // 유니클럽 (하이라이트 단일 링크)
-  const clubMenu = {
-    label: '유니클럽',
-    href: '/club',
-    highlight: true,
   };
 
   // 리서치랩 (외부 링크)
@@ -127,7 +120,6 @@ export async function getNavigationMenu() {
   return [
     introMenu,
     programMenu,
-    clubMenu,
     communityMenu,
     participateMenu,
     researchLabMenu,

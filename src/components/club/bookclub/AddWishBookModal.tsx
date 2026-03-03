@@ -111,7 +111,7 @@ export default function AddWishBookModal({
                 : 'text-zinc-500'
             }`}
           >
-            책장에서 선택
+            진행도서에서 선택
           </button>
           <button
             onClick={() => setMode('custom')}
