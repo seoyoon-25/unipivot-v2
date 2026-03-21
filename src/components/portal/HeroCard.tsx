@@ -60,11 +60,11 @@ export default function HeroCard({ members, heroImage }: { members: number; hero
                 </p>
 
                 {/* 해시태그 */}
-                <div className="flex flex-wrap justify-end gap-2 mt-6">
+                <div className="flex flex-nowrap justify-end gap-1.5 md:gap-2 mt-6">
                   {MAIN_SERVICE.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-4 py-1.5 bg-white/[0.08] backdrop-blur-sm rounded-full text-white/60 text-sm border border-white/[0.05]"
+                      className="px-2.5 md:px-4 py-1 md:py-1.5 bg-white/[0.08] backdrop-blur-sm rounded-full text-white/60 text-xs md:text-sm border border-white/[0.05] whitespace-nowrap"
                     >
                       #{tag}
                     </span>
