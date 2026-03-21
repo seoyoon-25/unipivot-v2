@@ -105,20 +105,38 @@ export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  const [hoveredMenu, setHoveredMenu] = useState<string | null>(null)
+  const [highlightStyle, setHighlightStyle] = useState({ left: 0, width: 0 })
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const menuRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const { data: session } = useSession()
 
-  const handleMouseEnter = useCallback((label: string) => {
+  // 드롭다운이 있는 메뉴만 필터링
+  const dropdownMenus = menuItems.filter(item => item.children)
+
+  const handleMenuHover = useCallback((label: string) => {
+    setHoveredMenu(label)
+    const el = menuRefs.current[label]
+    if (el) {
+      setHighlightStyle({
+        left: el.offsetLeft,
+        width: el.offsetWidth,
+      })
+    }
+  }, [])
+
+  const handleDropdownEnter = useCallback(() => {
     if (dropdownTimeoutRef.current) {
       clearTimeout(dropdownTimeoutRef.current)
       dropdownTimeoutRef.current = null
     }
-    setActiveDropdown(label)
+    setActiveDropdown('open')
   }, [])
 
-  const handleMouseLeave = useCallback(() => {
+  const handleDropdownLeave = useCallback(() => {
     dropdownTimeoutRef.current = setTimeout(() => {
       setActiveDropdown(null)
+      setHoveredMenu(null)
     }, 100)
   }, [])
 
@@ -139,76 +157,52 @@ export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
   return (
     <nav
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white border-b border-gray-200',
-        isScrolled && 'shadow-lg shadow-gray-200/50'
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white',
+        isScrolled && 'shadow-lg shadow-gray-200/50',
+        !activeDropdown && 'border-b border-gray-200'
       )}
     >
-      <div className="max-w-7xl mx-auto px-4 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="flex items-center justify-between h-18 lg:h-22 py-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center group">
+          <Link href="/" className="flex items-center group pl-2">
             <Image
               src={logoUrl || DEFAULT_LOGO}
               alt="UniPivot"
-              width={160}
-              height={48}
+              width={180}
+              height={56}
               priority
-              className="h-10 w-auto transition-opacity group-hover:opacity-80"
+              className="h-12 w-auto transition-opacity group-hover:opacity-80"
             />
           </Link>
 
-          {/* Desktop Menu - Hover dropdown centered under each menu item */}
-          <div className="hidden lg:flex items-center gap-12">
+          {/* Desktop Menu - with sliding highlight dropdown */}
+          <div
+            className="hidden lg:flex items-center"
+            onMouseEnter={handleDropdownEnter}
+            onMouseLeave={handleDropdownLeave}
+          >
             {menuItems.map((item) =>
               item.children ? (
-                <div
+                <button
                   key={item.label}
-                  className="relative"
-                  onMouseEnter={() => handleMouseEnter(item.label)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <button className="nav-link-animated text-gray-600 hover:text-[#FF6B35] font-medium transition-colors py-2 text-lg">
-                    {item.label}
-                  </button>
-
-                  {/* Dropdown - positioned under each menu item */}
-                  {activeDropdown === item.label && (
-                    <div
-                      className="absolute top-full left-0 w-full mt-1 z-50 animate-dropdown-in rounded-b-md py-2"
-                      style={{
-                        backgroundColor: '#EA6C00',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                      }}
-                    >
-                      <div className="flex flex-col gap-1">
-                        {item.children.map((child) => (
-                          <Link
-                            key={child.href}
-                            href={child.href}
-                            target={child.external ? '_blank' : undefined}
-                            rel={child.external ? 'noopener noreferrer' : undefined}
-                            onClick={() => setActiveDropdown(null)}
-                            className="group relative px-4 py-2 rounded-md text-[#FFF7ED] text-sm font-medium transition-all duration-150 hover:bg-white/[0.12] hover:text-white whitespace-nowrap"
-                          >
-                            <span className="flex items-center gap-1">
-                              {child.label}
-                              {child.external && <ExternalLink className="w-3 h-3" />}
-                            </span>
-                            {/* Underline animation */}
-                            <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-[#FFEDD5] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-150 origin-left" />
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
+                  onMouseEnter={() => handleMenuHover(item.label)}
+                  className={cn(
+                    'px-6 py-4 text-base font-semibold tracking-wide transition-all duration-200',
+                    hoveredMenu === item.label
+                      ? 'bg-[#F97316] text-white'
+                      : 'text-gray-700 hover:text-gray-900'
                   )}
-                </div>
+                >
+                  {item.label}
+                </button>
               ) : (
                 <a
                   key={item.label}
                   href={item.href!}
                   target={item.external ? '_blank' : undefined}
                   rel={item.external ? 'noopener noreferrer' : undefined}
-                  className="nav-link-animated text-gray-600 hover:text-[#FF6B35] font-medium transition-colors py-2 text-lg flex items-center gap-1"
+                  className="px-6 py-4 text-base font-semibold tracking-wide text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1"
                 >
                   {item.label}
                   {item.external && <ExternalLink className="w-3 h-3" />}
@@ -216,6 +210,72 @@ export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
               )
             )}
           </div>
+
+          {/* Full-width Dropdown Panel with Sliding Highlight */}
+          {activeDropdown && (
+            <div
+              className="absolute left-0 right-0 top-full z-40 animate-dropdown-in"
+              style={{ marginTop: 0 }}
+              onMouseEnter={handleDropdownEnter}
+              onMouseLeave={handleDropdownLeave}
+            >
+              <div className="bg-white shadow-lg border-b border-gray-100">
+                <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                  <div className="relative">
+                    {/* Sliding Orange Highlight */}
+                    <div
+                      className="absolute top-0 bottom-0 bg-[#F97316] z-0"
+                      style={{
+                        left: hoveredMenu ? highlightStyle.left : 0,
+                        width: hoveredMenu ? highlightStyle.width : 0,
+                        opacity: hoveredMenu ? 1 : 0,
+                        transition: 'left 200ms ease, width 200ms ease, opacity 150ms ease',
+                      }}
+                    />
+
+                    {/* Menu Columns */}
+                    <div className="relative z-10 flex">
+                      {dropdownMenus.map((menu) => (
+                        <div
+                          key={menu.label}
+                          ref={(el) => { menuRefs.current[menu.label] = el }}
+                          onMouseEnter={() => handleMenuHover(menu.label)}
+                          className="flex-1 px-6 py-5"
+                        >
+                          {/* Submenu Items */}
+                          <div className="flex flex-col gap-1">
+                            {menu.children?.map((child) => (
+                              <Link
+                                key={child.href}
+                                href={child.href}
+                                target={child.external ? '_blank' : undefined}
+                                rel={child.external ? 'noopener noreferrer' : undefined}
+                                onClick={() => {
+                                  setActiveDropdown(null)
+                                  setHoveredMenu(null)
+                                }}
+                                className={cn(
+                                  'text-sm py-2 transition-all duration-150 border-b-2 border-transparent',
+                                  hoveredMenu === menu.label
+                                    ? 'text-white/80 hover:text-white hover:border-white/60'
+                                    : 'text-gray-500 hover:text-gray-800 hover:border-gray-400'
+                                )}
+                              >
+                                <span className="flex items-center gap-1">
+                                  {child.label}
+                                  {child.external && <ExternalLink className="w-3 h-3" />}
+                                </span>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Auth Buttons - Desktop */}
           <div className="hidden lg:flex items-center gap-3">
