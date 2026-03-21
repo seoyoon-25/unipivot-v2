@@ -417,54 +417,52 @@ export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
           </Sheet>
         </div>
 
-        {/* Desktop Dropdown Panel - 서울아트책보고 스타일 */}
+        {/* Desktop Dropdown Panel */}
         {isDropdownOpen && (
-          <div className="hidden lg:block bg-[#F97316] animate-dropdown-in">
-            <div className="relative">
-              {/* 슬라이딩 하이라이트 */}
-              {highlightStyle && (
+          <div className="hidden lg:block bg-white shadow-lg border-t border-gray-100 animate-dropdown-in">
+            <div className="relative flex">
+              {dropdownMenus.map((menu) => (
                 <div
-                  className="absolute top-0 bottom-0 bg-[#EA580C] pointer-events-none"
-                  style={{
-                    left: highlightStyle.left,
-                    width: highlightStyle.width,
-                    transition: 'left 200ms ease, width 200ms ease',
-                  }}
-                />
-              )}
+                  key={menu.label}
+                  ref={(el) => { menuRefs.current[menu.label] = el }}
+                  onMouseEnter={() => handleColumnEnter(menu.label)}
+                  className={cn(
+                    'relative flex-1 min-w-[200px] px-8 py-6 transition-colors duration-200',
+                    hoveredMenu === menu.label ? 'bg-[#F97316]' : 'bg-white'
+                  )}
+                >
+                  {/* 카테고리 타이틀 */}
+                  <h3 className={cn(
+                    'font-bold text-sm mb-4 tracking-wide transition-colors duration-200',
+                    hoveredMenu === menu.label ? 'text-white' : 'text-gray-800'
+                  )}>
+                    {menu.label}
+                  </h3>
 
-              {/* 메뉴 컬럼들 */}
-              <div className="flex">
-                {dropdownMenus.map((menu) => (
-                  <div
-                    key={menu.label}
-                    ref={(el) => { menuRefs.current[menu.label] = el }}
-                    onMouseEnter={() => handleColumnEnter(menu.label)}
-                    className="relative flex-1 min-w-[200px] px-8 py-6"
-                  >
-                    {/* 카테고리 타이틀 */}
-                    <h3 className="text-white font-bold text-sm mb-4 tracking-wide">
-                      {menu.label}
-                    </h3>
-                    {/* 서브메뉴 아이템들 */}
-                    <ul className="space-y-2">
-                      {menu.children?.map((child) => (
-                        <li key={child.href}>
-                          <Link
-                            href={child.href}
-                            target={child.external ? '_blank' : undefined}
-                            rel={child.external ? 'noopener noreferrer' : undefined}
-                            className="flex items-center gap-1 text-white/80 hover:text-white text-sm transition-colors"
-                          >
-                            {child.label}
-                            {child.external && <ExternalLink className="w-3 h-3" />}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
+                  {/* 서브메뉴 아이템들 */}
+                  <ul className="space-y-2">
+                    {menu.children?.map((child) => (
+                      <li key={child.href}>
+                        <Link
+                          href={child.href}
+                          target={child.external ? '_blank' : undefined}
+                          rel={child.external ? 'noopener noreferrer' : undefined}
+                          className={cn(
+                            'group flex items-center gap-1 text-sm transition-all duration-150',
+                            'border-b-2 border-transparent pb-0.5',
+                            hoveredMenu === menu.label
+                              ? 'text-white/70 hover:text-white hover:border-white'
+                              : 'text-gray-500 hover:text-gray-900 hover:border-gray-400'
+                          )}
+                        >
+                          {child.label}
+                          {child.external && <ExternalLink className="w-3 h-3" />}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           </div>
         )}
