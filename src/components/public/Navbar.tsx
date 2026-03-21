@@ -104,9 +104,9 @@ const DEFAULT_LOGO = '/images/logo.png'
 export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null)
-  const [highlightStyle, setHighlightStyle] = useState({ left: 0, width: 0 })
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [highlightStyle, setHighlightStyle] = useState<{ left: number; width: number } | null>(null)
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const menuRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const { data: session } = useSession()
@@ -114,8 +114,25 @@ export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
   // 드롭다운이 있는 메뉴만 필터링
   const dropdownMenus = menuItems.filter(item => item.children)
 
-  const handleMenuHover = useCallback((label: string) => {
+  const handleMenuEnter = useCallback((label: string) => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current)
+      dropdownTimeoutRef.current = null
+    }
     setHoveredMenu(label)
+    setIsDropdownOpen(true)
+  }, [])
+
+  const handleMenuLeave = useCallback(() => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setHoveredMenu(null)
+      setIsDropdownOpen(false)
+      setHighlightStyle(null)
+    }, 150)
+  }, [])
+
+  // 드롭다운 컬럼 호버 시 하이라이트 위치 업데이트
+  const handleColumnEnter = useCallback((label: string) => {
     const el = menuRefs.current[label]
     if (el) {
       setHighlightStyle({
@@ -123,21 +140,7 @@ export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
         width: el.offsetWidth,
       })
     }
-  }, [])
-
-  const handleDropdownEnter = useCallback(() => {
-    if (dropdownTimeoutRef.current) {
-      clearTimeout(dropdownTimeoutRef.current)
-      dropdownTimeoutRef.current = null
-    }
-    setActiveDropdown('open')
-  }, [])
-
-  const handleDropdownLeave = useCallback(() => {
-    dropdownTimeoutRef.current = setTimeout(() => {
-      setActiveDropdown(null)
-      setHoveredMenu(null)
-    }, 100)
+    setHoveredMenu(label)
   }, [])
 
   useEffect(() => {
@@ -154,128 +157,82 @@ export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
     }
   }, [])
 
+  // 초기 하이라이트 위치 설정
+  useEffect(() => {
+    if (isDropdownOpen && hoveredMenu) {
+      const el = menuRefs.current[hoveredMenu]
+      if (el && !highlightStyle) {
+        setHighlightStyle({
+          left: el.offsetLeft,
+          width: el.offsetWidth,
+        })
+      }
+    }
+  }, [isDropdownOpen, hoveredMenu, highlightStyle])
+
   return (
     <nav
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white',
         isScrolled && 'shadow-lg shadow-gray-200/50',
-        !activeDropdown && 'border-b border-gray-200'
+        !isDropdownOpen && 'border-b border-gray-200'
       )}
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between h-18 lg:h-22 py-4">
+      {/* 메뉴바 + 드롭다운 전체 Wrapper */}
+      <div onMouseLeave={handleMenuLeave}>
+        {/* 상단 메뉴바 */}
+        <div className="flex items-center justify-between px-6 lg:px-10">
           {/* Logo */}
-          <Link href="/" className="flex items-center group pl-2">
+          <Link href="/" className="flex items-center group py-5">
             <Image
               src={logoUrl || DEFAULT_LOGO}
               alt="UniPivot"
               width={180}
               height={56}
               priority
-              className="h-12 w-auto transition-opacity group-hover:opacity-80"
+              className="h-11 w-auto transition-opacity group-hover:opacity-80"
             />
           </Link>
 
-          {/* Desktop Menu - with sliding highlight dropdown */}
-          <div
-            className="hidden lg:flex items-center"
-            onMouseEnter={handleDropdownEnter}
-            onMouseLeave={handleDropdownLeave}
-          >
+          {/* Desktop Menu - 상단 메뉴 버튼들 */}
+          <div className="hidden lg:flex items-stretch h-full">
             {menuItems.map((item) =>
               item.children ? (
-                <button
+                <div
                   key={item.label}
-                  onMouseEnter={() => handleMenuHover(item.label)}
+                  onMouseEnter={() => handleMenuEnter(item.label)}
                   className={cn(
-                    'px-6 py-4 text-base font-semibold tracking-wide transition-all duration-200',
+                    'flex items-center px-7 cursor-pointer transition-colors duration-150',
                     hoveredMenu === item.label
-                      ? 'bg-[#F97316] text-white'
-                      : 'text-gray-700 hover:text-gray-900'
+                      ? 'bg-[#F97316]'
+                      : 'bg-transparent'
                   )}
                 >
-                  {item.label}
-                </button>
+                  <span
+                    className={cn(
+                      'text-[15px] font-bold tracking-wide transition-colors duration-150',
+                      hoveredMenu === item.label
+                        ? 'text-white'
+                        : 'text-gray-800'
+                    )}
+                  >
+                    {item.label}
+                  </span>
+                </div>
               ) : (
                 <a
                   key={item.label}
                   href={item.href!}
                   target={item.external ? '_blank' : undefined}
                   rel={item.external ? 'noopener noreferrer' : undefined}
-                  className="px-6 py-4 text-base font-semibold tracking-wide text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1"
+                  className="flex items-center px-7 text-[15px] font-bold tracking-wide text-gray-800 hover:text-[#F97316] transition-colors"
                 >
                   {item.label}
-                  {item.external && <ExternalLink className="w-3 h-3" />}
+                  {item.external && <ExternalLink className="w-3 h-3 ml-1" />}
                 </a>
               )
             )}
           </div>
-
-          {/* Full-width Dropdown Panel with Sliding Highlight */}
-          {activeDropdown && (
-            <div
-              className="absolute left-0 right-0 top-full z-40 animate-dropdown-in"
-              style={{ marginTop: 0 }}
-              onMouseEnter={handleDropdownEnter}
-              onMouseLeave={handleDropdownLeave}
-            >
-              <div className="bg-white shadow-lg border-b border-gray-100">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                  <div className="relative">
-                    {/* Sliding Orange Highlight */}
-                    <div
-                      className="absolute top-0 bottom-0 bg-[#F97316] z-0"
-                      style={{
-                        left: hoveredMenu ? highlightStyle.left : 0,
-                        width: hoveredMenu ? highlightStyle.width : 0,
-                        opacity: hoveredMenu ? 1 : 0,
-                        transition: 'left 200ms ease, width 200ms ease, opacity 150ms ease',
-                      }}
-                    />
-
-                    {/* Menu Columns */}
-                    <div className="relative z-10 flex">
-                      {dropdownMenus.map((menu) => (
-                        <div
-                          key={menu.label}
-                          ref={(el) => { menuRefs.current[menu.label] = el }}
-                          onMouseEnter={() => handleMenuHover(menu.label)}
-                          className="flex-1 px-6 py-5"
-                        >
-                          {/* Submenu Items */}
-                          <div className="flex flex-col gap-1">
-                            {menu.children?.map((child) => (
-                              <Link
-                                key={child.href}
-                                href={child.href}
-                                target={child.external ? '_blank' : undefined}
-                                rel={child.external ? 'noopener noreferrer' : undefined}
-                                onClick={() => {
-                                  setActiveDropdown(null)
-                                  setHoveredMenu(null)
-                                }}
-                                className={cn(
-                                  'text-sm py-2 transition-all duration-150 border-b-2 border-transparent',
-                                  hoveredMenu === menu.label
-                                    ? 'text-white/80 hover:text-white hover:border-white/60'
-                                    : 'text-gray-500 hover:text-gray-800 hover:border-gray-400'
-                                )}
-                              >
-                                <span className="flex items-center gap-1">
-                                  {child.label}
-                                  {child.external && <ExternalLink className="w-3 h-3" />}
-                                </span>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Auth Buttons - Desktop */}
           <div className="hidden lg:flex items-center gap-3">
@@ -459,6 +416,58 @@ export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
             </SheetContent>
           </Sheet>
         </div>
+
+        {/* Desktop Dropdown Panel - 서울아트책보고 스타일 */}
+        {isDropdownOpen && (
+          <div className="hidden lg:block bg-[#F97316] animate-dropdown-in">
+            <div className="relative">
+              {/* 슬라이딩 하이라이트 */}
+              {highlightStyle && (
+                <div
+                  className="absolute top-0 bottom-0 bg-[#EA580C] pointer-events-none"
+                  style={{
+                    left: highlightStyle.left,
+                    width: highlightStyle.width,
+                    transition: 'left 200ms ease, width 200ms ease',
+                  }}
+                />
+              )}
+
+              {/* 메뉴 컬럼들 */}
+              <div className="flex">
+                {dropdownMenus.map((menu) => (
+                  <div
+                    key={menu.label}
+                    ref={(el) => { menuRefs.current[menu.label] = el }}
+                    onMouseEnter={() => handleColumnEnter(menu.label)}
+                    className="relative flex-1 min-w-[200px] px-8 py-6"
+                  >
+                    {/* 카테고리 타이틀 */}
+                    <h3 className="text-white font-bold text-sm mb-4 tracking-wide">
+                      {menu.label}
+                    </h3>
+                    {/* 서브메뉴 아이템들 */}
+                    <ul className="space-y-2">
+                      {menu.children?.map((child) => (
+                        <li key={child.href}>
+                          <Link
+                            href={child.href}
+                            target={child.external ? '_blank' : undefined}
+                            rel={child.external ? 'noopener noreferrer' : undefined}
+                            className="flex items-center gap-1 text-white/80 hover:text-white text-sm transition-colors"
+                          >
+                            {child.label}
+                            {child.external && <ExternalLink className="w-3 h-3" />}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   )
