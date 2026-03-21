@@ -11,7 +11,10 @@ export const metadata: Metadata = {
     template: '%s | 유니피벗',
   },
   icons: {
-    icon: '/images/favicon.png',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/images/favicon.png', type: 'image/png' },
+    ],
     apple: '/images/favicon.png',
   },
   description: '남북청년이 함께 새로운 한반도를 만들어갑니다. UniPivot은 남북청년 교류와 통일 관련 프로그램을 운영하는 비영리 단체입니다.',
