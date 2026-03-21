@@ -12,11 +12,6 @@ export const staticMenuItems = [
       { label: '토론회', href: '/programs?type=DEBATE', description: '주제별 토론회' },
     ],
   },
-  {
-    label: '리서치랩',
-    href: 'https://lab.bestcome.org',
-    external: true,
-  },
 ];
 
 // DB 기반 동적 메뉴 (소개, 소통마당, 함께하기)
@@ -117,20 +112,12 @@ export async function getNavigationMenu() {
     highlight: true,
   };
 
-  // 리서치랩 (외부 링크)
-  const researchLabMenu = {
-    label: '리서치랩',
-    href: 'https://lab.bestcome.org',
-    external: true,
-  };
-
   return [
     introMenu,
     programMenu,
     clubMenu,
     communityMenu,
     participateMenu,
-    researchLabMenu,
   ];
 }
 
