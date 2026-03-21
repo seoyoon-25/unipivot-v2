@@ -4,10 +4,9 @@ import { cn } from '@/lib/utils'
 import { Menu, User, LogOut, Settings, Info, BookOpen, MessageSquare, Heart, FlaskConical, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { Avatar } from '@/components/ui'
-import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -110,7 +109,23 @@ const DEFAULT_LOGO = '/images/logo.png'
 export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const { data: session } = useSession()
+
+  const handleMouseEnter = useCallback((label: string) => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current)
+      dropdownTimeoutRef.current = null
+    }
+    setActiveDropdown(label)
+  }, [])
+
+  const handleMouseLeave = useCallback(() => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setActiveDropdown(null)
+    }, 100)
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -118,7 +133,12 @@ export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
     }
 
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      if (dropdownTimeoutRef.current) {
+        clearTimeout(dropdownTimeoutRef.current)
+      }
+    }
   }, [])
 
   return (
@@ -142,41 +162,20 @@ export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
             />
           </Link>
 
-          {/* Desktop Menu - Krafton style with underline animation */}
+          {/* Desktop Menu - Hover dropdown with full-width mega menu */}
           <div className="hidden lg:flex items-center gap-8">
             {menuItems.map((item) =>
               item.children ? (
-                <DropdownMenu key={item.label}>
-                  <DropdownMenuTrigger asChild>
-                    <button className="nav-link-animated text-gray-600 hover:text-[#FF6B35] font-medium transition-colors py-2 text-lg">
-                      {item.label}
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56 bg-white border-gray-200">
-                    <DropdownMenuLabel className="text-gray-500 text-xs uppercase tracking-wider">
-                      {item.label}
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator className="bg-gray-200" />
-                    {item.children.map((child) => (
-                      <DropdownMenuItem key={child.href} asChild className="focus:bg-[#FF6B35]/10 focus:text-gray-900">
-                        <Link
-                          href={child.href}
-                          target={child.external ? '_blank' : undefined}
-                          rel={child.external ? 'noopener noreferrer' : undefined}
-                          className="flex flex-col items-start gap-0.5 text-gray-600 hover:text-gray-900"
-                        >
-                          <span className="font-medium flex items-center gap-1">
-                            {child.label}
-                            {child.external && <ExternalLink className="w-3 h-3" />}
-                          </span>
-                          {child.description && (
-                            <span className="text-xs text-gray-400">{child.description}</span>
-                          )}
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div
+                  key={item.label}
+                  className="relative"
+                  onMouseEnter={() => handleMouseEnter(item.label)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <button className="nav-link-animated text-gray-600 hover:text-[#FF6B35] font-medium transition-colors py-2 text-lg">
+                    {item.label}
+                  </button>
+                </div>
               ) : (
                 <a
                   key={item.label}
@@ -191,6 +190,47 @@ export function Navbar({ menuItems = defaultMenuItems, logoUrl }: NavbarProps) {
               )
             )}
           </div>
+
+          {/* Full-width Hover Dropdown */}
+          {activeDropdown && (
+            <div
+              className="absolute left-0 right-0 top-full z-40"
+              onMouseEnter={() => handleMouseEnter(activeDropdown)}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div
+                className="animate-dropdown-in"
+                style={{
+                  backgroundColor: '#EA6C00',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                }}
+              >
+                <div className="max-w-7xl mx-auto px-6 py-4">
+                  <div className="flex items-center justify-center gap-8">
+                    {menuItems
+                      .find((item) => item.label === activeDropdown)
+                      ?.children?.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          target={child.external ? '_blank' : undefined}
+                          rel={child.external ? 'noopener noreferrer' : undefined}
+                          onClick={() => setActiveDropdown(null)}
+                          className="group relative px-4 py-2 rounded-md text-[#FFF7ED] text-sm font-medium transition-all duration-150 hover:bg-white/[0.12] hover:text-white"
+                        >
+                          <span className="flex items-center gap-1">
+                            {child.label}
+                            {child.external && <ExternalLink className="w-3 h-3" />}
+                          </span>
+                          {/* Underline animation */}
+                          <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-[#FFEDD5] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-150 origin-left" />
+                        </Link>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Auth Buttons - Desktop */}
           <div className="hidden lg:flex items-center gap-3">
